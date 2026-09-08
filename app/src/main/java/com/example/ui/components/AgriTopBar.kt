@@ -17,8 +17,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -37,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
@@ -52,7 +57,8 @@ fun AgriTopBar(
     currentLanguage: AppLanguage,
     onLanguageSelected: (AppLanguage) -> Unit,
     onHelpClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isCompact: Boolean = false
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -65,13 +71,18 @@ fun AgriTopBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .padding(horizontal = 16.dp, vertical = if (isCompact) 6.dp else 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Left: Branding & Greeting & Location
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+            // Left: Branding & Greeting & Location (responsive to width and compact mode)
+            if (isCompact) {
+                Row(
+                    modifier = Modifier
+                        .weight(1f, fill = false)
+                        .padding(end = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Box(
                         modifier = Modifier
                             .size(30.dp)
@@ -79,46 +90,112 @@ fun AgriTopBar(
                             .background(AgriGreenPrimary),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "🌱",
-                            fontSize = 16.sp
+                        Icon(
+                            imageVector = Icons.Default.Spa,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.ExtraBold,
                         color = AgriGreenPrimary
                     )
-                }
-                Spacer(modifier = Modifier.height(2.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = stringResource(R.string.greeting_farmer),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = AgriTextPrimary
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = "•",
                         color = AgriTextSecondary
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = stringResource(R.string.greeting_farmer),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriTextPrimary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Icon(
                         imageVector = Icons.Default.LocationOn,
                         contentDescription = null,
                         tint = AgriGreenPrimary,
-                        modifier = Modifier.size(15.dp)
+                        modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
                         text = stringResource(R.string.location_nagpur),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Medium,
-                        color = AgriTextSecondary
+                        color = AgriTextSecondary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .weight(1f, fill = false)
+                        .padding(end = 8.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(34.dp)
+                                .clip(CircleShape)
+                                .background(AgriGreenPrimary),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Spa,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.app_name),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = AgriGreenPrimary
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = stringResource(R.string.greeting_farmer),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextPrimary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "•",
+                            color = AgriTextSecondary
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = null,
+                            tint = AgriGreenPrimary,
+                            modifier = Modifier.size(15.dp)
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                        Text(
+                            text = stringResource(R.string.location_nagpur),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Medium,
+                            color = AgriTextSecondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
 
@@ -136,9 +213,11 @@ fun AgriTopBar(
                             .padding(horizontal = 14.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "🌐",
-                            fontSize = 14.sp
+                        Icon(
+                            imageVector = Icons.Default.Language,
+                            contentDescription = null,
+                            tint = AgriGreenPrimary,
+                            modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
@@ -148,11 +227,11 @@ fun AgriTopBar(
                             color = AgriGreenPrimary
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "▾",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = AgriGreenPrimary
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            tint = AgriGreenPrimary,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
 
@@ -175,11 +254,11 @@ fun AgriTopBar(
                                         )
                                         if (lang == currentLanguage) {
                                             Spacer(modifier = Modifier.width(10.dp))
-                                            Text(
-                                                text = "✓",
-                                                color = AgriGreenPrimary,
-                                                fontWeight = FontWeight.ExtraBold,
-                                                fontSize = 16.sp
+                                            Icon(
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = null,
+                                                tint = AgriGreenPrimary,
+                                                modifier = Modifier.size(18.dp)
                                             )
                                         }
                                     }

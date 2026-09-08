@@ -11,6 +11,12 @@
     <string name="nav_help">मदद</string>
 
     <!-- Home Sections -->
+    <string name="home_hierarchy_step1">1. आपके पास क्या उपज है?</string>
+    <string name="home_hierarchy_step2">2. आज इसका क्या भाव है?</string>
+    <string name="home_hierarchy_step3">3. आपको कहाँ बेचना चाहिए?</string>
+    <string name="home_hierarchy_step4">4. अब आपको क्या करना चाहिए?</string>
+    <string name="label_why_sell_here">यहाँ क्यों बेचें?</string>
+    <string name="home_browse_buyers_sub">गारंटीड भुगतान वाले सत्यापित खरीदार खोजें</string>
     <string name="section_your_produce">आपकी उपज</string>
     <string name="crop_soybean">सोयाबीन</string>
     <string name="produce_qty_50">50 क्विंटल</string>
@@ -112,6 +118,8 @@
     <string name="summary_produce_label">आपकी उपज का विवरण</string>
     <string name="btn_find_best_option">सर्वोत्तम बिक्री विकल्प खोजें</string>
     <string name="home_greeting_subtitle">आपकी फसल के लिए सही बाजार और सही समय</string>
+    <string name="home_primary_question">मुझे अपनी उपज कहाँ बेचनी चाहिए?</string>
+    <string name="home_primary_question_sub">आपकी फसल के लिए आज का सर्वोत्तम सत्यापित अवसर यहाँ है</string>
     <string name="verified_by_mandi">सत्यापित खरीदार • तुरंत भुगतान</string>
 
     <!-- Phase 2: Selling Flow Step Headers & Subtitles -->

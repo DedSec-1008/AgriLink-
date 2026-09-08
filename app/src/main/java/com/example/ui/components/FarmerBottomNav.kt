@@ -16,9 +16,17 @@ import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -125,6 +133,113 @@ fun FarmerBottomNavigation(
                         unselectedTextColor = AgriTextSecondary
                     )
                 )
+            }
+        }
+    }
+}
+
+/**
+ * Adaptive Navigation Rail for landscape orientations.
+ * Provides comfortable vertical spacing, >=48dp touch targets, and preserves
+ * the exact same 5 farmer destinations with high-contrast visual clarity.
+ */
+@Composable
+fun FarmerNavigationRail(
+    currentDestination: FarmerNavDestination,
+    onNavigate: (FarmerNavDestination) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    NavigationRail(
+        modifier = modifier.shadow(6.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = AgriTextPrimary,
+        header = {
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 12.dp)
+                    .size(40.dp)
+                    .background(AgriGreenPrimary, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Spa,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+    ) {
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            FarmerNavDestination.values().forEach { destination ->
+                val isSelected = currentDestination == destination
+                val isSell = destination == FarmerNavDestination.SELL
+
+                if (isSell) {
+                    NavigationRailItem(
+                        selected = isSelected,
+                        onClick = { onNavigate(destination) },
+                        icon = {
+                            Box(
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .background(
+                                        color = if (isSelected) AgriGoldSecondary else AgriGreenPrimary,
+                                        shape = CircleShape
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = destination.selectedIcon,
+                                    contentDescription = stringResource(destination.titleRes),
+                                    tint = Color.White,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        },
+                        label = {
+                            Text(
+                                text = stringResource(destination.titleRes),
+                                fontWeight = FontWeight.ExtraBold,
+                                color = if (isSelected) AgriGoldSecondary else AgriGreenPrimary,
+                                fontSize = 11.sp
+                            )
+                        },
+                        colors = NavigationRailItemDefaults.colors(
+                            indicatorColor = Color.Transparent
+                        )
+                    )
+                } else {
+                    NavigationRailItem(
+                        selected = isSelected,
+                        onClick = { onNavigate(destination) },
+                        icon = {
+                            Icon(
+                                imageVector = if (isSelected) destination.selectedIcon else destination.unselectedIcon,
+                                contentDescription = stringResource(destination.titleRes),
+                                modifier = Modifier.size(22.dp)
+                            )
+                        },
+                        label = {
+                            Text(
+                                text = stringResource(destination.titleRes),
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                                fontSize = 11.sp
+                            )
+                        },
+                        colors = NavigationRailItemDefaults.colors(
+                            selectedIconColor = AgriGreenPrimary,
+                            selectedTextColor = AgriGreenPrimary,
+                            indicatorColor = AgriGreenContainer,
+                            unselectedIconColor = AgriTextSecondary,
+                            unselectedTextColor = AgriTextSecondary
+                        )
+                    )
+                }
             }
         }
     }

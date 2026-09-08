@@ -5,6 +5,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +17,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Spa
+import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.TrendingDown
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Card
@@ -69,19 +74,27 @@ fun WhatIHaveCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.section_your_produce),
+                    text = stringResource(R.string.home_hierarchy_step1),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.ExtraBold,
                     color = AgriTextSecondary,
                     letterSpacing = 0.8.sp
                 )
-                Box(
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
                         .background(AgriGreenContainer)
                         .border(1.dp, AgriHeroGreenBorder, RoundedCornerShape(8.dp))
                         .padding(horizontal = 8.dp, vertical = 3.dp)
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = AgriGreenPrimary,
+                        modifier = Modifier.size(13.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(produce.qualityRes),
                         style = MaterialTheme.typography.labelSmall,
@@ -91,31 +104,40 @@ fun WhatIHaveCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(52.dp)
                         .clip(CircleShape)
-                        .background(AgriGreenContainer),
+                        .background(AgriGreenContainer)
+                        .border(1.dp, AgriHeroGreenBorder, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = produce.iconEmoji, fontSize = 24.sp)
+                    Icon(
+                        imageVector = Icons.Default.Spa,
+                        contentDescription = stringResource(produce.cropNameRes),
+                        tint = AgriGreenPrimary,
+                        modifier = Modifier.size(28.dp)
+                    )
                 }
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(14.dp))
                 Column {
                     Text(
                         text = stringResource(produce.cropNameRes),
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = AgriTextPrimary
+                        fontWeight = FontWeight.ExtraBold,
+                        color = AgriTextPrimary,
+                        fontSize = 22.sp
                     )
+                    Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "${produce.quantityQuintals} ${stringResource(R.string.unit_quintals)}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = AgriTextSecondary
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriGreenPrimary,
+                        fontSize = 17.sp
                     )
                 }
             }
@@ -146,33 +168,53 @@ fun TodaysPriceCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.section_todays_price),
+                    text = stringResource(R.string.home_hierarchy_step2),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.ExtraBold,
                     color = AgriTextSecondary,
                     letterSpacing = 0.8.sp
                 )
-                Text(
-                    text = stringResource(priceInfo.marketNameRes),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = AgriTextPrimary
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Storefront,
+                        contentDescription = null,
+                        tint = AgriGreenPrimary,
+                        modifier = Modifier.size(15.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(priceInfo.marketNameRes),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriTextPrimary
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            Row(
+            @OptIn(ExperimentalLayoutApi::class)
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = "₹${priceInfo.pricePerQuintal} / quintal",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = AgriTextPrimary
-                )
+                Row(verticalAlignment = Alignment.Baseline) {
+                    Text(
+                        text = "₹${priceInfo.pricePerQuintal}",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = AgriTextPrimary,
+                        fontSize = 28.sp
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "/ quintal",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = AgriTextSecondary
+                    )
+                }
 
                 // Price Direction Indicator
                 Row(
@@ -180,7 +222,7 @@ fun TodaysPriceCard(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
                         .background(if (priceInfo.isPositiveChange) AgriGreenContainer else AgriGoldContainer)
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .padding(horizontal = 8.dp, vertical = 5.dp)
                 ) {
                     Icon(
                         imageVector = if (priceInfo.isPositiveChange) Icons.Default.TrendingUp else Icons.Default.TrendingDown,

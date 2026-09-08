@@ -1,22 +1,33 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# AgriLink (Web)
 
-# Run and deploy your AI Studio app
+An agricultural market-linkage & price discovery platform ported from Android to React, TypeScript, and Tailwind CSS.
 
-This contains everything you need to run your app locally.
+## Features Preserved & Implemented
+- **Home & Dashboard**: Produce summary, active transaction lifecycle banner, and quick-action navigation.
+- **Selling Flow**: Multi-step lot creation wizard (Crop selection, Quality grading, Quantity & Storage timing, Net realization calculator, Buyer matching).
+- **Mandi Market Prices**: Real-time mandi rates across regional agricultural markets with positive/negative trend indicators and search filter.
+- **My Lots & Competitive Offers**: Lot listings, status badges, incoming buyer offers with transparent net realization breakdown (deducting transport & handling).
+- **6-Stage Transaction Lifecycle**:
+  1. Offer Accepted
+  2. Logistics Booking (Vehicle selection, transporter rating, cost per quintal)
+  3. Produce Pickup & Dispatch confirmation
+  4. Delivery Tracking with timeline checkpoints
+  5. Payment Tracking & Delay Flagging
+  6. Sale Completion & Buyer Rating
+- **Buyers Directory & Profiles**: Verified badges, payment turnaround records, accepted commodities, and historical reliability.
+- **Support & Grievances**: Category-based help desk, emergency helpline, and formal issue escalation modal.
+- **Multi-Language Localization**: Full dynamic localization in English (`en`), Hindi (`hi`), and Marathi (`mr`).
 
-View your app in AI Studio: https://ai.studio/apps/8e89fd4e-5fd9-421e-8ac9-b3e4c824b26d
+## Tech Stack
+- **Framework**: React 18, Vite, TypeScript
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **Animations & Effects**: Motion & Canvas Confetti
+- **State Management**: React Context (`AgriContext`) with LocalStorage persistence
 
-## Run Locally
-
-**Prerequisites:**  [Android Studio](https://developer.android.com/studio)
-
-
-1. Open Android Studio
-2. Select **Open** and choose the directory containing this project
-3. Allow Android Studio to fix any incompatibilities as it imports the project.
-4. Create a file named `.env` in the project directory and set `GEMINI_API_KEY` in that file to your Gemini API key (see `.env.example` for an example)
-5. Remove this line from the app's `build.gradle.kts` file: `signingConfig = signingConfigs.getByName("debugConfig")`
-6. Run the app on an emulator or physical device
-7. If you have already published your app in AI Studio, please [request upload key reset](https://support.google.com/googleplay/android-developer/answer/9842756#zippy=%2Crequest-an-upload-key-reset) in Google Play Console.
+## Running Locally
+```bash
+npm install
+npm run dev
+```
+The application will start on `http://localhost:3000`.

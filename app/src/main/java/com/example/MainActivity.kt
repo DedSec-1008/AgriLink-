@@ -1,10 +1,12 @@
 package com.example
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -15,10 +17,15 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.data.AgriRepository
 import com.example.data.AppLanguage
 import com.example.data.MockAgriRepository
@@ -26,6 +33,7 @@ import com.example.data.createLocalizedContext
 import com.example.ui.components.AgriTopBar
 import com.example.ui.components.FarmerBottomNavigation
 import com.example.ui.components.FarmerNavDestination
+import com.example.ui.components.FarmerNavigationRail
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.rememberCoroutineScope
 import com.example.ui.screens.AcceptOfferConfirmScreen
@@ -69,6 +77,49 @@ sealed interface AppScreen {
     data object YourSales : AppScreen
 }
 
+val AppScreenSaver = Saver<AppScreen, String>(
+    save = { screen ->
+        when (screen) {
+            is AppScreen.MainNav -> "MainNav"
+            is AppScreen.BuyersDirectory -> "BuyersDirectory"
+            is AppScreen.BuyerProfile -> "BuyerProfile:${screen.buyerId}"
+            is AppScreen.LotDetails -> "LotDetails:${screen.lotId}"
+            is AppScreen.Offers -> "Offers:${screen.lotId}"
+            is AppScreen.OfferDetails -> "OfferDetails:${screen.offerId}"
+            is AppScreen.AcceptOfferConfirm -> "AcceptOfferConfirm:${screen.offerId}"
+            is AppScreen.TransactionPreview -> "TransactionPreview:${screen.transactionId}"
+            is AppScreen.TransactionDetail -> "TransactionDetail:${screen.transactionId}"
+            is AppScreen.ArrangeTransport -> "ArrangeTransport:${screen.transactionId}"
+            is AppScreen.ProducePickup -> "ProducePickup:${screen.transactionId}"
+            is AppScreen.DeliveryTracking -> "DeliveryTracking:${screen.transactionId}"
+            is AppScreen.PaymentTracking -> "PaymentTracking:${screen.transactionId}"
+            is AppScreen.SaleCompleted -> "SaleCompleted:${screen.transactionId}"
+            is AppScreen.YourSales -> "YourSales"
+        }
+    },
+    restore = { serialized ->
+        val parts = serialized.split(":", limit = 2)
+        when (parts[0]) {
+            "MainNav" -> AppScreen.MainNav
+            "BuyersDirectory" -> AppScreen.BuyersDirectory
+            "BuyerProfile" -> AppScreen.BuyerProfile(parts.getOrElse(1) { "" })
+            "LotDetails" -> AppScreen.LotDetails(parts.getOrElse(1) { "" })
+            "Offers" -> AppScreen.Offers(parts.getOrElse(1) { "" })
+            "OfferDetails" -> AppScreen.OfferDetails(parts.getOrElse(1) { "" })
+            "AcceptOfferConfirm" -> AppScreen.AcceptOfferConfirm(parts.getOrElse(1) { "" })
+            "TransactionPreview" -> AppScreen.TransactionPreview(parts.getOrElse(1) { "" })
+            "TransactionDetail" -> AppScreen.TransactionDetail(parts.getOrElse(1) { "" })
+            "ArrangeTransport" -> AppScreen.ArrangeTransport(parts.getOrElse(1) { "" })
+            "ProducePickup" -> AppScreen.ProducePickup(parts.getOrElse(1) { "" })
+            "DeliveryTracking" -> AppScreen.DeliveryTracking(parts.getOrElse(1) { "" })
+            "PaymentTracking" -> AppScreen.PaymentTracking(parts.getOrElse(1) { "" })
+            "SaleCompleted" -> AppScreen.SaleCompleted(parts.getOrElse(1) { "" })
+            "YourSales" -> AppScreen.YourSales
+            else -> AppScreen.MainNav
+        }
+    }
+)
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,12 +134,22 @@ class MainActivity : ComponentActivity() {
 fun AgriLinkFarmerApp() {
     var selectedLanguage by rememberSaveable { mutableStateOf(AppLanguage.ENGLISH) }
     var currentDestination by rememberSaveable { mutableStateOf(FarmerNavDestination.HOME) }
-    var currentScreen by remember { mutableStateOf<AppScreen>(AppScreen.MainNav) }
+    var currentScreen by rememberSaveable(stateSaver = AppScreenSaver) { mutableStateOf<AppScreen>(AppScreen.MainNav) }
 
     val repository: AgriRepository = remember { MockAgriRepository() }
-    val sellingViewModel: SellingViewModel = remember { SellingViewModel(repository) }
+    val sellingViewModel: SellingViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return SellingViewModel(repository) as T
+            }
+        }
+    )
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     val baseContext = LocalContext.current
     val localizedContext = remember(selectedLanguage) {
@@ -97,31 +158,8 @@ fun AgriLinkFarmerApp() {
 
     CompositionLocalProvider(LocalContext provides localizedContext) {
         AgriLinkTheme {
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                topBar = {
-                    AgriTopBar(
-                        currentLanguage = selectedLanguage,
-                        onLanguageSelected = { selectedLanguage = it },
-                        onHelpClicked = {
-                            currentScreen = AppScreen.MainNav
-                            currentDestination = FarmerNavDestination.HELP
-                        }
-                    )
-                },
-                bottomBar = {
-                    FarmerBottomNavigation(
-                        currentDestination = currentDestination,
-                        onNavigate = {
-                            currentDestination = it
-                            currentScreen = AppScreen.MainNav
-                        }
-                    )
-                },
-                snackbarHost = { SnackbarHost(snackbarHostState) }
-            ) { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    when (val screen = currentScreen) {
+            val appScreenContent: @Composable () -> Unit = {
+                when (val screen = currentScreen) {
                         is AppScreen.MainNav -> {
                             when (currentDestination) {
                                 FarmerNavDestination.HOME -> FarmerHomeScreen(
@@ -385,6 +423,66 @@ fun AgriLinkFarmerApp() {
                                 }
                             )
                         }
+                    }
+                }
+            }
+
+            if (isLandscape) {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    FarmerNavigationRail(
+                        currentDestination = currentDestination,
+                        onNavigate = {
+                            currentDestination = it
+                            currentScreen = AppScreen.MainNav
+                        }
+                    )
+                    Scaffold(
+                        modifier = Modifier.weight(1f),
+                        topBar = {
+                            AgriTopBar(
+                                currentLanguage = selectedLanguage,
+                                onLanguageSelected = { selectedLanguage = it },
+                                onHelpClicked = {
+                                    currentScreen = AppScreen.MainNav
+                                    currentDestination = FarmerNavDestination.HELP
+                                },
+                                isCompact = true
+                            )
+                        },
+                        snackbarHost = { SnackbarHost(snackbarHostState) }
+                    ) { innerPadding ->
+                        Box(modifier = Modifier.padding(innerPadding)) {
+                            appScreenContent()
+                        }
+                    }
+                }
+            } else {
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    topBar = {
+                        AgriTopBar(
+                            currentLanguage = selectedLanguage,
+                            onLanguageSelected = { selectedLanguage = it },
+                            onHelpClicked = {
+                                currentScreen = AppScreen.MainNav
+                                currentDestination = FarmerNavDestination.HELP
+                            },
+                            isCompact = false
+                        )
+                    },
+                    bottomBar = {
+                        FarmerBottomNavigation(
+                            currentDestination = currentDestination,
+                            onNavigate = {
+                                currentDestination = it
+                                currentScreen = AppScreen.MainNav
+                            }
+                        )
+                    },
+                    snackbarHost = { SnackbarHost(snackbarHostState) }
+                ) { innerPadding ->
+                    Box(modifier = Modifier.padding(innerPadding)) {
+                        appScreenContent()
                     }
                 }
             }

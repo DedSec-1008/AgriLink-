@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -52,7 +53,7 @@ fun QuickActionGrid(
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = stringResource(R.string.section_quick_actions),
+            text = stringResource(R.string.home_hierarchy_step4),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.ExtraBold,
             color = AgriTextSecondary,
@@ -120,7 +121,7 @@ private fun QuickActionButton(
 ) {
     Card(
         modifier = modifier
-            .height(78.dp)
+            .heightIn(min = 76.dp)
             .then(
                 if (!isPrimary) Modifier.border(1.5.dp, AgriCardBorder, RoundedCornerShape(14.dp))
                 else Modifier

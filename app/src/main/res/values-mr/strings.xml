@@ -11,6 +11,12 @@
     <string name="nav_help">मदत</string>
 
     <!-- Home Sections -->
+    <string name="home_hierarchy_step1">1. तुमच्याकडे काय शेतमाल आहे?</string>
+    <string name="home_hierarchy_step2">2. आज याचा काय भाव आहे?</string>
+    <string name="home_hierarchy_step3">3. तुम्ही कुठे विकले पाहिजे?</string>
+    <string name="home_hierarchy_step4">4. आता तुम्ही पुढे काय करावे?</string>
+    <string name="label_why_sell_here">येथे का विकावे?</string>
+    <string name="home_browse_buyers_sub">खात्रीशीर पेमेंट देणारे पडताळणी झालेले खरेदीदार शोधा</string>
     <string name="section_your_produce">तुमचा शेतमाल</string>
     <string name="crop_soybean">सोयाबीन</string>
     <string name="produce_qty_50">50 क्विंटल</string>
@@ -112,6 +118,8 @@
     <string name="summary_produce_label">आपल्या शेतमालाचा तपशील</string>
     <string name="btn_find_best_option">सर्वोत्तम विक्री पर्याय शोधा</string>
     <string name="home_greeting_subtitle">आपल्या शेतमालासाठी योग्य भाव आणि अचूक माहिती</string>
+    <string name="home_primary_question">मी माझा शेतमाल कुठे विकू?</string>
+    <string name="home_primary_question_sub">तुमच्या शेतमालासाठी आजची सर्वोत्तम खात्रीशीर संधी येथे आहे</string>
     <string name="verified_by_mandi">खात्रीशीर खरेदीदार • जलद पेमेंट</string>
 
     <!-- Phase 2: Selling Flow Step Headers & Subtitles -->

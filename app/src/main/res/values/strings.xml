@@ -11,6 +11,12 @@
     <string name="nav_help">Help</string>
 
     <!-- Home Sections -->
+    <string name="home_hierarchy_step1">1. WHAT DO YOU HAVE?</string>
+    <string name="home_hierarchy_step2">2. WHAT IS IT WORTH TODAY?</string>
+    <string name="home_hierarchy_step3">3. WHERE SHOULD YOU SELL?</string>
+    <string name="home_hierarchy_step4">4. WHAT SHOULD YOU DO NEXT?</string>
+    <string name="label_why_sell_here">Why sell here?</string>
+    <string name="home_browse_buyers_sub">Find verified buyers with guaranteed payment</string>
     <string name="section_your_produce">YOUR PRODUCE</string>
     <string name="crop_soybean">Soybean</string>
     <string name="produce_qty_50">50 quintals</string>
@@ -112,6 +118,8 @@
     <string name="summary_produce_label">SUMMARY OF YOUR PRODUCE</string>
     <string name="btn_find_best_option">Find Best Option</string>
     <string name="home_greeting_subtitle">Market intelligence for your harvest</string>
+    <string name="home_primary_question">Where should I sell my produce?</string>
+    <string name="home_primary_question_sub">Here is today\'s best verified opportunity for your crop</string>
     <string name="verified_by_mandi">Verified Buyer • Instant Payment</string>
 
     <!-- Phase 2: Selling Flow Step Headers & Subtitles -->
