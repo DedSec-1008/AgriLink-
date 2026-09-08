@@ -297,19 +297,14 @@ fun AgriLinkFarmerApp() {
                                 currentScreen = AppScreen.MainNav
                                 currentDestination = FarmerNavDestination.MY_LOTS
                             }
-                            TransactionDetailScreen(
+                            TransactionPreviewScreen(
                                 transactionId = screen.transactionId,
                                 repository = repository,
                                 onBack = {
                                     currentScreen = AppScreen.MainNav
                                     currentDestination = FarmerNavDestination.MY_LOTS
                                 },
-                                onNavigateToLogistics = { txId -> currentScreen = AppScreen.ArrangeTransport(txId) },
-                                onNavigateToPickup = { txId -> currentScreen = AppScreen.ProducePickup(txId) },
-                                onNavigateToDelivery = { txId -> currentScreen = AppScreen.DeliveryTracking(txId) },
-                                onNavigateToPayment = { txId -> currentScreen = AppScreen.PaymentTracking(txId) },
-                                onNavigateToCompleted = { txId -> currentScreen = AppScreen.SaleCompleted(txId) },
-                                onNavigateToYourSales = { currentScreen = AppScreen.YourSales },
+                                onArrangeTransport = { currentScreen = AppScreen.ArrangeTransport(screen.transactionId) },
                                 onGoToMyLots = {
                                     currentScreen = AppScreen.MainNav
                                     currentDestination = FarmerNavDestination.MY_LOTS
@@ -317,8 +312,7 @@ fun AgriLinkFarmerApp() {
                                 onGoToHome = {
                                     currentScreen = AppScreen.MainNav
                                     currentDestination = FarmerNavDestination.HOME
-                                },
-                                snackbarHostState = snackbarHostState
+                                }
                             )
                         }
                         is AppScreen.TransactionDetail -> {

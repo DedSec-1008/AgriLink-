@@ -1,33 +1,28 @@
-# AgriLink (Web)
+# AgriLink (Android)
 
-An agricultural market-linkage & price discovery platform ported from Android to React, TypeScript, and Tailwind CSS.
+An intelligent agricultural market-linkage & price discovery platform for farmers and FPOs, built natively for Android using Kotlin and Jetpack Compose.
 
-## Features Preserved & Implemented
-- **Home & Dashboard**: Produce summary, active transaction lifecycle banner, and quick-action navigation.
-- **Selling Flow**: Multi-step lot creation wizard (Crop selection, Quality grading, Quantity & Storage timing, Net realization calculator, Buyer matching).
-- **Mandi Market Prices**: Real-time mandi rates across regional agricultural markets with positive/negative trend indicators and search filter.
-- **My Lots & Competitive Offers**: Lot listings, status badges, incoming buyer offers with transparent net realization breakdown (deducting transport & handling).
-- **6-Stage Transaction Lifecycle**:
-  1. Offer Accepted
+## Core Features
+- **Farmer Home Dashboard**: Summary of current produce, regional market price indicators, active transaction tracking card, and quick navigation.
+- **Sell Produce Wizard**: Multi-step lot creation flow including commodity selection, quality grading, quantity & storage timing, net realization calculation, and buyer recommendation matching.
+- **Regional Market Prices**: Real-time mandi price discovery with daily price trend changes and crop filtering.
+- **My Lots & Competitive Offers**: Lot listings, status badges, incoming buyer offers with transparent net realization breakdown (deducting transport and handling costs).
+- **End-to-End 6-Stage Transaction Lifecycle**:
+  1. Offer Accepted & Contract Confirmation
   2. Logistics Booking (Vehicle selection, transporter rating, cost per quintal)
   3. Produce Pickup & Dispatch confirmation
-  4. Delivery Tracking with timeline checkpoints
+  4. Delivery Tracking with stage milestones
   5. Payment Tracking & Delay Flagging
   6. Sale Completion & Buyer Rating
-- **Buyers Directory & Profiles**: Verified badges, payment turnaround records, accepted commodities, and historical reliability.
-- **Support & Grievances**: Category-based help desk, emergency helpline, and formal issue escalation modal.
-- **Multi-Language Localization**: Full dynamic localization in English (`en`), Hindi (`hi`), and Marathi (`mr`).
+- **Verified Buyers Directory**: Verified buyer profiles, payment turnaround metrics, on-time payment records, and demand listings.
+- **Help Desk & Grievance Support**: Category guides, 24x7 toll-free helpline, voice assistant entry point, and formal issue escalation dialog.
+- **Multilingual Support**: Dynamic runtime localization in English, Hindi (हिन्दी), and Marathi (मराठी).
+- **Adaptive Layouts**: Full support for portrait and landscape orientations (Navigation Rail).
 
 ## Tech Stack
-- **Framework**: React 18, Vite, TypeScript
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **Animations & Effects**: Motion & Canvas Confetti
-- **State Management**: React Context (`AgriContext`) with LocalStorage persistence
+- **Framework**: Android SDK 36, Kotlin 2.0+
+- **UI Toolkit**: Jetpack Compose, Material Design 3 (M3)
+- **Architecture**: MVVM with Repository Pattern, StateFlow & Coroutines
+- **Testing**: Local JVM tests using Robolectric and Roborazzi screenshot tests
+- **Build System**: Gradle (Kotlin DSL)
 
-## Running Locally
-```bash
-npm install
-npm run dev
-```
-The application will start on `http://localhost:3000`.
