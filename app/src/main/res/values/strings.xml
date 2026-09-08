@@ -1,0 +1,459 @@
+<resources>
+    <string name="app_name">AgriLink</string>
+    <string name="greeting_farmer">Namaste, Farmer</string>
+    <string name="location_nagpur">Nagpur, Maharashtra</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_prices">Prices</string>
+    <string name="nav_sell">Sell</string>
+    <string name="nav_my_lots">My Lots</string>
+    <string name="nav_help">Help</string>
+
+    <!-- Home Sections -->
+    <string name="section_your_produce">YOUR PRODUCE</string>
+    <string name="crop_soybean">Soybean</string>
+    <string name="produce_qty_50">50 quintals</string>
+    <string name="produce_quality_good">Good quality</string>
+
+    <string name="section_todays_price">TODAY\'S PRICE</string>
+    <string name="price_soybean_modal">₹4,850 / quintal</string>
+    <string name="market_nagpur">Nagpur Market</string>
+    <string name="price_change_yesterday">↑ ₹120 from yesterday</string>
+
+    <!-- Best Selling Opportunity Card -->
+    <string name="badge_best_opportunity">BEST SELLING OPPORTUNITY</string>
+    <string name="buyer_abc_foods">ABC Foods</string>
+    <string name="verified_buyer_tag">Verified Buyer</string>
+    <string name="label_quoted_price">Quoted price</string>
+    <string name="quoted_price_val">₹4,850 / quintal</string>
+    <string name="label_after_expenses">In your pocket after expenses</string>
+    <string name="net_price_val">₹4,700 / quintal</string>
+    <string name="label_estimated_total">Total estimated payout</string>
+    <string name="total_payout_val">₹2,35,000</string>
+    <string name="status_strong_rec">Strong recommendation</string>
+    <string name="reason_verified_buyer">Verified buyer</string>
+    <string name="reason_good_price">Good price</string>
+    <string name="reason_affordable_transport">Affordable transport</string>
+    <string name="reason_suitable_qty">Suitable quantity match</string>
+    <string name="btn_find_best_place">Find Best Place to Sell</string>
+    <string name="btn_sell_here">Sell Here</string>
+    <string name="label_net_realization_hero">NET IN YOUR POCKET</string>
+    <string name="label_deduction_note">₹150/q estimated transport &amp; mandi fee</string>
+
+    <!-- Quick Actions -->
+    <string name="section_quick_actions">QUICK ACTIONS</string>
+    <string name="action_check_prices">Check Prices</string>
+    <string name="action_sell_produce">Sell Produce</string>
+    <string name="action_my_lots">My Lots</string>
+    <string name="action_get_help">Get Help</string>
+
+    <!-- Prices Screen -->
+    <string name="title_prices">Market Prices</string>
+    <string name="subtitle_prices">Latest modal rates from nearby agricultural mandis</string>
+    <string name="market_katol">Katol Market</string>
+    <string name="price_katol">₹4,780 / quintal</string>
+    <string name="market_hingna">Hingna Market</string>
+    <string name="price_hingna">₹4,720 / quintal</string>
+    <string name="market_amravati">Amravati APMC</string>
+    <string name="price_amravati">₹4,820 / quintal</string>
+    <string name="status_steady">Stable trend</string>
+
+    <!-- Sell Screen -->
+    <string name="title_where_to_sell">Where should I sell?</string>
+    <string name="subtitle_where_to_sell">Tell us about your produce and we\'ll help you find the best option.</string>
+    <string name="step1_crop_heading">Step 1: What do you want to sell?</string>
+    <string name="crop_wheat">Wheat</string>
+    <string name="crop_rice">Rice</string>
+    <string name="crop_maize">Maize</string>
+    <string name="crop_other">Other</string>
+    <string name="step2_qty_heading">Step 2: How much do you have?</string>
+    <string name="unit_quintals">quintals</string>
+    <string name="step3_quality_heading">Step 3: What is the quality?</string>
+    <string name="quality_good">Good</string>
+    <string name="quality_average">Average</string>
+    <string name="quality_poor">Poor</string>
+    <string name="btn_continue">Continue</string>
+    <string name="btn_back">Back</string>
+    <string name="btn_reset_flow">Start Over</string>
+
+    <!-- My Lots Screen -->
+    <string name="title_my_lots">My Lots</string>
+    <string name="subtitle_my_lots">Active produce lots and received offers</string>
+    <string name="lot_id_sample">Lot #AG-1024</string>
+    <string name="lot_status_waiting">Waiting for offer</string>
+    <string name="btn_view_lot">View Lot</string>
+    <string name="empty_lots_title">No active lots</string>
+    <string name="empty_lots_desc">You haven\'t listed any crops yet. Tap Sell to get started!</string>
+    <string name="btn_create_first_lot">Create a Lot</string>
+
+    <!-- Help Screen -->
+    <string name="title_help">Help &amp; Support</string>
+    <string name="subtitle_help">Guides and assistance for farmers</string>
+    <string name="ask_agrilink_title">🎙 Ask AgriLink</string>
+    <string name="ask_agrilink_desc">Tap to ask questions in Hindi, Marathi, or English (Voice Assistant)</string>
+    <string name="cat_selling">Selling</string>
+    <string name="cat_price">Price</string>
+    <string name="cat_buyer">Buyer</string>
+    <string name="cat_lot">Lot</string>
+    <string name="cat_transport">Transport</string>
+    <string name="cat_payment">Payment</string>
+    <string name="cat_verification">Buyer Verification</string>
+    <string name="cat_using_app">Using AgriLink</string>
+
+    <!-- Additional UI Polish Strings -->
+    <string name="section_nearby_mandi_rates">Nearby Mandi Rates</string>
+    <string name="label_buyer">Buyer</string>
+    <string name="btn_new_lot">+ New Lot</string>
+    <string name="helpline_label">Kisan Helpline (Toll-Free)</string>
+    <string name="helpline_timing">1800-180-1551 • 6 AM to 10 PM</string>
+    <string name="step4_title">Step 4: Confirm Details &amp; Find Best Market</string>
+    <string name="location_produce_label">Current Produce Location</string>
+    <string name="summary_produce_label">SUMMARY OF YOUR PRODUCE</string>
+    <string name="btn_find_best_option">Find Best Option</string>
+    <string name="home_greeting_subtitle">Market intelligence for your harvest</string>
+    <string name="verified_by_mandi">Verified Buyer • Instant Payment</string>
+
+    <!-- Phase 2: Selling Flow Step Headers & Subtitles -->
+    <string name="sell_step_progress">Step %1$d of 5</string>
+    <string name="step1_title">What do you want to sell?</string>
+    <string name="step1_subtitle">Choose your crop.</string>
+    <string name="step2_title">How much do you have?</string>
+    <string name="step2_subtitle">Enter estimated quantity in quintals.</string>
+    <string name="step3_title">How is the quality?</string>
+    <string name="step3_subtitle">Choose the quality of your harvest.</string>
+    <string name="step4_heading">Where is your produce?</string>
+    <string name="step4_subtitle">We use your location to estimate nearby markets and transport costs.</string>
+    <string name="step5_title">When will it be ready?</string>
+    <string name="step5_subtitle">Tell us when your harvest will be available.</string>
+    
+    <!-- Quality Descriptions -->
+    <string name="quality_good_desc">Clean and good quality</string>
+    <string name="quality_average_desc">Normal quality</string>
+    <string name="quality_poor_desc">Lower quality</string>
+    <string name="quality_photo_helper">📷 Add photo for quality help (Coming soon)</string>
+    
+    <!-- Location Choices -->
+    <string name="loc_use_my_location">Use my location</string>
+    <string name="loc_choose_location">Choose location</string>
+    <string name="loc_nagpur">Nagpur, Maharashtra</string>
+    <string name="loc_katol">Katol, Maharashtra</string>
+    <string name="loc_amravati">Amravati, Maharashtra</string>
+    <string name="loc_wardha">Wardha, Maharashtra</string>
+    <string name="loc_hingna">Hingna, Maharashtra</string>
+
+    <!-- Ready Timing Options -->
+    <string name="timing_ready_now">Ready now</string>
+    <string name="timing_ready_now_desc">Harvested and packed</string>
+    <string name="timing_few_days">Ready in a few days</string>
+    <string name="timing_few_days_desc">Available in 3 to 7 days</string>
+    <string name="timing_choose_date">Choose date / Later</string>
+    <string name="timing_choose_date_desc">Next week or upcoming harvest</string>
+
+    <!-- Review Step -->
+    <string name="review_title">Review your produce</string>
+    <string name="review_subtitle">Check your details before finding the best options.</string>
+    <string name="review_header_produce">YOUR PRODUCE</string>
+    <string name="review_edit">Edit</string>
+    <string name="review_crop_label">Crop</string>
+    <string name="review_quantity_label">Quantity</string>
+    <string name="review_quality_label">Quality</string>
+    <string name="review_location_label">Location</string>
+    <string name="review_timing_label">Ready</string>
+
+    <!-- Analysis / Loading State -->
+    <string name="analysis_loading_title">Finding the best option for you…</string>
+    <string name="analysis_check_prices">Checking today\'s prices</string>
+    <string name="analysis_compare_markets">Comparing nearby markets</string>
+    <string name="analysis_check_demand">Checking buyer demand</string>
+    <string name="analysis_estimate_transport">Estimating transport cost</string>
+    <string name="analysis_compare_realization">Comparing expected realization</string>
+
+    <!-- Recommendations Screen -->
+    <string name="rec_results_title">BEST OPTIONS FOR YOU</string>
+    <string name="rec_results_subtitle">Ranked by expected payout in your pocket after all expenses</string>
+    <string name="badge_top_pick">⭐ BEST OPTION</string>
+    <string name="badge_other_options">Other good options</string>
+    <string name="label_quoted_price_short">Quoted price</string>
+    <string name="label_after_expenses_short">After estimated expenses</string>
+    <string name="label_estimated_total_short">Estimated total</string>
+    <string name="btn_why_this_option">Why this option?</string>
+    <string name="btn_hide_details">Hide details</string>
+    <string name="detail_distance">Distance</string>
+    <string name="detail_transport">Transport estimate</string>
+    <string name="detail_handling">Handling &amp; mandi fees</string>
+    <string name="detail_payment">Payment reliability</string>
+
+    <!-- Buyers & Opportunities -->
+    <string name="buyer_nagpur_mandi">Nagpur Mandi (APMC)</string>
+    <string name="buyer_xyz_traders">XYZ Traders</string>
+    <string name="buyer_type_verified_direct">Verified Direct Buyer</string>
+    <string name="buyer_type_regulated_apmc">Regulated APMC Mandi</string>
+    <string name="buyer_type_local_trader">Licensed Local Trader</string>
+    <string name="status_good_option">Good option</string>
+    <string name="payment_same_day">Same-day bank transfer</string>
+    <string name="payment_mandi_cycle">1–2 days Mandi payment</string>
+    <string name="payment_on_weighment">Payment upon weighment</string>
+
+    <string name="reason_highest_payout">Highest net payout in your pocket</string>
+    <string name="reason_low_transport">Lowest transport deduction</string>
+    <string name="reason_quality_match">Premium for clean, good quality</string>
+    <string name="reason_payment_history">100% reliable payment history</string>
+    <string name="reason_regulated_market">Government regulated mandi</string>
+    <string name="reason_quick_unloading">Fast weighment and quick unloading</string>
+    <string name="reason_suitable_quality">Suitable quality</string>
+    <string name="reason_reliable_buyer">Reliable buyer</string>
+
+    <!-- Confirm Sell Step -->
+    <string name="confirm_sell_title">Sell to %1$s</string>
+    <string name="confirm_sell_prompt">Are you ready to create this lot?</string>
+    <string name="label_sell_to">SELL TO</string>
+    <string name="label_expected_amount_after_expenses">Expected amount after expenses</string>
+    <string name="label_estimated_transport">Estimated transport</string>
+    <string name="label_note_share_details">Creating a lot shares your produce details with this verified buyer to receive formal offers.</string>
+    <string name="breakdown_title">CALCULATION BREAKDOWN</string>
+    <string name="breakdown_gross">Gross Quoted Amount</string>
+    <string name="breakdown_transport">Estimated Transport</string>
+    <string name="breakdown_handling">Estimated Handling &amp; Fees</string>
+    <string name="breakdown_net">Expected In Your Pocket</string>
+    <string name="btn_create_lot">Create Lot</string>
+    <string name="btn_go_back">Go Back</string>
+
+    <!-- Lot Created Success Screen -->
+    <string name="title_lot_created">LOT CREATED</string>
+    <string name="success_lot_created">Lot created successfully!</string>
+    <string name="success_lot_msg">Your lot has been listed and is waiting for buyer offers.</string>
+    <string name="success_lot_id">Lot ID: %1$s</string>
+    <string name="btn_view_my_lot">View My Lot</string>
+    <string name="btn_done">Done</string>
+
+    <!-- Accessibility / Stepper Descriptions -->
+    <string name="desc_decrease_qty">Decrease quantity</string>
+    <string name="desc_increase_qty">Increase quantity</string>
+    <string name="type_exact_quantity">Type exact quantity</string>
+    <string name="hide_manual_entry">Hide manual entry</string>
+    <string name="label_exact_quintals">Exact quintals</string>
+
+    <!-- Empty / Error States -->
+    <string name="empty_rec_title">We couldn\'t find a good match right now</string>
+    <string name="empty_rec_desc">Try changing your quantity, quality, or ready date to see more opportunities.</string>
+    <string name="error_rec_title">We couldn\'t find a good option right now.</string>
+    <string name="btn_try_again">Try Again</string>
+
+    <!-- Phase 3: Buyers & Directory -->
+    <string name="title_buyers">Buyers</string>
+    <string name="subtitle_buyers">Verified buyers looking to purchase produce directly</string>
+    <string name="buyer_nagpur_agro">Nagpur Agro</string>
+    <string name="buyer_verified">Verified buyer</string>
+    <string name="buyer_verification_pending">Verification pending</string>
+    <string name="buyer_not_verified">Not verified</string>
+    <string name="buyer_needs">Needs: %1$s • %2$d quintals</string>
+    <string name="buyer_needs_range">Needs: %1$s • %2$d–%3$d quintals</string>
+    <string name="buyer_offer_rate">Offer: ₹%1$s / quintal</string>
+    <string name="buyer_payment_speed">Payment: %1$s</string>
+    <string name="payment_within_2_days">Usually within 2 days</string>
+    <string name="payment_within_3_days">Usually within 3 days</string>
+    <string name="payment_within_4_days">Usually within 4 days</string>
+    <string name="btn_view_buyer">View Buyer</string>
+    <string name="btn_sell_to_buyer">Sell to this buyer</string>
+    <string name="btn_view_demand">View demand</string>
+    <string name="section_current_demand">CURRENT DEMAND</string>
+    <string name="section_price">PRICE</string>
+    <string name="section_payment">PAYMENT</string>
+    <string name="section_transactions">TRANSACTIONS</string>
+    <string name="section_farmer_rating">FARMER RATING</string>
+    <string name="section_more_about_buyer">MORE ABOUT THIS BUYER</string>
+    <string name="buyer_stat_ontime">%1$d%% payments on time</string>
+    <string name="buyer_stat_completed_tx">%1$d completed transactions</string>
+    <string name="buyer_stat_dispute_rate">%1$.1f%% dispute rate</string>
+    <string name="buyer_stat_avg_payment">%1$d-day average payment</string>
+    <string name="buyer_payment_terms_direct">Direct bank transfer upon weighment</string>
+    <string name="buyer_delivery_center_or_farmgate">Farmgate pickup or delivery to Nagpur center</string>
+    <string name="buyer_quality_requirement">Moisture &lt; 12%, Foreign matter &lt; 2%</string>
+    <string name="label_needed_timeline">Needed: %1$s</string>
+    <string name="timeline_this_week">This week</string>
+    <string name="empty_buyers_title">No buyers found</string>
+    <string name="empty_buyers_desc">We couldn\'t find a buyer matching your produce right now.</string>
+
+    <!-- Phase 3: Lots & Details -->
+    <string name="title_lot_details">Lot Details</string>
+    <string name="section_lot_status">LOT STATUS</string>
+    <string name="section_offers">OFFERS</string>
+    <string name="offers_received_count">%1$d offers received</string>
+    <string name="offers_received_single">1 offer received</string>
+    <string name="btn_view_offers">View Offers</string>
+    <string name="status_offer_accepted">Offer accepted</string>
+    <string name="status_waiting_offers">Waiting for offers</string>
+    <string name="label_expected_price">Expected price</string>
+    <string name="label_estimated_after_expenses">Estimated after expenses</string>
+    <string name="label_ready">Ready</string>
+
+    <!-- Phase 3: Offers Screen & Detail -->
+    <string name="title_offers">Offers for %1$s</string>
+    <string name="subtitle_offers">Review buyer offers and choose the best option for your produce</string>
+    <string name="offer_from_buyer">OFFER FROM %1$s</string>
+    <string name="btn_accept_offer">Accept Offer</string>
+    <string name="btn_reject_offer">Decline</string>
+    <string name="btn_view_details">View Details</string>
+    <string name="btn_contact_buyer">Ask / Contact</string>
+    <string name="title_offer_details">Offer Details</string>
+    <string name="offer_status_pending">Waiting for your decision</string>
+    <string name="offer_status_accepted">Offer accepted</string>
+    <string name="offer_status_rejected">Offer declined</string>
+    <string name="offer_status_expired">Offer expired</string>
+    <string name="offer_status_cancelled">Offer cancelled</string>
+    <string name="label_quoted_total">Total quoted amount</string>
+    <string name="label_delivery_requirements">Delivery requirements</string>
+    <string name="label_quality_requirements">Quality requirements</string>
+    <string name="label_offer_validity">Offer validity</string>
+    <string name="offer_valid_24h">Valid for 24 hours</string>
+    <string name="empty_offers_title">No offers yet</string>
+    <string name="empty_offers_desc">Your lot is available to interested buyers. We\'ll show you when someone makes an offer.</string>
+
+    <!-- Phase 3: Accept Confirmation & Transaction Preview -->
+    <string name="title_accept_confirm">ACCEPT THIS OFFER?</string>
+    <string name="accept_confirm_sub">Once accepted, a transaction begins with %1$s.</string>
+    <string name="btn_confirm_accept">Accept Offer</string>
+    <string name="tx_accepted_header">OFFER ACCEPTED ✓</string>
+    <string name="tx_accepted_msg">Your offer with %1$s is now confirmed!</string>
+    <string name="next_step_label">Next step:</string>
+    <string name="next_step_arrange_transport">Arrange transport</string>
+    <string name="btn_arrange_transport">Arrange Transport</string>
+    <string name="btn_back_to_my_lots">Go to My Lots</string>
+    <string name="btn_back_to_home">Go to Home</string>
+    <string name="tx_status_offer_accepted">Offer accepted</string>
+    <string name="tx_status_logistics_booked">Transport arranged</string>
+    <string name="tx_status_dispatched">Produce picked up</string>
+    <string name="tx_status_delivered">Produce delivered</string>
+    <string name="tx_status_payment_initiated">Payment on the way</string>
+    <string name="tx_status_payment_received">Payment received</string>
+    <string name="tx_status_completed">Sale completed</string>
+    <string name="tx_status_payment_delayed">Payment is delayed</string>
+    <string name="tx_status_cancelled">Cancelled</string>
+    <string name="tx_status_disputed">Disputed</string>
+
+    <!-- Phase 4: Payment States -->
+    <string name="payment_status_pending">Waiting for payment</string>
+    <string name="payment_status_initiated">Payment on the way</string>
+    <string name="payment_status_received">Payment received ✓</string>
+    <string name="payment_status_delayed">Payment is delayed</string>
+
+    <!-- Phase 4: Transaction Detail Screen -->
+    <string name="title_your_sale">YOUR SALE</string>
+    <string name="title_transaction_detail">Transaction Details</string>
+    <string name="label_what_has_happened">WHAT HAS HAPPENED</string>
+    <string name="label_what_next">WHAT SHOULD I DO NEXT?</string>
+    <string name="step_offer_accepted">Offer accepted</string>
+    <string name="step_arrange_transport">Arrange transport</string>
+    <string name="step_produce_picked_up">Produce picked up</string>
+    <string name="step_delivered">Delivered</string>
+    <string name="step_payment_received">Payment received</string>
+    <string name="step_completed">Sale completed</string>
+    <string name="label_transaction_id">Transaction ID</string>
+    <string name="label_agreed_price">Agreed Price</string>
+    <string name="label_net_in_pocket">Estimated amount after expenses</string>
+    <string name="tx_step_offer_accepted">Offer accepted</string>
+    <string name="tx_step_arrange_transport">Arrange transport</string>
+    <string name="tx_step_produce_pickup">Produce picked up</string>
+    <string name="tx_step_delivered">Delivered</string>
+    <string name="tx_step_payment_received">Payment received</string>
+    <string name="tx_step_sale_completed">Sale completed</string>
+
+    <!-- Next Actions -->
+    <string name="next_action_header">NEXT STEP</string>
+    <string name="action_arrange_transport">Arrange transport</string>
+    <string name="action_confirm_pickup">Produce pickup</string>
+    <string name="action_track_delivery">Track delivery</string>
+    <string name="action_confirm_delivery">Confirm delivery</string>
+    <string name="action_track_payment">Track payment</string>
+    <string name="action_confirm_payment">Confirm payment received</string>
+    <string name="action_view_completed">View completed sale</string>
+
+    <!-- Phase 4: Logistics Screen -->
+    <string name="title_arrange_transport">Arrange transport</string>
+    <string name="subtitle_arrange_transport">Book reliable transport to deliver produce safely to the buyer</string>
+    <string name="label_pickup_location">Pickup</string>
+    <string name="label_delivery_location">Delivery</string>
+    <string name="label_distance">Distance</string>
+    <string name="label_distance_val">%1$d km</string>
+    <string name="label_transport_cost">Estimated transport cost</string>
+    <string name="label_cost_per_q">Estimated cost per quintal</string>
+    <string name="recommended_transport_header">Recommended transport</string>
+    <string name="transporter_shree_agro">Shree Agro Transport</string>
+    <string name="vehicle_small_medium">Small/medium goods vehicle</string>
+    <string name="estimated_pickup_time">Tomorrow, 8:00 AM</string>
+    <string name="btn_book_transport">BOOK TRANSPORT</string>
+    <string name="transport_arranged_header">TRANSPORT ARRANGED ✓</string>
+    <string name="transport_failure_msg">Transport isn\'t available right now.</string>
+    <string name="btn_choose_another">Choose Another Option</string>
+
+    <!-- Phase 4: Pickup & Dispatch Screen -->
+    <string name="title_produce_pickup">PRODUCE PICKUP</string>
+    <string name="msg_transporter_ready">Your transporter is ready.</string>
+    <string name="btn_confirm_pickup">CONFIRM PICKUP</string>
+    <string name="pickup_success_snack">Produce picked up successfully. Status: In transit.</string>
+
+    <!-- Phase 4: In-Transit & Delivery Screen -->
+    <string name="title_produce_in_transit">YOUR PRODUCE IS ON THE WAY</string>
+    <string name="status_in_transit">🚚 In transit</string>
+    <string name="expected_delivery_today">Expected delivery: Today</string>
+    <string name="title_produce_delivered">PRODUCE DELIVERED ✓</string>
+    <string name="delivered_today">Delivered: Today</string>
+    <string name="btn_confirm_delivery">CONFIRM DELIVERY</string>
+
+    <!-- Phase 4: Payment Screen & Transparency -->
+    <string name="title_payment">Payment</string>
+    <string name="subtitle_payment">Track payment progress and review deduction breakdown</string>
+    <string name="payment_breakdown_title">Transparent Calculation</string>
+    <string name="label_produce_value">Produce value (%1$d × ₹%2$s)</string>
+    <string name="label_deduction_transport">Estimated transport</string>
+    <string name="label_deduction_other">Other estimated costs</string>
+    <string name="label_payment_deduction_note">Deductions are estimated based on transport distance and handling fees.</string>
+    <string name="btn_confirm_payment_received">CONFIRM PAYMENT RECEIVED</string>
+    <string name="payment_received_header">PAYMENT RECEIVED ✓</string>
+    <string name="amount_received_label">Amount received:</string>
+    <string name="payment_delayed_header">PAYMENT DELAYED</string>
+    <string name="payment_delayed_msg">Payment has not arrived yet.</string>
+    <string name="expected_payment_label">Expected payment:</string>
+    <string name="expected_date_label">Expected date: Today</string>
+    <string name="btn_simulate_delay">Check / Flag Delay</string>
+
+    <!-- Phase 4: Sale Completed Screen -->
+    <string name="title_sale_completed">SALE COMPLETED ✓</string>
+    <string name="btn_rate_buyer">RATE BUYER</string>
+    <string name="rating_submitted_msg">Thank you for rating this buyer!</string>
+    <string name="rate_dialog_title">Rate your experience</string>
+    <string name="rate_feedback_hint">Share optional feedback for other farmers</string>
+    <string name="btn_submit_rating">Submit Rating</string>
+    <string name="btn_skip_rating">Skip</string>
+
+    <!-- Phase 4: Grievance Foundation -->
+    <string name="grievance_prompt">Having a problem?</string>
+    <string name="btn_get_help">GET HELP</string>
+    <string name="grievance_dialog_title">What can we help you with?</string>
+    <string name="grievance_type_payment">Payment problem</string>
+    <string name="grievance_type_buyer">Buyer problem</string>
+    <string name="grievance_type_delivery">Delivery problem</string>
+    <string name="grievance_type_transport">Transport problem</string>
+    <string name="grievance_type_quality">Quality problem</string>
+    <string name="grievance_type_other">Other issue</string>
+    <string name="grievance_submitted_snack">Support ticket created. An AgriLink agri-officer will reach out within 2 hours.</string>
+
+    <!-- Phase 4: Your Sales (History) Screen -->
+    <string name="title_your_sales">Your Sales</string>
+    <string name="subtitle_your_sales">History of all active and completed transactions</string>
+    <string name="empty_sales_msg">You haven\'t completed a sale yet.</string>
+    <string name="btn_sell_produce">Sell Produce</string>
+    <string name="btn_view_sales_history">View Sales History</string>
+
+    <!-- Phase 3: Home Active Sale Integration -->
+    <string name="home_active_sale_title">YOUR ACTIVE SALE</string>
+    <string name="home_active_sale_sub">Active Sale</string>
+    <string name="btn_view_sale">View Sale</string>
+    <string name="action_browse_buyers">Browse Buyers</string>
+
+    <!-- Languages -->
+    <string name="lang_english">English</string>
+    <string name="lang_hindi">हिन्दी</string>
+    <string name="lang_marathi">मराठी</string>
+</resources>

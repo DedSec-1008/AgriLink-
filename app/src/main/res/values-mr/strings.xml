@@ -1,0 +1,459 @@
+<resources>
+    <string name="app_name">ॲग्रीलिंक</string>
+    <string name="greeting_farmer">नमस्ते, शेतकरी मित्र</string>
+    <string name="location_nagpur">नागपूर, महाराष्ट्र</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">मुख्य</string>
+    <string name="nav_prices">बाजारभाव</string>
+    <string name="nav_sell">विक्री</string>
+    <string name="nav_my_lots">माझे सौदे</string>
+    <string name="nav_help">मदत</string>
+
+    <!-- Home Sections -->
+    <string name="section_your_produce">तुमचा शेतमाल</string>
+    <string name="crop_soybean">सोयाबीन</string>
+    <string name="produce_qty_50">50 क्विंटल</string>
+    <string name="produce_quality_good">उत्तम दर्जा</string>
+
+    <string name="section_todays_price">आजचा भाव</string>
+    <string name="price_soybean_modal">₹4,850 / क्विंटल</string>
+    <string name="market_nagpur">नागपूर बाजार</string>
+    <string name="price_change_yesterday">↑ कालपेक्षा ₹120 जास्त</string>
+
+    <!-- Best Selling Opportunity Card -->
+    <string name="badge_best_opportunity">सर्वोत्तम विक्री संधी</string>
+    <string name="buyer_abc_foods">एबीसी फूड्स</string>
+    <string name="verified_buyer_tag">खात्रीशीर खरेदीदार</string>
+    <string name="label_quoted_price">खरेदीदाराने दिलेला भाव</string>
+    <string name="quoted_price_val">₹4,850 / क्विंटल</string>
+    <string name="label_after_expenses">खर्च वजा जाता हातात मिळणारा भाव</string>
+    <string name="net_price_val">₹4,700 / क्विंटल</string>
+    <string name="label_estimated_total">एकूण अंदाजे हातात मिळणारी रक्कम</string>
+    <string name="total_payout_val">₹2,35,000</string>
+    <string name="status_strong_rec">उत्तम शिफारस</string>
+    <string name="reason_verified_buyer">नोंदणीकृत व खात्रीशीर खरेदीदार</string>
+    <string name="reason_good_price">उत्तम बाजारभाव</string>
+    <string name="reason_affordable_transport">परवडणारी वाहतूक व्यवस्था</string>
+    <string name="reason_suitable_qty">योग्य प्रमाण जुळणी</string>
+    <string name="btn_find_best_place">विक्रीसाठी योग्य ठिकाण शोधा</string>
+    <string name="btn_sell_here">येथे विका</string>
+    <string name="label_net_realization_hero">हातात मिळणारा निव्वळ नफा</string>
+    <string name="label_deduction_note">₹150/क्विंटल वाहतूक खर्च व बाजार समिती शुल्क वजा</string>
+
+    <!-- Quick Actions -->
+    <string name="section_quick_actions">जलद पर्याय</string>
+    <string name="action_check_prices">बाजारभाव पहा</string>
+    <string name="action_sell_produce">माल विका</string>
+    <string name="action_my_lots">माझे सौदे</string>
+    <string name="action_get_help">मदत मिळवा</string>
+
+    <!-- Prices Screen -->
+    <string name="title_prices">बाजारभाव</string>
+    <string name="subtitle_prices">जवळपासच्या कृषी उत्पन्न बाजार समित्यांचे ताजे भाव</string>
+    <string name="market_katol">काटोल बाजार</string>
+    <string name="price_katol">₹4,780 / क्विंटल</string>
+    <string name="market_hingna">हिंगणा बाजार</string>
+    <string name="price_hingna">₹4,720 / क्विंटल</string>
+    <string name="market_amravati">अमरावती एपीएमसी</string>
+    <string name="price_amravati">₹4,820 / क्विंटल</string>
+    <string name="status_steady">स्थिर कल</string>
+
+    <!-- Sell Screen -->
+    <string name="title_where_to_sell">माल कुठे विकावा?</string>
+    <string name="subtitle_where_to_sell">आपल्या शेतमालाची माहिती द्या, आम्ही सर्वोत्तम पर्याय शोधू.</string>
+    <string name="step1_crop_heading">टप्पा 1: आपण काय विकू इच्छिता?</string>
+    <string name="crop_wheat">गहू</string>
+    <string name="crop_rice">भात / तांदूळ</string>
+    <string name="crop_maize">मका</string>
+    <string name="crop_other">इतर</string>
+    <string name="step2_qty_heading">टप्पा 2: आपल्याकडे किती प्रमाण आहे?</string>
+    <string name="unit_quintals">क्विंटल</string>
+    <string name="step3_quality_heading">टप्पा 3: शेतमालाचा दर्जा कसा आहे?</string>
+    <string name="quality_good">चांगला</string>
+    <string name="quality_average">मध्यम</string>
+    <string name="quality_poor">कमी</string>
+    <string name="btn_continue">पुढे जा</string>
+    <string name="btn_back">मागे या</string>
+    <string name="btn_reset_flow">पुन्हा सुरू करा</string>
+
+    <!-- My Lots Screen -->
+    <string name="title_my_lots">माझे सौदे</string>
+    <string name="subtitle_my_lots">नोंदवलेला शेतमाल आणि आलेले खरेदी प्रस्ताव</string>
+    <string name="lot_id_sample">लॉट #AG-1024</string>
+    <string name="lot_status_waiting">ऑफरची प्रतीक्षा</string>
+    <string name="btn_view_lot">लॉट पहा</string>
+    <string name="empty_lots_title">कोणताही सक्रिय लॉट नाही</string>
+    <string name="empty_lots_desc">आपण अद्याप शेतमाल नोंदवलेला नाही. सुरुवात करण्यासाठी \'विक्री\' वर टॅप करा!</string>
+    <string name="btn_create_first_lot">लॉट तयार करा</string>
+
+    <!-- Help Screen -->
+    <string name="title_help">मदत आणि सहाय्य</string>
+    <string name="subtitle_help">शेतकऱ्यांसाठी सुलभ मार्गदर्शक आणि सहाय्य</string>
+    <string name="ask_agrilink_title">🎙 ॲग्रीलिंकला विचारा</string>
+    <string name="ask_agrilink_desc">मराठी, हिंदी किंवा इंग्रजीमध्ये बोलून प्रश्न विचारा (आवाज सहाय्यक)</string>
+    <string name="cat_selling">शेतमाल विक्री</string>
+    <string name="cat_price">बाजारभाव</string>
+    <string name="cat_buyer">खरेदीदार</string>
+    <string name="cat_lot">लॉट नोंदणी</string>
+    <string name="cat_transport">वाहतूक व गाडी</string>
+    <string name="cat_payment">पैसे / पेमेंट</string>
+    <string name="cat_verification">खरेदीदार पडताळणी</string>
+    <string name="cat_using_app">ॲपचा वापर</string>
+
+    <!-- Additional UI Polish Strings -->
+    <string name="section_nearby_mandi_rates">जवळपासचे बाजारभाव</string>
+    <string name="label_buyer">खरेदीदार</string>
+    <string name="btn_new_lot">+ नवीन लॉट</string>
+    <string name="helpline_label">शेतकरी हेल्पलाइन (टोल-फ्री)</string>
+    <string name="helpline_timing">1800-180-1551 • सकाळी 6 ते रात्री 10</string>
+    <string name="step4_title">टप्पा 4: ठिकाण आणि शेतमाल निश्चित करा</string>
+    <string name="location_produce_label">शेतमालाचे सध्याचे ठिकाण</string>
+    <string name="summary_produce_label">आपल्या शेतमालाचा तपशील</string>
+    <string name="btn_find_best_option">सर्वोत्तम विक्री पर्याय शोधा</string>
+    <string name="home_greeting_subtitle">आपल्या शेतमालासाठी योग्य भाव आणि अचूक माहिती</string>
+    <string name="verified_by_mandi">खात्रीशीर खरेदीदार • जलद पेमेंट</string>
+
+    <!-- Phase 2: Selling Flow Step Headers & Subtitles -->
+    <string name="sell_step_progress">टप्पा %1$d / 5</string>
+    <string name="step1_title">तुम्हाला काय विकायचे आहे?</string>
+    <string name="step1_subtitle">आपले पीक निवडा.</string>
+    <string name="step2_title">तुमच्याकडे किती शेतमाल आहे?</string>
+    <string name="step2_subtitle">अंदाजे प्रमाण क्विंटलमध्ये टाका.</string>
+    <string name="step3_title">मालाचा दर्जा कसा आहे?</string>
+    <string name="step3_subtitle">आपल्या शेतमालाची गुणवत्ता निवडा.</string>
+    <string name="step4_heading">तुमचा शेतमाल कुठे आहे?</string>
+    <string name="step4_subtitle">जवळची बाजारपेठ आणि वाहतूक खर्चाचा अंदाज लावण्यासाठी आम्ही तुमचे ठिकाण वापरतो.</string>
+    <string name="step5_title">माल कधी तयार होईल?</string>
+    <string name="step5_subtitle">माल कधी उपलब्ध होईल ते सांगा.</string>
+    
+    <!-- Quality Descriptions -->
+    <string name="quality_good_desc">स्वच्छ आणि उत्तम दर्जा</string>
+    <string name="quality_average_desc">मध्यम / सामान्य दर्जा</string>
+    <string name="quality_poor_desc">कमी दर्जाचा माल</string>
+    <string name="quality_photo_helper">📷 दर्जा तपासणीसाठी फोटो जोडा (लवकरच येत आहे)</string>
+    
+    <!-- Location Choices -->
+    <string name="loc_use_my_location">माझे सध्याचे ठिकाण वापरा</string>
+    <string name="loc_choose_location">ठिकाण निवडा</string>
+    <string name="loc_nagpur">नागपूर, महाराष्ट्र</string>
+    <string name="loc_katol">काटोल, महाराष्ट्र</string>
+    <string name="loc_amravati">अमरावती, महाराष्ट्र</string>
+    <string name="loc_wardha">वर्धा, महाराष्ट्र</string>
+    <string name="loc_hingna">हिंगणा, महाराष्ट्र</string>
+
+    <!-- Ready Timing Options -->
+    <string name="timing_ready_now">आत्ता तयार आहे</string>
+    <string name="timing_ready_now_desc">कापणी व पोती भरून तयार</string>
+    <string name="timing_few_days">काही दिवसांत तयार</string>
+    <string name="timing_few_days_desc">3 ते 7 दिवसांत उपलब्ध</string>
+    <string name="timing_choose_date">तारीख निवडा / नंतर</string>
+    <string name="timing_choose_date_desc">पुढील आठवड्यात किंवा आगामी पीक</string>
+
+    <!-- Review Step -->
+    <string name="review_title">आपल्या शेतमालाची माहिती तपासा</string>
+    <string name="review_subtitle">सर्वोत्तम पर्याय शोधण्यापूर्वी माहितीची खात्री करा.</string>
+    <string name="review_header_produce">आपला शेतमाल</string>
+    <string name="review_edit">बदला</string>
+    <string name="review_crop_label">पीक</string>
+    <string name="review_quantity_label">प्रमाण</string>
+    <string name="review_quality_label">दर्जा</string>
+    <string name="review_location_label">ठिकाण</string>
+    <string name="review_timing_label">तयार होण्याची वेळ</string>
+
+    <!-- Analysis / Loading State -->
+    <string name="analysis_loading_title">तुमच्यासाठी सर्वोत्तम पर्याय शोधत आहोत…</string>
+    <string name="analysis_check_prices">आजचे बाजारभाव तपासत आहोत</string>
+    <string name="analysis_compare_markets">जवळच्या बाजारांची तुलना</string>
+    <string name="analysis_check_demand">खरेदीदारांची मागणी तपासत आहोत</string>
+    <string name="analysis_estimate_transport">वाहतूक खर्चाचा अंदाज</string>
+    <string name="analysis_compare_realization">हातात येणाऱ्या प्रत्यक्ष रकमेची तुलना</string>
+
+    <!-- Recommendations Screen -->
+    <string name="rec_results_title">तुमच्यासाठी सर्वोत्तम पर्याय</string>
+    <string name="rec_results_subtitle">खर्च वजा जाता तुमच्या हातात उरणार्या अंदाजे नफ्यानुसार क्रमवारी</string>
+    <string name="badge_top_pick">⭐ सर्वोत्तम पर्याय</string>
+    <string name="badge_other_options">इतर चांगले पर्याय</string>
+    <string name="label_quoted_price_short">मिळणारा भाव</string>
+    <string name="label_after_expenses_short">अंदाजे खर्च वजा जाता</string>
+    <string name="label_estimated_total_short">एकूण अंदाजे रक्कम</string>
+    <string name="btn_why_this_option">हाच पर्याय का?</string>
+    <string name="btn_hide_details">तपशील लपवा</string>
+    <string name="detail_distance">अंतर</string>
+    <string name="detail_transport">अंदाजे वाहतूक खर्च</string>
+    <string name="detail_handling">हमाली व बाजार शुल्क</string>
+    <string name="detail_payment">पेमेंटची विश्वासार्हता</string>
+
+    <!-- Buyers & Opportunities -->
+    <string name="buyer_nagpur_mandi">नागपूर बाजार समिती (APMC)</string>
+    <string name="buyer_xyz_traders">XYZ ट्रेडर्स</string>
+    <string name="buyer_type_verified_direct">पडताळणी झालेला थेट खरेदीदार</string>
+    <string name="buyer_type_regulated_apmc">शासकीय मान्यताप्राप्त बाजार समिती</string>
+    <string name="buyer_type_local_trader">परवानाधारक स्थानिक व्यापारी</string>
+    <string name="status_good_option">चांगला पर्याय</string>
+    <string name="payment_same_day">त्याच दिवशी बँक खात्यात</string>
+    <string name="payment_mandi_cycle">1–2 दिवसांत पेमेंट</string>
+    <string name="payment_on_weighment">काटा होताच पेमेंट</string>
+
+    <string name="reason_highest_payout">हातात सर्वात जास्त प्रत्यक्ष रक्कम</string>
+    <string name="reason_low_transport">कमी वाहतूक खर्च</string>
+    <string name="reason_quality_match">स्वच्छ आणि चांगल्या मालास योग्य भाव</string>
+    <string name="reason_payment_history">100% खात्रीशीर पेमेंटचा इतिहास</string>
+    <string name="reason_regulated_market">शासकीय नियमांनुसार व्यवहार</string>
+    <string name="reason_quick_unloading">जलद काटा आणि मालाची लगेच उचल</string>
+    <string name="reason_suitable_quality">योग्य गुणवत्ता</string>
+    <string name="reason_reliable_buyer">विश्वसनीय खरेदीदार</string>
+
+    <!-- Confirm Sell Step -->
+    <string name="confirm_sell_title">%1$s यांना विक्री</string>
+    <string name="confirm_sell_prompt">तुम्ही हा लॉट तयार करण्यास तयार आहात का?</string>
+    <string name="label_sell_to">यांना विका</string>
+    <string name="label_expected_amount_after_expenses">खर्च वजा जाता मिळणारी अंदाजे रक्कम</string>
+    <string name="label_estimated_transport">अंदाजे वाहतूक खर्च</string>
+    <string name="label_note_share_details">लॉट तयार केल्यावर आपल्या शेतमालाची माहिती खरेदीदाराला औपचारिक ऑफरसाठी पाठवली जाईल.</string>
+    <string name="breakdown_title">खर्च आणि उत्पन्नाचा हिशोब</string>
+    <string name="breakdown_gross">एकूण भावानुसार रक्कम</string>
+    <string name="breakdown_transport">अंदाजे वाहतूक खर्च</string>
+    <string name="breakdown_handling">अंदाजे हमाली व इतर खर्च</string>
+    <string name="breakdown_net">हातात मिळणारी अंदाजे रक्कम</string>
+    <string name="btn_create_lot">लॉट तयार करा</string>
+    <string name="btn_go_back">मागे जा</string>
+
+    <!-- Lot Created Success Screen -->
+    <string name="title_lot_created">लॉट तयार झाला</string>
+    <string name="success_lot_created">लॉट यशस्वीरीत्या तयार झाला!</string>
+    <string name="success_lot_msg">तुमचा लॉट नोंदवला गेला आहे आणि खरेदीदारांच्या ऑफरची प्रतीक्षा आहे.</string>
+    <string name="success_lot_id">लॉट आयडी: %1$s</string>
+    <string name="btn_view_my_lot">माझा लॉट पहा</string>
+    <string name="btn_done">पूर्ण झाले</string>
+
+    <!-- Accessibility / Stepper Descriptions -->
+    <string name="desc_decrease_qty">प्रमाण कमी करा</string>
+    <string name="desc_increase_qty">प्रमाण वाढवा</string>
+    <string name="type_exact_quantity">अचूक प्रमाण लिहा</string>
+    <string name="hide_manual_entry">मॅन्युअल नोंद लपवा</string>
+    <string name="label_exact_quintals">अचूक क्विंटल</string>
+
+    <!-- Empty / Error States -->
+    <string name="empty_rec_title">सध्या योग्य पर्याय सापडला नाही</string>
+    <string name="empty_rec_desc">अधिक पर्याय पाहण्यासाठी प्रमाण, दर्जा किंवा माल तयार होण्याची तारीख बदलून पहा.</string>
+    <string name="error_rec_title">आम्हाला सध्या कोणताही चांगला पर्याय सापडला नाही.</string>
+    <string name="btn_try_again">पुन्हा प्रयत्न करा</string>
+
+    <!-- Phase 3: Buyers & Directory -->
+    <string name="title_buyers">खरेदीदार</string>
+    <string name="subtitle_buyers">थेट शेतमाल खरेदी करणारे पडताळणी केलेले खरेदीदार</string>
+    <string name="buyer_nagpur_agro">नागपूर ॲग्रो</string>
+    <string name="buyer_verified">पडताळणी केलेले खरेदीदार</string>
+    <string name="buyer_verification_pending">पडताळणी प्रलंबित</string>
+    <string name="buyer_not_verified">पडताळणी झालेली नाही</string>
+    <string name="buyer_needs">मागणी: %1$s • %2$d क्विंटल</string>
+    <string name="buyer_needs_range">मागणी: %1$s • %2$d–%3$d क्विंटल</string>
+    <string name="buyer_offer_rate">ऑफर: ₹%1$s / क्विंटल</string>
+    <string name="buyer_payment_speed">पेमेंट: %1$s</string>
+    <string name="payment_within_2_days">सहसा २ दिवसांत</string>
+    <string name="payment_within_3_days">सहसा ३ दिवसांत</string>
+    <string name="payment_within_4_days">सहसा ४ दिवसांत</string>
+    <string name="btn_view_buyer">खरेदीदार पहा</string>
+    <string name="btn_sell_to_buyer">या खरेदीदारास विका</string>
+    <string name="btn_view_demand">मागणी पहा</string>
+    <string name="section_current_demand">सध्याची मागणी</string>
+    <string name="section_price">दर</string>
+    <string name="section_payment">पेमेंट</string>
+    <string name="section_transactions">व्यवहार</string>
+    <string name="section_farmer_rating">शेतकरी रेटिंग</string>
+    <string name="section_more_about_buyer">या खरेदीदाराबद्दल अधिक माहिती</string>
+    <string name="buyer_stat_ontime">%1$d%% वेळेवर पेमेंट</string>
+    <string name="buyer_stat_completed_tx">%1$d पूर्ण झालेले व्यवहार</string>
+    <string name="buyer_stat_dispute_rate">%1$.1f%% तक्रार प्रमाण</string>
+    <string name="buyer_stat_avg_payment">%1$d-दिवस सरासरी पेमेंट वेळ</string>
+    <string name="buyer_payment_terms_direct">वजनानंतर थेट बँक खात्यात पैसे जमा</string>
+    <string name="buyer_delivery_center_or_farmgate">शेतकऱ्याच्या बांधावरून उचल किंवा नागपूर केंद्रावर पोहोच</string>
+    <string name="buyer_quality_requirement">ओलावा &lt; 12%, कचरा &lt; 2%</string>
+    <string name="label_needed_timeline">कधी हवे: %1$s</string>
+    <string name="timeline_this_week">या आठवड्यात</string>
+    <string name="empty_buyers_title">खरेदीदार सापडले नाहीत</string>
+    <string name="empty_buyers_desc">सध्या तुमच्या शेतमालासाठी खरेदीदार उपलब्ध नाहीत.</string>
+
+    <!-- Phase 3: Lots & Details -->
+    <string name="title_lot_details">लॉट तपशील</string>
+    <string name="section_lot_status">लॉट स्थिती</string>
+    <string name="section_offers">ऑफर</string>
+    <string name="offers_received_count">%1$d ऑफर प्राप्त</string>
+    <string name="offers_received_single">1 ऑफर प्राप्त</string>
+    <string name="btn_view_offers">ऑफर पहा</string>
+    <string name="status_offer_accepted">ऑफर स्वीकारली</string>
+    <string name="status_waiting_offers">ऑफरची प्रतीक्षा</string>
+    <string name="label_expected_price">अपेक्षित भाव</string>
+    <string name="label_estimated_after_expenses">खर्च वजा जाता अंदाजे</string>
+    <string name="label_ready">तयारी</string>
+
+    <!-- Phase 3: Offers Screen & Detail -->
+    <string name="title_offers">%1$s साठी ऑफर</string>
+    <string name="subtitle_offers">खरेदीदारांच्या ऑफर तपासा आणि सर्वोत्तम पर्याय निवडा</string>
+    <string name="offer_from_buyer">%1$s कडून ऑफर</string>
+    <string name="btn_accept_offer">ऑफर स्वीकारा</string>
+    <string name="btn_reject_offer">नाकारा</string>
+    <string name="btn_view_details">तपशील पहा</string>
+    <string name="btn_contact_buyer">संपर्क साधा</string>
+    <string name="title_offer_details">ऑफर तपशील</string>
+    <string name="offer_status_pending">तुमच्या निर्णयाची प्रतीक्षा</string>
+    <string name="offer_status_accepted">ऑफर स्वीकारली</string>
+    <string name="offer_status_rejected">ऑफर नाकारली</string>
+    <string name="offer_status_expired">ऑफर संपली</string>
+    <string name="offer_status_cancelled">ऑफर रद्द झाली</string>
+    <string name="label_quoted_total">एकूण नमूद रक्कम</string>
+    <string name="label_delivery_requirements">डिलिव्हरी अटी</string>
+    <string name="label_quality_requirements">गुणवत्ता अटी</string>
+    <string name="label_offer_validity">ऑफर मुदत</string>
+    <string name="offer_valid_24h">24 तासांसाठी वैध</string>
+    <string name="empty_offers_title">अजून ऑफर नाही</string>
+    <string name="empty_offers_desc">तुमचा लॉट खरेदीदारांसाठी उपलब्ध आहे. ऑफर आल्यावर येथे दिसेल.</string>
+
+    <!-- Phase 3: Accept Confirmation & Transaction Preview -->
+    <string name="title_accept_confirm">ही ऑफर स्वीकारायची का?</string>
+    <string name="accept_confirm_sub">स्वीकार केल्यानंतर %1$s सोबत विक्री प्रक्रिया सुरू होईल.</string>
+    <string name="btn_confirm_accept">ऑफर स्वीकारा</string>
+    <string name="tx_accepted_header">ऑफर स्वीकारली ✓</string>
+    <string name="tx_accepted_msg">%1$s सोबत तुमचा व्यवहार निश्चित झाला आहे!</string>
+    <string name="next_step_label">पुढील पायरी:</string>
+    <string name="next_step_arrange_transport">वाहतूक व्यवस्था करा</string>
+    <string name="btn_arrange_transport">वाहतूक व्यवस्था करा</string>
+    <string name="btn_back_to_my_lots">माझ्या लॉटवर जा</string>
+    <string name="btn_back_to_home">मुख्य पानावर जा</string>
+    <string name="tx_status_offer_accepted">ऑफर स्वीकारली</string>
+    <string name="tx_status_logistics_booked">वाहतूक व्यवस्था झाली</string>
+    <string name="tx_status_dispatched">माल उचलला गेला</string>
+    <string name="tx_status_delivered">माल पोहोचवला</string>
+    <string name="tx_status_payment_initiated">पेमेंट येत आहे</string>
+    <string name="tx_status_payment_received">पेमेंट मिळाले</string>
+    <string name="tx_status_completed">विक्री पूर्ण झाली</string>
+    <string name="tx_status_payment_delayed">पेमेंटला उशीर होत आहे</string>
+    <string name="tx_status_cancelled">रद्द केले</string>
+    <string name="tx_status_disputed">वादग्रस्त</string>
+
+    <!-- Phase 4: Payment States -->
+    <string name="payment_status_pending">पेमेंटची प्रतीक्षा</string>
+    <string name="payment_status_initiated">पेमेंट येत आहे</string>
+    <string name="payment_status_received">पेमेंट मिळाले ✓</string>
+    <string name="payment_status_delayed">पेमेंटला उशीर होत आहे</string>
+
+    <!-- Phase 4: Transaction Detail Screen -->
+    <string name="title_your_sale">तुमची विक्री</string>
+    <string name="title_transaction_detail">व्यवहार तपशील</string>
+    <string name="label_what_has_happened">आतापर्यंत काय झाले</string>
+    <string name="label_what_next">आता तुम्ही काय करावे?</string>
+    <string name="step_offer_accepted">ऑफर स्वीकारली</string>
+    <string name="step_arrange_transport">वाहतूक व्यवस्था</string>
+    <string name="step_produce_picked_up">माल उचलला गेला</string>
+    <string name="step_delivered">माल पोहोचवला</string>
+    <string name="step_payment_received">पेमेंट मिळाले</string>
+    <string name="step_completed">विक्री पूर्ण झाली</string>
+    <string name="label_transaction_id">व्यवहार आयडी</string>
+    <string name="label_agreed_price">ठरलेला दर</string>
+    <string name="label_net_in_pocket">खर्च वजा जाता अंदाजे रक्कम</string>
+    <string name="tx_step_offer_accepted">ऑफर स्वीकारली</string>
+    <string name="tx_step_arrange_transport">वाहतूक व्यवस्था</string>
+    <string name="tx_step_produce_pickup">माल उचलला गेला</string>
+    <string name="tx_step_delivered">माल पोहोचवला</string>
+    <string name="tx_step_payment_received">पेमेंट मिळाले</string>
+    <string name="tx_step_sale_completed">विक्री पूर्ण झाली</string>
+
+    <!-- Next Actions -->
+    <string name="next_action_header">पुढील पायरी</string>
+    <string name="action_arrange_transport">वाहतूक व्यवस्था करा</string>
+    <string name="action_confirm_pickup">माल उचलणे</string>
+    <string name="action_track_delivery">पोहोच पहा</string>
+    <string name="action_confirm_delivery">पोहोचल्याची खात्री करा</string>
+    <string name="action_track_payment">पेमेंट तपासा</string>
+    <string name="action_confirm_payment">पेमेंट मिळाल्याची खात्री करा</string>
+    <string name="action_view_completed">पूर्ण विक्री पहा</string>
+
+    <!-- Phase 4: Logistics Screen -->
+    <string name="title_arrange_transport">वाहतूक व्यवस्था करा</string>
+    <string name="subtitle_arrange_transport">खरेदीदारापर्यंत सुरक्षितपणे शेतमाल पोहोचवण्यासाठी खात्रीशीर वाहन बुक करा</string>
+    <string name="label_pickup_location">उचलण्याचे ठिकाण</string>
+    <string name="label_delivery_location">पोहोचवण्याचे ठिकाण</string>
+    <string name="label_distance">अंतर</string>
+    <string name="label_distance_val">%1$d किमी</string>
+    <string name="label_transport_cost">अंदाजे वाहतूक खर्च</string>
+    <string name="label_cost_per_q">प्रति क्विंटल अंदाजे खर्च</string>
+    <string name="recommended_transport_header">शिफारस केलेली वाहतूक</string>
+    <string name="transporter_shree_agro">श्री ॲग्रो ट्रान्सपोर्ट</string>
+    <string name="vehicle_small_medium">लहान/मध्यम मालवाहू वाहन</string>
+    <string name="estimated_pickup_time">उद्या सकाळी 8:00 वाजता</string>
+    <string name="btn_book_transport">वाहतूक बुक करा</string>
+    <string name="transport_arranged_header">वाहतूक व्यवस्था झाली ✓</string>
+    <string name="transport_failure_msg">सध्या वाहतूक उपलब्ध नाही.</string>
+    <string name="btn_choose_another">दुसरा पर्याय निवडा</string>
+
+    <!-- Phase 4: Pickup & Dispatch Screen -->
+    <string name="title_produce_pickup">माल उचलणे</string>
+    <string name="msg_transporter_ready">तुमचा वाहतूकदार तयार आहे.</string>
+    <string name="btn_confirm_pickup">माल उचलल्याची खात्री करा</string>
+    <string name="pickup_success_snack">माल उचलला गेला. स्थिती: मार्गावर.</string>
+
+    <!-- Phase 4: In-Transit & Delivery Screen -->
+    <string name="title_produce_in_transit">तुमचा माल मार्गावर आहे</string>
+    <string name="status_in_transit">🚚 मार्गावर आहे</string>
+    <string name="expected_delivery_today">अपेक्षित पोहोच: आज</string>
+    <string name="title_produce_delivered">माल पोहोचवला ✓</string>
+    <string name="delivered_today">पोहोच: आज</string>
+    <string name="btn_confirm_delivery">पोहोचल्याची खात्री करा</string>
+
+    <!-- Phase 4: Payment Screen & Transparency -->
+    <string name="title_payment">पेमेंट</string>
+    <string name="subtitle_payment">पेमेंटची प्रगती तपासा आणि खर्चाचा तपशील पहा</string>
+    <string name="payment_breakdown_title">पारदर्शक हिशोब</string>
+    <string name="label_produce_value">मालाचे मूल्य (%1$d × ₹%2$s)</string>
+    <string name="label_deduction_transport">अंदाजे वाहतूक खर्च</string>
+    <string name="label_deduction_other">इतर अंदाजे खर्च</string>
+    <string name="label_payment_deduction_note">कपात ही वाहतूक अंतर आणि हमाली शुल्कावर आधारित अंदाजे आहे.</string>
+    <string name="btn_confirm_payment_received">पेमेंट मिळाल्याची खात्री करा</string>
+    <string name="payment_received_header">पेमेंट मिळाले ✓</string>
+    <string name="amount_received_label">मिळालेली रक्कम:</string>
+    <string name="payment_delayed_header">पेमेंटला उशीर</string>
+    <string name="payment_delayed_msg">पेमेंट अजून आलेले नाही.</string>
+    <string name="expected_payment_label">अपेक्षित रक्कम:</string>
+    <string name="expected_date_label">अपेक्षित तारीख: आज</string>
+    <string name="btn_simulate_delay">उशीर तपासा / कळवा</string>
+
+    <!-- Phase 4: Sale Completed Screen -->
+    <string name="title_sale_completed">विक्री पूर्ण झाली ✓</string>
+    <string name="btn_rate_buyer">खरेदीदाराला रेटिंग द्या</string>
+    <string name="rating_submitted_msg">खरेदीदाराला रेटिंग दिल्याबद्दल धन्यवाद!</string>
+    <string name="rate_dialog_title">तुमचा अनुभव नोंदवा</string>
+    <string name="rate_feedback_hint">इतर शेतकरी मित्रांसाठी तुमचा अभिप्राय लिहा (पर्यायी)</string>
+    <string name="btn_submit_rating">रेटिंग सबमिट करा</string>
+    <string name="btn_skip_rating">सोडून द्या</string>
+
+    <!-- Phase 4: Grievance Foundation -->
+    <string name="grievance_prompt">काही अडचण येत आहे का?</string>
+    <string name="btn_get_help">मदत मिळवा</string>
+    <string name="grievance_dialog_title">आम्ही आपल्याला कशी मदत करू शकतो?</string>
+    <string name="grievance_type_payment">पेमेंटची समस्या</string>
+    <string name="grievance_type_buyer">खरेदीदाराची समस्या</string>
+    <string name="grievance_type_delivery">पोहोचण्यात समस्या</string>
+    <string name="grievance_type_transport">वाहतुकीची समस्या</string>
+    <string name="grievance_type_quality">गुणवत्तेची समस्या</string>
+    <string name="grievance_type_other">इतर समस्या</string>
+    <string name="grievance_submitted_snack">मदत विनंती नोंदवली गेली. ॲग्रीलिंक कृषी अधिकारी 2 तासांत संपर्क साधतील.</string>
+
+    <!-- Phase 4: Your Sales (History) Screen -->
+    <string name="title_your_sales">तुमची विक्री</string>
+    <string name="subtitle_your_sales">सर्व चालू आणि पूर्ण झालेल्या व्यवहारांचा इतिहास</string>
+    <string name="empty_sales_msg">तुम्ही अद्याप कोणतीही विक्री पूर्ण केलेली नाही.</string>
+    <string name="btn_sell_produce">माल विका</string>
+    <string name="btn_view_sales_history">विक्री इतिहास पहा</string>
+
+    <!-- Phase 3: Home Active Sale Integration -->
+    <string name="home_active_sale_title">तुमची चालू विक्री</string>
+    <string name="home_active_sale_sub">चालू विक्री</string>
+    <string name="btn_view_sale">व्यवहार पहा</string>
+    <string name="action_browse_buyers">खरेदीदार पहा</string>
+
+    <!-- Languages -->
+    <string name="lang_english">English</string>
+    <string name="lang_hindi">हिन्दी</string>
+    <string name="lang_marathi">मराठी</string>
+</resources>

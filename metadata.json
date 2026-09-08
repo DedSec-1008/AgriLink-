@@ -1,0 +1,6 @@
+{
+  "name": "AgriLink",
+  "description": "Intelligent agricultural market-linkage & price discovery platform for farmers and FPOs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

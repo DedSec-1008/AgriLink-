@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Golden grain stalk and linkage node visual -->
+    <path
+        android:fillColor="#FFD54F"
+        android:pathData="M54,24 C50,28 50,34 54,38 C58,34 58,28 54,24 Z" />
+    <path
+        android:fillColor="#FFCA28"
+        android:pathData="M46,32 C41,35 40,41 44,45 C48,43 50,37 46,32 Z" />
+    <path
+        android:fillColor="#FFC107"
+        android:pathData="M62,32 C66,35 68,41 64,45 C60,43 58,37 62,32 Z" />
+    <path
+        android:fillColor="#FFA000"
+        android:pathData="M43,45 C38,48 37,54 41,58 C45,56 47,50 43,45 Z" />
+    <path
+        android:fillColor="#FFB300"
+        android:pathData="M65,45 C70,48 71,54 67,58 C63,56 61,50 65,45 Z" />
+    <!-- Center stalk stem -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:pathData="M54,34 L54,78" />
+    <!-- Linkage nodes (Intelligent Market Linkage) -->
+    <path
+        android:fillColor="#81C784"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:pathData="M38,72 A6,6 0 1,0 38,72.01" />
+    <path
+        android:fillColor="#81C784"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:pathData="M70,72 A6,6 0 1,0 70,72.01" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,78 A7,7 0 1,0 54,78.01" />
+    <!-- Interconnecting lines -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:pathData="M38,72 L54,78 L70,72" />
+</vector>
