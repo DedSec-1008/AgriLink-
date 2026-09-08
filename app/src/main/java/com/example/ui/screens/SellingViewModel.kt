@@ -14,6 +14,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+enum class LocationSource {
+    NONE,
+    CURRENT_LOCATION,
+    MANUAL_SELECTION
+}
+
+enum class HarvestReadiness {
+    NONE,
+    READY_NOW,
+    WITHIN_7_DAYS,
+    LATER
+}
+
 enum class SellingStep(val stepNumber: Int) {
     CROP(1),
     QUANTITY(2),
@@ -31,12 +44,14 @@ data class SellingUiState(
     val currentStep: SellingStep = SellingStep.CROP,
     val selectedCrop: CropOption = CropOption("soybean", R.string.crop_soybean, "🌱", 4850),
     val quantityQuintals: Int = 50,
-    val qualityKey: String = "good",
+    val qualityKey: String = "",
     val qualityRes: Int = R.string.produce_quality_good,
-    val location: String = "Nagpur, Maharashtra",
-    val locationRes: Int = R.string.loc_nagpur,
-    val readyTiming: String = "Ready now",
-    val readyTimingRes: Int = R.string.timing_ready_now,
+    val location: String = "",
+    val locationRes: Int = 0,
+    val locationSource: LocationSource = LocationSource.NONE,
+    val harvestReadiness: HarvestReadiness = HarvestReadiness.NONE,
+    val readyTiming: String = "",
+    val readyTimingRes: Int = 0,
     val analysisProgressIndex: Int = 0,
     val recommendations: List<SellingOpportunity> = emptyList(),
     val selectedOpportunity: SellingOpportunity? = null,
@@ -51,6 +66,10 @@ class SellingViewModel(
 
     private val _uiState = MutableStateFlow(SellingUiState())
     val uiState: StateFlow<SellingUiState> = _uiState.asStateFlow()
+
+    fun setCrop(crop: CropOption) {
+        _uiState.update { it.copy(selectedCrop = crop) }
+    }
 
     fun selectCrop(crop: CropOption) {
         _uiState.update { it.copy(selectedCrop = crop, currentStep = SellingStep.QUANTITY) }
@@ -72,12 +91,50 @@ class SellingViewModel(
         _uiState.update { it.copy(qualityKey = qualityKey, qualityRes = displayRes) }
     }
 
-    fun selectLocation(locationName: String, locationRes: Int) {
-        _uiState.update { it.copy(location = locationName, locationRes = locationRes) }
+    fun selectLocation(
+        locationName: String,
+        locationRes: Int,
+        source: LocationSource = LocationSource.MANUAL_SELECTION
+    ) {
+        _uiState.update {
+            it.copy(
+                location = locationName,
+                locationRes = locationRes,
+                locationSource = source
+            )
+        }
+    }
+
+    fun selectHarvestReadiness(readiness: HarvestReadiness) {
+        val (timing, res) = when (readiness) {
+            HarvestReadiness.READY_NOW -> "Ready now" to R.string.timing_ready_now
+            HarvestReadiness.WITHIN_7_DAYS -> "Within 7 days" to R.string.timing_within_7_days
+            HarvestReadiness.LATER -> "Later" to R.string.timing_later
+            HarvestReadiness.NONE -> "" to 0
+        }
+        _uiState.update {
+            it.copy(
+                harvestReadiness = readiness,
+                readyTiming = timing,
+                readyTimingRes = res
+            )
+        }
     }
 
     fun selectReadyTiming(timing: String, timingRes: Int) {
-        _uiState.update { it.copy(readyTiming = timing, readyTimingRes = timingRes) }
+        val readiness = when (timing) {
+            "Ready now" -> HarvestReadiness.READY_NOW
+            "Within 7 days" -> HarvestReadiness.WITHIN_7_DAYS
+            "Later" -> HarvestReadiness.LATER
+            else -> HarvestReadiness.NONE
+        }
+        _uiState.update {
+            it.copy(
+                readyTiming = timing,
+                readyTimingRes = timingRes,
+                harvestReadiness = readiness
+            )
+        }
     }
 
     fun goToStep(step: SellingStep) {
@@ -193,6 +250,8 @@ class SellingViewModel(
                 quantityQuintals = buyer.currentDemandMinQ.coerceAtLeast(50),
                 location = "Nagpur, Maharashtra",
                 locationRes = R.string.loc_nagpur,
+                locationSource = LocationSource.MANUAL_SELECTION,
+                harvestReadiness = HarvestReadiness.READY_NOW,
                 readyTiming = "Ready now",
                 readyTimingRes = R.string.timing_ready_now
             )

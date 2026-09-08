@@ -113,7 +113,7 @@
     <string name="btn_new_lot">+ New Lot</string>
     <string name="helpline_label">Kisan Helpline (Toll-Free)</string>
     <string name="helpline_timing">1800-180-1551 • 6 AM to 10 PM</string>
-    <string name="step4_title">Step 4: Confirm Details &amp; Find Best Market</string>
+    <string name="step4_title">Where is your produce?</string>
     <string name="location_produce_label">Current Produce Location</string>
     <string name="summary_produce_label">SUMMARY OF YOUR PRODUCE</string>
     <string name="btn_find_best_option">Find Best Option</string>
@@ -126,14 +126,25 @@
     <string name="sell_step_progress">Step %1$d of 5</string>
     <string name="step1_title">What do you want to sell?</string>
     <string name="step1_subtitle">Choose your crop.</string>
+    <string name="state_selected">Selected</string>
     <string name="step2_title">How much do you have?</string>
     <string name="step2_subtitle">Enter estimated quantity in quintals.</string>
-    <string name="step3_title">How is the quality?</string>
+    <string name="step3_title">How good is your produce?</string>
     <string name="step3_subtitle">Choose the quality of your harvest.</string>
+    <string name="err_quality_required">Please select the quality of your produce.</string>
     <string name="step4_heading">Where is your produce?</string>
-    <string name="step4_subtitle">We use your location to estimate nearby markets and transport costs.</string>
+    <string name="step4_subtitle">Tell us where your produce is located so we can find the best selling option.</string>
     <string name="step5_title">When will it be ready?</string>
+    <string name="step5_heading">When are you ready to sell?</string>
     <string name="step5_subtitle">Tell us when your harvest will be available.</string>
+    <string name="timing_ready_now_sub">I can sell my produce now</string>
+    <string name="timing_within_7_days">Within 7 days</string>
+    <string name="timing_within_7_days_sub">I will be ready within a week</string>
+    <string name="timing_later">Later</string>
+    <string name="timing_later_sub">I am not ready to sell yet</string>
+    <string name="timing_why_matters">The best place to sell can change depending on when you are ready.</string>
+    <string name="btn_see_best_options">See Best Selling Options</string>
+    <string name="err_timing_required">Please select when you are ready to sell.</string>
     
     <!-- Quality Descriptions -->
     <string name="quality_good_desc">Clean and good quality</string>
@@ -142,8 +153,20 @@
     <string name="quality_photo_helper">📷 Add photo for quality help (Coming soon)</string>
     
     <!-- Location Choices -->
-    <string name="loc_use_my_location">Use my location</string>
-    <string name="loc_choose_location">Choose location</string>
+    <string name="loc_use_my_location">Use my current location</string>
+    <string name="loc_choose_location">Choose location manually</string>
+    <string name="loc_your_location">Your location</string>
+    <string name="loc_detected_badge">Location detected</string>
+    <string name="loc_manual_badge">Selected manually</string>
+    <string name="loc_change_manual">Change location</string>
+    <string name="loc_privacy_note">Location is used to find nearby markets, buyers and transport costs.</string>
+    <string name="loc_permission_needed">Location permission is needed to find nearby selling options.</string>
+    <string name="loc_services_disabled">Turn on location to detect your current area.</string>
+    <string name="loc_unavailable">Location unavailable. Please select your location manually.</string>
+    <string name="loc_detecting">Detecting location…</string>
+    <string name="btn_choose_manually">Choose Location Manually</string>
+    <string name="select_location_prompt">Select your district or market</string>
+    <string name="err_location_required">Please choose or detect your location.</string>
     <string name="loc_nagpur">Nagpur, Maharashtra</string>
     <string name="loc_katol">Katol, Maharashtra</string>
     <string name="loc_amravati">Amravati, Maharashtra</string>
@@ -241,6 +264,9 @@
     <string name="type_exact_quantity">Type exact quantity</string>
     <string name="hide_manual_entry">Hide manual entry</string>
     <string name="label_exact_quintals">Exact quintals</string>
+    <string name="err_qty_required">Please enter the quantity.</string>
+    <string name="err_qty_greater_than_zero">Quantity must be greater than 0.</string>
+    <string name="quick_qty_label">%1$d q</string>
 
     <!-- Empty / Error States -->
     <string name="empty_rec_title">We couldn\'t find a good match right now</string>
@@ -464,4 +490,27 @@
     <string name="lang_english">English</string>
     <string name="lang_hindi">हिन्दी</string>
     <string name="lang_marathi">मराठी</string>
+
+    <!-- Phase 5 / Refined Prices Screen -->
+    <string name="title_price_trend">7-Day Price Trend</string>
+    <string name="trend_increased_7d">Price has increased over the last 7 days.</string>
+    <string name="trend_steady_7d">Price has remained steady this week.</string>
+    <string name="trend_decreased_7d">Price has softened slightly over recent days.</string>
+    <string name="trend_summary_nagpur">Up by ₹120 in Nagpur APMC this week</string>
+    <string name="badge_benchmark_market">Benchmark Market</string>
+    <string name="badge_highest_rate">Highest Rate</string>
+    <string name="label_select_crop">Select Crop</string>
+    <string name="prices_sell_action_title">Ready to sell your crop?</string>
+    <string name="prices_sell_action_subtext">Find the buyer or market that gives you the highest net earnings after transport and handling costs.</string>
+    <string name="market_distance_nearby">Nearby</string>
+    <string name="price_diff_lower">₹%1$d lower</string>
+    <string name="chart_day_mon">Mon</string>
+    <string name="chart_day_tue">Tue</string>
+    <string name="chart_day_wed">Wed</string>
+    <string name="chart_day_thu">Thu</string>
+    <string name="chart_day_fri">Fri</string>
+    <string name="chart_day_sat">Sat</string>
+    <string name="chart_day_today">Today</string>
+    <string name="label_todays_benchmark">Today\'s Benchmark Price</string>
+    <string name="label_mandi_distance">%1$d km away</string>
 </resources>

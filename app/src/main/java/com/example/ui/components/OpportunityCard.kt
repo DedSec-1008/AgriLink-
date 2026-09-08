@@ -197,7 +197,7 @@ fun OpportunityCard(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Row(verticalAlignment = Alignment.Baseline) {
+                        Row(verticalAlignment = Alignment.Bottom) {
                             Text(
                                 text = "₹${opportunity.netRealizationPerQ}",
                                 fontSize = 32.sp,

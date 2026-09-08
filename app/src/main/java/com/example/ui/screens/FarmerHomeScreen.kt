@@ -2,13 +2,15 @@ package com.example.ui.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,12 +18,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.HelpOutline
@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
 import com.example.data.AgriRepository
-import com.example.model.Transaction
+import com.example.model.AgriTransaction
 import com.example.ui.components.OpportunityCard
 import com.example.ui.components.QuickActionGrid
 import com.example.ui.components.TodaysPriceCard
@@ -81,136 +81,79 @@ fun FarmerHomeScreen(
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-    if (isLandscape) {
-        // =========================================================================
-        // LANDSCAPE RESPONSIVE LAYOUT
-        // 2-Column mental model:
-        // Left: WHAT DO I HAVE? -> WHAT IS IT WORTH?
-        // Right: WHERE SHOULD I SELL? -> WHAT SHOULD I DO NEXT?
-        // =========================================================================
-        Row(
-            modifier = modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Left Column: Produce, Benchmark Prices, Active sale & Buyers
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                FarmerGreetingHeader()
+    val scrollState = rememberSaveable(saver = ScrollState.Saver) { ScrollState(0) }
 
-                if (activeSale != null) {
-                    ActiveSaleCard(
-                        activeSale = activeSale,
-                        onNavigateToActiveSale = onNavigateToActiveSale
-                    )
-                }
-
-                // Step 1: What I have ready to sell
-                WhatIHaveCard(produce = currentProduce)
-
-                // Step 2: Today's benchmark price
-                TodaysPriceCard(priceInfo = todaysPrice)
-
-                // Step 5: Browse Buyers Banner
-                BrowseBuyersCard(onNavigateToBuyers = onNavigateToBuyers)
-
-                Spacer(modifier = Modifier.height(16.dp))
+    val inventorySection = @Composable {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            if (activeSale != null) {
+                ActiveSaleCard(
+                    activeSale = activeSale,
+                    onNavigateToActiveSale = onNavigateToActiveSale
+                )
             }
-
-            // Right Column: Best Selling Opportunity & Quick Actions
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Primary Question Callout: "WHERE SHOULD I SELL?"
-                WhereShouldISellHeader()
-
-                // Undisputed decision card answering the primary question
-                OpportunityCard(
-                    opportunity = bestOpportunity,
-                    onSellHereClicked = onNavigateToSell,
-                    onFindBestPlaceClicked = onNavigateToSell
-                )
-
-                // Quick actions ("WHAT SHOULD YOU DO NEXT?")
-                QuickActionGrid(
-                    onCheckPricesClicked = onNavigateToPrices,
-                    onSellProduceClicked = onNavigateToSell,
-                    onMyLotsClicked = onNavigateToMyLots,
-                    onGetHelpClicked = onNavigateToHelp
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
+            WhatIHaveCard(produce = currentProduce)
+            TodaysPriceCard(priceInfo = todaysPrice)
+            if (isLandscape) {
+                BrowseBuyersCard(onNavigateToBuyers = onNavigateToBuyers)
             }
         }
-    } else {
-        // =========================================================================
-        // PORTRAIT PRIMARY EXPERIENCE
-        // Single column layout with maximum width constraint to avoid overstretching
-        // on wider portrait devices while providing full edge-to-edge experience on phones.
-        // =========================================================================
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .widthIn(max = 640.dp)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                FarmerGreetingHeader()
+    }
 
-                if (activeSale != null) {
-                    ActiveSaleCard(
-                        activeSale = activeSale,
-                        onNavigateToActiveSale = onNavigateToActiveSale
-                    )
-                }
-
-                // Step 1: What I have ready to sell
-                WhatIHaveCard(produce = currentProduce)
-
-                // Step 2: Today's benchmark price
-                TodaysPriceCard(priceInfo = todaysPrice)
-
-                // Step 3 in Farmer Hierarchy: "WHERE SHOULD I SELL?"
-                WhereShouldISellHeader()
-
-                // Best selling opportunity (Undisputed decision card answering the primary question)
-                OpportunityCard(
-                    opportunity = bestOpportunity,
-                    onSellHereClicked = onNavigateToSell,
-                    onFindBestPlaceClicked = onNavigateToSell
-                )
-
-                // Step 4 in Farmer Hierarchy: Quick actions ("WHAT SHOULD YOU DO NEXT?")
-                QuickActionGrid(
-                    onCheckPricesClicked = onNavigateToPrices,
-                    onSellProduceClicked = onNavigateToSell,
-                    onMyLotsClicked = onNavigateToMyLots,
-                    onGetHelpClicked = onNavigateToHelp
-                )
-
-                // Step 5: Browse Buyers Banner
+    val actionSection = @Composable {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            WhereShouldISellHeader()
+            OpportunityCard(
+                opportunity = bestOpportunity,
+                onSellHereClicked = onNavigateToSell,
+                onFindBestPlaceClicked = onNavigateToSell
+            )
+            QuickActionGrid(
+                onCheckPricesClicked = onNavigateToPrices,
+                onSellProduceClicked = onNavigateToSell,
+                onMyLotsClicked = onNavigateToMyLots,
+                onGetHelpClicked = onNavigateToHelp
+            )
+            if (!isLandscape) {
                 BrowseBuyersCard(onNavigateToBuyers = onNavigateToBuyers)
-
-                Spacer(modifier = Modifier.height(12.dp))
             }
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .widthIn(max = if (isLandscape) 1100.dp else 640.dp)
+                .verticalScroll(scrollState)
+                .padding(horizontal = 16.dp, vertical = if (isLandscape) 10.dp else 16.dp),
+            verticalArrangement = Arrangement.spacedBy(if (isLandscape) 12.dp else 16.dp)
+        ) {
+            FarmerGreetingHeader()
+
+            if (isLandscape) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        inventorySection()
+                    }
+                    Box(modifier = Modifier.weight(1f)) {
+                        actionSection()
+                    }
+                }
+            } else {
+                inventorySection()
+                actionSection()
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -314,7 +257,7 @@ private fun WhereShouldISellHeader() {
 
 @Composable
 private fun ActiveSaleCard(
-    activeSale: Transaction,
+    activeSale: AgriTransaction,
     onNavigateToActiveSale: (String) -> Unit
 ) {
     Card(

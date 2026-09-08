@@ -172,7 +172,8 @@ fun AgriLinkFarmerApp() {
                                     onNavigateToActiveSale = { txId -> currentScreen = AppScreen.TransactionDetail(txId) }
                                 )
                                 FarmerNavDestination.PRICES -> PricesScreen(
-                                    repository = repository
+                                    repository = repository,
+                                    onNavigateToSell = { currentDestination = FarmerNavDestination.SELL }
                                 )
                                 FarmerNavDestination.SELL -> SellScreen(
                                     repository = repository,
@@ -419,65 +420,33 @@ fun AgriLinkFarmerApp() {
                         }
                     }
                 }
-            }
 
-            if (isLandscape) {
-                Row(modifier = Modifier.fillMaxSize()) {
-                    FarmerNavigationRail(
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                topBar = {
+                    AgriTopBar(
+                        currentLanguage = selectedLanguage,
+                        onLanguageSelected = { selectedLanguage = it },
+                        onHelpClicked = {
+                            currentScreen = AppScreen.MainNav
+                            currentDestination = FarmerNavDestination.HELP
+                        },
+                        isCompact = isLandscape
+                    )
+                },
+                bottomBar = {
+                    FarmerBottomNavigation(
                         currentDestination = currentDestination,
                         onNavigate = {
                             currentDestination = it
                             currentScreen = AppScreen.MainNav
                         }
                     )
-                    Scaffold(
-                        modifier = Modifier.weight(1f),
-                        topBar = {
-                            AgriTopBar(
-                                currentLanguage = selectedLanguage,
-                                onLanguageSelected = { selectedLanguage = it },
-                                onHelpClicked = {
-                                    currentScreen = AppScreen.MainNav
-                                    currentDestination = FarmerNavDestination.HELP
-                                },
-                                isCompact = true
-                            )
-                        },
-                        snackbarHost = { SnackbarHost(snackbarHostState) }
-                    ) { innerPadding ->
-                        Box(modifier = Modifier.padding(innerPadding)) {
-                            appScreenContent()
-                        }
-                    }
-                }
-            } else {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    topBar = {
-                        AgriTopBar(
-                            currentLanguage = selectedLanguage,
-                            onLanguageSelected = { selectedLanguage = it },
-                            onHelpClicked = {
-                                currentScreen = AppScreen.MainNav
-                                currentDestination = FarmerNavDestination.HELP
-                            },
-                            isCompact = false
-                        )
-                    },
-                    bottomBar = {
-                        FarmerBottomNavigation(
-                            currentDestination = currentDestination,
-                            onNavigate = {
-                                currentDestination = it
-                                currentScreen = AppScreen.MainNav
-                            }
-                        )
-                    },
-                    snackbarHost = { SnackbarHost(snackbarHostState) }
-                ) { innerPadding ->
-                    Box(modifier = Modifier.padding(innerPadding)) {
-                        appScreenContent()
-                    }
+                },
+                snackbarHost = { SnackbarHost(snackbarHostState) }
+            ) { innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) {
+                    appScreenContent()
                 }
             }
         }

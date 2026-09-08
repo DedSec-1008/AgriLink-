@@ -113,7 +113,7 @@
     <string name="btn_new_lot">+ नया लॉट</string>
     <string name="helpline_label">किसान हेल्पलाइन (टोल-फ्री)</string>
     <string name="helpline_timing">1800-180-1551 • सुबह 6 से रात 10</string>
-    <string name="step4_title">चरण 4: स्थान और उपज की पुष्टि करें</string>
+    <string name="step4_title">आपकी उपज कहाँ है?</string>
     <string name="location_produce_label">उपज का वर्तमान स्थान</string>
     <string name="summary_produce_label">आपकी उपज का विवरण</string>
     <string name="btn_find_best_option">सर्वोत्तम बिक्री विकल्प खोजें</string>
@@ -126,14 +126,25 @@
     <string name="sell_step_progress">चरण %1$d / 5</string>
     <string name="step1_title">आप क्या बेचना चाहते हैं?</string>
     <string name="step1_subtitle">अपनी फसल चुनें।</string>
+    <string name="state_selected">चुना गया</string>
     <string name="step2_title">आपके पास कितनी उपज है?</string>
     <string name="step2_subtitle">अनुमानित मात्रा क्विंटल में दर्ज करें।</string>
-    <string name="step3_title">गुणवत्ता कैसी है?</string>
+    <string name="step3_title">आपकी उपज की गुणवत्ता कैसी है?</string>
     <string name="step3_subtitle">अपनी फसल की गुणवत्ता चुनें।</string>
+    <string name="err_quality_required">कृपया अपनी उपज की गुणवत्ता चुनें।</string>
     <string name="step4_heading">आपकी उपज कहाँ है?</string>
-    <string name="step4_subtitle">हम आस-पास के बाजारों और परिवहन खर्च के अनुमान के लिए आपके स्थान का उपयोग करते हैं।</string>
+    <string name="step4_subtitle">अपनी उपज का स्थान बताएं ताकि हम सबसे अच्छा बिक्री विकल्प ढूंढ सकें।</string>
     <string name="step5_title">यह कब तैयार होगी?</string>
+    <string name="step5_heading">आप कब बेचने के लिए तैयार हैं?</string>
     <string name="step5_subtitle">बताएं कि आपकी फसल कब बिक्री के लिए उपलब्ध होगी।</string>
+    <string name="timing_ready_now_sub">मैं अपनी उपज अभी बेच सकता हूँ</string>
+    <string name="timing_within_7_days">7 दिनों के भीतर</string>
+    <string name="timing_within_7_days_sub">मैं एक सप्ताह में तैयार हो जाऊंगा</string>
+    <string name="timing_later">बाद में</string>
+    <string name="timing_later_sub">मैं अभी बेचने के लिए तैयार नहीं हूँ</string>
+    <string name="timing_why_matters">आप कब तैयार हैं, इसके आधार पर बेचने का सबसे अच्छा स्थान बदल सकता है।</string>
+    <string name="btn_see_best_options">सर्वोत्तम बिक्री विकल्प देखें</string>
+    <string name="err_timing_required">कृपया चुनें कि आप कब बेचने के लिए तैयार हैं।</string>
     
     <!-- Quality Descriptions -->
     <string name="quality_good_desc">साफ और उत्तम गुणवत्ता</string>
@@ -143,7 +154,19 @@
     
     <!-- Location Choices -->
     <string name="loc_use_my_location">मेरे वर्तमान स्थान का उपयोग करें</string>
-    <string name="loc_choose_location">स्थान चुनें</string>
+    <string name="loc_choose_location">स्थान मैन्युअल रूप से चुनें</string>
+    <string name="loc_your_location">आपका स्थान</string>
+    <string name="loc_detected_badge">स्थान का पता लगाया गया</string>
+    <string name="loc_manual_badge">मैन्युअल रूप से चयनित</string>
+    <string name="loc_change_manual">स्थान बदलें</string>
+    <string name="loc_privacy_note">स्थान का उपयोग नजदीकी मंडियों, खरीदारों और परिवहन खर्च खोजने के लिए किया जाता है।</string>
+    <string name="loc_permission_needed">नजदीकी बिक्री विकल्प खोजने के लिए स्थान अनुमति आवश्यक है।</string>
+    <string name="loc_services_disabled">अपने वर्तमान क्षेत्र का पता लगाने के लिए स्थान सेवा चालू करें।</string>
+    <string name="loc_unavailable">स्थान अनुपलब्ध है। कृपया अपना स्थान मैन्युअल रूप से चुनें।</string>
+    <string name="loc_detecting">स्थान का पता लगाया जा रहा है…</string>
+    <string name="btn_choose_manually">स्थान मैन्युअल रूप से चुनें</string>
+    <string name="select_location_prompt">अपना जिला या मंडी चुनें</string>
+    <string name="err_location_required">कृपया अपना स्थान चुनें या पता लगाएं।</string>
     <string name="loc_nagpur">नागपुर, महाराष्ट्र</string>
     <string name="loc_katol">काटोल, महाराष्ट्र</string>
     <string name="loc_amravati">अमरावती, महाराष्ट्र</string>
@@ -241,6 +264,9 @@
     <string name="type_exact_quantity">सटीक मात्रा लिखें</string>
     <string name="hide_manual_entry">मैन्युअल प्रविष्टि छिपाएं</string>
     <string name="label_exact_quintals">सटीक क्विंटल</string>
+    <string name="err_qty_required">कृपया मात्रा दर्ज करें।</string>
+    <string name="err_qty_greater_than_zero">मात्रा 0 से अधिक होनी चाहिए।</string>
+    <string name="quick_qty_label">%1$d क्विंटल</string>
 
     <!-- Empty / Error States -->
     <string name="empty_rec_title">वर्तमान में कोई उपयुक्त विकल्प नहीं मिला</string>
@@ -464,4 +490,27 @@
     <string name="lang_english">English</string>
     <string name="lang_hindi">हिन्दी</string>
     <string name="lang_marathi">मराठी</string>
-</resources>
+
+    <!-- Phase 5 / Refined Prices Screen -->
+    <string name="title_price_trend">पिछले 7 दिनों का भाव रुझान</string>
+    <string name="trend_increased_7d">पिछले 7 दिनों में भाव में बढ़ोतरी हुई है।</string>
+    <string name="trend_steady_7d">इस सप्ताह भाव स्थिर रहा है।</string>
+    <string name="trend_decreased_7d">हाल के दिनों में भाव में हल्की नरमी आई है।</string>
+    <string name="trend_summary_nagpur">इस सप्ताह नागपुर मंडी में ₹120 की बढ़त</string>
+    <string name="badge_benchmark_market">मुख्य संदर्भ मंडी</string>
+    <string name="badge_highest_rate">सर्वोच्च भाव</string>
+    <string name="label_select_crop">फसल चुनें</string>
+    <string name="prices_sell_action_title">क्या आप अपनी फसल बेचना चाहते हैं?</string>
+    <string name="prices_sell_action_subtext">भाड़ा और अन्य खर्च काटकर अपनी जेब में सबसे ज्यादा कमाई दिलाने वाला सही विकल्प जानें।</string>
+    <string name="market_distance_nearby">पास में</string>
+    <string name="price_diff_lower">₹%1$d कम</string>
+    <string name="chart_day_mon">सोम</string>
+    <string name="chart_day_tue">मंगल</string>
+    <string name="chart_day_wed">बुध</string>
+    <string name="chart_day_thu">गुरु</string>
+    <string name="chart_day_fri">शुक्र</string>
+    <string name="chart_day_sat">शनि</string>
+    <string name="chart_day_today">आज</string>
+    <string name="label_todays_benchmark">आज का मुख्य संदर्भ भाव</string>
+    <string name="label_mandi_distance">%1$d किमी दूर</string>
+ </resources>

@@ -199,7 +199,7 @@ fun TodaysPriceCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row(verticalAlignment = Alignment.Baseline) {
+                Row(verticalAlignment = Alignment.Bottom) {
                     Text(
                         text = "₹${priceInfo.pricePerQuintal}",
                         style = MaterialTheme.typography.headlineMedium,

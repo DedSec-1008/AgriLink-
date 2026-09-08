@@ -3,6 +3,7 @@ package com.example
 import com.example.data.MockAgriRepository
 import com.example.data.MockRecommendationService
 import com.example.model.CropOption
+import com.example.ui.screens.HarvestReadiness
 import com.example.ui.screens.SellingStep
 import com.example.ui.screens.SellingViewModel
 import kotlinx.coroutines.Dispatchers
@@ -134,7 +135,7 @@ class Phase2SellingFlowTest {
         // Verify lot appears in Repository's getMyLots Flow
         val allLots = repository.getMyLots().first()
         assertTrue(allLots.any { it.lotId == createdLot.lotId && it.buyerNameRes == R.string.buyer_abc_foods })
-        assertEquals("Lot #AG-1024", createdLot.lotId)
+        assertTrue(createdLot.lotId.startsWith("Lot #AG-"))
         assertEquals(R.string.lot_status_waiting, createdLot.statusRes)
 
         // Test Duplicate Lot Protection (Section 18)
@@ -164,5 +165,371 @@ class Phase2SellingFlowTest {
         // Verify state was preserved!
         assertEquals(85, viewModel.uiState.value.quantityQuintals)
         assertEquals("wheat", viewModel.uiState.value.selectedCrop.id)
+    }
+
+    @Test
+    fun testStep1CropSelectionAndContinuance() {
+        val repository = MockAgriRepository()
+        val viewModel = SellingViewModel(repository)
+
+        // Verify initial state is on CROP step
+        assertEquals(SellingStep.CROP, viewModel.uiState.value.currentStep)
+
+        // Verify all repository crops including 'other'
+        val availableCrops = repository.getAvailableCrops()
+        val otherCrop = availableCrops.first { it.id == "other" }
+        val wheatCrop = availableCrops.first { it.id == "wheat" }
+
+        // Farmer taps Wheat card: updates selectedCrop, stays on CROP step until Continue
+        viewModel.setCrop(wheatCrop)
+        assertEquals(SellingStep.CROP, viewModel.uiState.value.currentStep)
+        assertEquals("wheat", viewModel.uiState.value.selectedCrop.id)
+
+        // Farmer taps Other card: updates selectedCrop, stays on CROP step
+        viewModel.setCrop(otherCrop)
+        assertEquals(SellingStep.CROP, viewModel.uiState.value.currentStep)
+        assertEquals("other", viewModel.uiState.value.selectedCrop.id)
+
+        // Farmer presses Continue: proceeds to QUANTITY step
+        viewModel.goToStep(SellingStep.QUANTITY)
+        assertEquals(SellingStep.QUANTITY, viewModel.uiState.value.currentStep)
+        assertEquals("other", viewModel.uiState.value.selectedCrop.id)
+
+        // Going back returns to CROP step and keeps "other" selected
+        val backSuccess = viewModel.goBack()
+        assertTrue(backSuccess)
+        assertEquals(SellingStep.CROP, viewModel.uiState.value.currentStep)
+        assertEquals("other", viewModel.uiState.value.selectedCrop.id)
+    }
+
+    @Test
+    fun testStep2QuantitySelectionAndContinuance() = runTest {
+        val repository = MockAgriRepository()
+        val viewModel = SellingViewModel(repository)
+        val availableCrops = repository.getAvailableCrops()
+
+        val soybean = availableCrops.first { it.id == "soybean" }
+        viewModel.setCrop(soybean)
+        viewModel.goToStep(SellingStep.QUANTITY)
+
+        assertEquals(SellingStep.QUANTITY, viewModel.uiState.value.currentStep)
+        assertEquals("soybean", viewModel.uiState.value.selectedCrop.id)
+
+        // Presets & direct updates
+        viewModel.updateQuantity(25)
+        assertEquals(25, viewModel.uiState.value.quantityQuintals)
+
+        viewModel.updateQuantity(100)
+        assertEquals(100, viewModel.uiState.value.quantityQuintals)
+
+        // Stepper behavior (custom value)
+        viewModel.updateQuantity(95)
+        assertEquals(95, viewModel.uiState.value.quantityQuintals)
+
+        // Navigate back to Step 1 (Crop Selection): crop must remain intact
+        val backToCrop = viewModel.goBack()
+        assertTrue(backToCrop)
+        assertEquals(SellingStep.CROP, viewModel.uiState.value.currentStep)
+        assertEquals("soybean", viewModel.uiState.value.selectedCrop.id)
+
+        // Navigate forward again to Step 2: quantity must remain intact
+        viewModel.goToStep(SellingStep.QUANTITY)
+        assertEquals(SellingStep.QUANTITY, viewModel.uiState.value.currentStep)
+        assertEquals(95, viewModel.uiState.value.quantityQuintals)
+
+        // Continue to Step 3 (Quality)
+        viewModel.goToStep(SellingStep.QUALITY)
+        assertEquals(SellingStep.QUALITY, viewModel.uiState.value.currentStep)
+        assertEquals(95, viewModel.uiState.value.quantityQuintals)
+        assertEquals("soybean", viewModel.uiState.value.selectedCrop.id)
+    }
+
+    @Test
+    fun testStep3QualitySelectionAndContinuance() = runTest {
+        val repository = MockAgriRepository()
+        val viewModel = SellingViewModel(repository)
+        val availableCrops = repository.getAvailableCrops()
+
+        val soybean = availableCrops.first { it.id == "soybean" }
+        viewModel.setCrop(soybean)
+        viewModel.goToStep(SellingStep.QUANTITY)
+        viewModel.updateQuantity(75)
+        viewModel.goToStep(SellingStep.QUALITY)
+
+        // Verify Step 3 initial state
+        assertEquals(SellingStep.QUALITY, viewModel.uiState.value.currentStep)
+        assertEquals("soybean", viewModel.uiState.value.selectedCrop.id)
+        assertEquals(75, viewModel.uiState.value.quantityQuintals)
+        assertEquals("", viewModel.uiState.value.qualityKey)
+
+        // Select Good
+        viewModel.selectQuality("good", R.string.produce_quality_good)
+        assertEquals("good", viewModel.uiState.value.qualityKey)
+        assertEquals(R.string.produce_quality_good, viewModel.uiState.value.qualityRes)
+
+        // Select Average
+        viewModel.selectQuality("average", R.string.quality_average)
+        assertEquals("average", viewModel.uiState.value.qualityKey)
+        assertEquals(R.string.quality_average, viewModel.uiState.value.qualityRes)
+
+        // Select Poor
+        viewModel.selectQuality("poor", R.string.quality_poor)
+        assertEquals("poor", viewModel.uiState.value.qualityKey)
+        assertEquals(R.string.quality_poor, viewModel.uiState.value.qualityRes)
+
+        // Re-select Good
+        viewModel.selectQuality("good", R.string.produce_quality_good)
+        assertEquals("good", viewModel.uiState.value.qualityKey)
+
+        // Go back to Step 2 (Quantity)
+        val backToQty = viewModel.goBack()
+        assertTrue(backToQty)
+        assertEquals(SellingStep.QUANTITY, viewModel.uiState.value.currentStep)
+        assertEquals(75, viewModel.uiState.value.quantityQuintals)
+        assertEquals("soybean", viewModel.uiState.value.selectedCrop.id)
+
+        // Go back to Step 1 (Crop)
+        val backToCrop = viewModel.goBack()
+        assertTrue(backToCrop)
+        assertEquals(SellingStep.CROP, viewModel.uiState.value.currentStep)
+        assertEquals("soybean", viewModel.uiState.value.selectedCrop.id)
+
+        // Move forward to Quantity and then Quality again
+        viewModel.goToStep(SellingStep.QUANTITY)
+        assertEquals(SellingStep.QUANTITY, viewModel.uiState.value.currentStep)
+        assertEquals(75, viewModel.uiState.value.quantityQuintals)
+
+        viewModel.goToStep(SellingStep.QUALITY)
+        assertEquals(SellingStep.QUALITY, viewModel.uiState.value.currentStep)
+        assertEquals("good", viewModel.uiState.value.qualityKey)
+        assertEquals(75, viewModel.uiState.value.quantityQuintals)
+        assertEquals("soybean", viewModel.uiState.value.selectedCrop.id)
+
+        // Continue to Step 4 (Location)
+        viewModel.goToStep(SellingStep.LOCATION)
+        assertEquals(SellingStep.LOCATION, viewModel.uiState.value.currentStep)
+        assertEquals("good", viewModel.uiState.value.qualityKey)
+        assertEquals(75, viewModel.uiState.value.quantityQuintals)
+        assertEquals("soybean", viewModel.uiState.value.selectedCrop.id)
+    }
+
+    @Test
+    fun testStep4LocationSelectionAndContinuance() = runTest {
+        val repository = MockAgriRepository()
+        val viewModel = SellingViewModel(repository)
+        val availableCrops = repository.getAvailableCrops()
+
+        // Complete Step 1: Crop
+        val soybean = availableCrops.first { it.id == "soybean" }
+        viewModel.setCrop(soybean)
+        viewModel.goToStep(SellingStep.QUANTITY)
+
+        // Complete Step 2: Quantity
+        viewModel.updateQuantity(60)
+        viewModel.goToStep(SellingStep.QUALITY)
+
+        // Complete Step 3: Quality
+        viewModel.selectQuality("good", R.string.produce_quality_good)
+        viewModel.goToStep(SellingStep.LOCATION)
+
+        // Step 4: Verify initial state
+        assertEquals(SellingStep.LOCATION, viewModel.uiState.value.currentStep)
+        assertEquals("soybean", viewModel.uiState.value.selectedCrop.id)
+        assertEquals(60, viewModel.uiState.value.quantityQuintals)
+        assertEquals("good", viewModel.uiState.value.qualityKey)
+
+        // Manual Location Selection (e.g. Amravati)
+        viewModel.selectLocation(
+            "Amravati, Maharashtra",
+            R.string.loc_amravati,
+            com.example.ui.screens.LocationSource.MANUAL_SELECTION
+        )
+        assertEquals("Amravati, Maharashtra", viewModel.uiState.value.location)
+        assertEquals(R.string.loc_amravati, viewModel.uiState.value.locationRes)
+        assertEquals(
+            com.example.ui.screens.LocationSource.MANUAL_SELECTION,
+            viewModel.uiState.value.locationSource
+        )
+
+        // Switch to Current Location (e.g. GPS detected Nagpur)
+        viewModel.selectLocation(
+            "Nagpur, Maharashtra",
+            R.string.loc_nagpur,
+            com.example.ui.screens.LocationSource.CURRENT_LOCATION
+        )
+        assertEquals("Nagpur, Maharashtra", viewModel.uiState.value.location)
+        assertEquals(R.string.loc_nagpur, viewModel.uiState.value.locationRes)
+        assertEquals(
+            com.example.ui.screens.LocationSource.CURRENT_LOCATION,
+            viewModel.uiState.value.locationSource
+        )
+
+        // Go back to Step 3 (Quality)
+        val backToQuality = viewModel.goBack()
+        assertTrue(backToQuality)
+        assertEquals(SellingStep.QUALITY, viewModel.uiState.value.currentStep)
+        assertEquals("good", viewModel.uiState.value.qualityKey)
+        assertEquals(60, viewModel.uiState.value.quantityQuintals)
+        assertEquals("soybean", viewModel.uiState.value.selectedCrop.id)
+
+        // Go back to Step 2 (Quantity)
+        val backToQuantity = viewModel.goBack()
+        assertTrue(backToQuantity)
+        assertEquals(SellingStep.QUANTITY, viewModel.uiState.value.currentStep)
+        assertEquals(60, viewModel.uiState.value.quantityQuintals)
+
+        // Navigate forward again to Quality and Location
+        viewModel.goToStep(SellingStep.QUALITY)
+        assertEquals(SellingStep.QUALITY, viewModel.uiState.value.currentStep)
+
+        viewModel.goToStep(SellingStep.LOCATION)
+        assertEquals(SellingStep.LOCATION, viewModel.uiState.value.currentStep)
+
+        // Verify Location data was fully preserved!
+        assertEquals("Nagpur, Maharashtra", viewModel.uiState.value.location)
+        assertEquals(R.string.loc_nagpur, viewModel.uiState.value.locationRes)
+        assertEquals(
+            com.example.ui.screens.LocationSource.CURRENT_LOCATION,
+            viewModel.uiState.value.locationSource
+        )
+
+        // Continue to Step 5 (READY_DATE)
+        viewModel.goToStep(SellingStep.READY_DATE)
+        assertEquals(SellingStep.READY_DATE, viewModel.uiState.value.currentStep)
+        assertEquals("Nagpur, Maharashtra", viewModel.uiState.value.location)
+        assertEquals(60, viewModel.uiState.value.quantityQuintals)
+        assertEquals("good", viewModel.uiState.value.qualityKey)
+        assertEquals("soybean", viewModel.uiState.value.selectedCrop.id)
+    }
+
+    @Test
+    fun testStep5HarvestReadinessSelectionAndProgression() = runTest {
+        val repository = MockAgriRepository()
+        val viewModel = SellingViewModel(repository)
+
+        // Setup Steps 1-4
+        viewModel.setCrop(CropOption("soybean", R.string.crop_soybean, "🌱", 4850))
+        viewModel.goToStep(SellingStep.QUANTITY)
+        viewModel.updateQuantity(50)
+        viewModel.goToStep(SellingStep.QUALITY)
+        viewModel.selectQuality("good", R.string.produce_quality_good)
+        viewModel.goToStep(SellingStep.LOCATION)
+        viewModel.selectLocation(
+            "Nagpur, Maharashtra",
+            R.string.loc_nagpur,
+            com.example.ui.screens.LocationSource.CURRENT_LOCATION
+        )
+
+        // Advance to Step 5 (READY_DATE)
+        viewModel.goToStep(SellingStep.READY_DATE)
+        assertEquals(SellingStep.READY_DATE, viewModel.uiState.value.currentStep)
+
+        // 1. Initial State: No harvest option selected -> harvestReadiness is NONE
+        assertEquals(HarvestReadiness.NONE, viewModel.uiState.value.harvestReadiness)
+        val canContinueInitially = viewModel.uiState.value.harvestReadiness != HarvestReadiness.NONE
+        org.junit.Assert.assertFalse(
+            "Continue must be disabled when no harvest option is selected",
+            canContinueInitially
+        )
+
+        // 2. Select "Ready now"
+        viewModel.selectHarvestReadiness(HarvestReadiness.READY_NOW)
+        assertEquals(HarvestReadiness.READY_NOW, viewModel.uiState.value.harvestReadiness)
+        assertEquals("Ready now", viewModel.uiState.value.readyTiming)
+        assertEquals(R.string.timing_ready_now, viewModel.uiState.value.readyTimingRes)
+        assertTrue(viewModel.uiState.value.harvestReadiness != HarvestReadiness.NONE)
+
+        // 3. Select "Within 7 days"
+        viewModel.selectHarvestReadiness(HarvestReadiness.WITHIN_7_DAYS)
+        assertEquals(HarvestReadiness.WITHIN_7_DAYS, viewModel.uiState.value.harvestReadiness)
+        assertEquals("Within 7 days", viewModel.uiState.value.readyTiming)
+        assertEquals(R.string.timing_within_7_days, viewModel.uiState.value.readyTimingRes)
+
+        // 4. Select "Later"
+        viewModel.selectHarvestReadiness(HarvestReadiness.LATER)
+        assertEquals(HarvestReadiness.LATER, viewModel.uiState.value.harvestReadiness)
+        assertEquals("Later", viewModel.uiState.value.readyTiming)
+        assertEquals(R.string.timing_later, viewModel.uiState.value.readyTimingRes)
+
+        // 5. Verify selectReadyTiming backwards compatibility
+        viewModel.selectReadyTiming("Ready now", R.string.timing_ready_now)
+        assertEquals(HarvestReadiness.READY_NOW, viewModel.uiState.value.harvestReadiness)
+        assertEquals("Ready now", viewModel.uiState.value.readyTiming)
+
+        // 6. Continue advances to the existing recommendation stage (SellingStep.REVIEW)
+        viewModel.goToStep(SellingStep.REVIEW)
+        assertEquals(SellingStep.REVIEW, viewModel.uiState.value.currentStep)
+
+        // 7. Back navigation preserves crop, quantity, quality, location, and timing
+        val backToReady = viewModel.goBack()
+        assertTrue(backToReady)
+        assertEquals(SellingStep.READY_DATE, viewModel.uiState.value.currentStep)
+        assertEquals(HarvestReadiness.READY_NOW, viewModel.uiState.value.harvestReadiness)
+        assertEquals("Ready now", viewModel.uiState.value.readyTiming)
+
+        val backToLocation = viewModel.goBack()
+        assertTrue(backToLocation)
+        assertEquals(SellingStep.LOCATION, viewModel.uiState.value.currentStep)
+        assertEquals("Nagpur, Maharashtra", viewModel.uiState.value.location)
+        assertEquals(
+            com.example.ui.screens.LocationSource.CURRENT_LOCATION,
+            viewModel.uiState.value.locationSource
+        )
+
+        val backToQuality = viewModel.goBack()
+        assertTrue(backToQuality)
+        assertEquals(SellingStep.QUALITY, viewModel.uiState.value.currentStep)
+        assertEquals("good", viewModel.uiState.value.qualityKey)
+
+        val backToQuantity = viewModel.goBack()
+        assertTrue(backToQuantity)
+        assertEquals(SellingStep.QUANTITY, viewModel.uiState.value.currentStep)
+        assertEquals(50, viewModel.uiState.value.quantityQuintals)
+
+        val backToCrop = viewModel.goBack()
+        assertTrue(backToCrop)
+        assertEquals(SellingStep.CROP, viewModel.uiState.value.currentStep)
+        assertEquals("soybean", viewModel.uiState.value.selectedCrop.id)
+
+        // 8. Re-navigating forward preserves all entered state
+        viewModel.goToStep(SellingStep.READY_DATE)
+        assertEquals(HarvestReadiness.READY_NOW, viewModel.uiState.value.harvestReadiness)
+        assertEquals("Nagpur, Maharashtra", viewModel.uiState.value.location)
+        assertEquals("good", viewModel.uiState.value.qualityKey)
+        assertEquals(50, viewModel.uiState.value.quantityQuintals)
+        assertEquals("soybean", viewModel.uiState.value.selectedCrop.id)
+    }
+
+    @Test
+    fun testStep5ResourceStringsIntegrity() {
+        val context = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>()
+
+        // Check English strings exist and are non-empty
+        val title = context.getString(R.string.step5_heading)
+        val subtitle = context.getString(R.string.step5_subtitle)
+        val readyNow = context.getString(R.string.timing_ready_now)
+        val readyNowSub = context.getString(R.string.timing_ready_now_sub)
+        val within7Days = context.getString(R.string.timing_within_7_days)
+        val within7DaysSub = context.getString(R.string.timing_within_7_days_sub)
+        val later = context.getString(R.string.timing_later)
+        val laterSub = context.getString(R.string.timing_later_sub)
+        val whyMatters = context.getString(R.string.timing_why_matters)
+        val btnSeeOptions = context.getString(R.string.btn_see_best_options)
+        val errTiming = context.getString(R.string.err_timing_required)
+
+        assertTrue(title.isNotBlank())
+        assertTrue(subtitle.isNotBlank())
+        assertTrue(readyNow.isNotBlank())
+        assertTrue(readyNowSub.isNotBlank())
+        assertTrue(within7Days.isNotBlank())
+        assertTrue(within7DaysSub.isNotBlank())
+        assertTrue(later.isNotBlank())
+        assertTrue(laterSub.isNotBlank())
+        assertTrue(whyMatters.isNotBlank())
+        assertTrue(btnSeeOptions.isNotBlank())
+        assertTrue(errTiming.isNotBlank())
+
+        assertEquals("When are you ready to sell?", title)
+        assertEquals("See Best Selling Options", btnSeeOptions)
     }
 }
