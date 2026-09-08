@@ -218,6 +218,7 @@ private fun ProduceLotCard(
                     color = AgriGreenPrimary
                 )
 
+                val isPublished = lot.statusRes == R.string.lot_status_published || lot.lotStatus == com.example.model.LotStatus.PUBLISHED
                 val isAccepted = lot.statusRes in listOf(
                     R.string.status_offer_accepted,
                     R.string.tx_status_offer_accepted,
@@ -228,17 +229,23 @@ private fun ProduceLotCard(
                     R.string.tx_status_payment_delayed,
                     R.string.tx_status_completed
                 )
+                val isGreenStatus = isAccepted || isPublished
                 Box(
                     modifier = Modifier
+                        .testTag("lot_status_tag_${lot.lotId}")
                         .clip(RoundedCornerShape(8.dp))
-                        .background(if (isAccepted) AgriGreenContainer else AgriGoldContainer)
+                        .background(if (isGreenStatus) AgriGreenContainer else AgriGoldContainer)
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = if (isAccepted) Icons.Default.Inventory2 else Icons.Default.HourglassEmpty,
+                            imageVector = when {
+                                isPublished -> Icons.Default.Inventory2
+                                isAccepted -> Icons.Default.Inventory2
+                                else -> Icons.Default.HourglassEmpty
+                            },
                             contentDescription = null,
-                            tint = if (isAccepted) AgriGreenPrimary else AgriGoldSecondary,
+                            tint = if (isGreenStatus) AgriGreenPrimary else AgriGoldSecondary,
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -246,7 +253,7 @@ private fun ProduceLotCard(
                             text = stringResource(lot.statusRes),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = if (isAccepted) AgriGreenPrimary else AgriGoldSecondary
+                            color = if (isGreenStatus) AgriGreenPrimary else AgriGoldSecondary
                         )
                     }
                 }
@@ -279,10 +286,19 @@ private fun ProduceLotCard(
                         fontWeight = FontWeight.Medium,
                         color = AgriTextSecondary
                     )
+                    if (lot.location.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "📍 ${lot.location}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AgriTextSecondary,
+                            modifier = Modifier.testTag("lot_location_${lot.lotId}")
+                        )
+                    }
                     if (lot.buyerNameRes != null) {
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = "${stringResource(R.string.label_buyer)}: ${stringResource(lot.buyerNameRes)}",
+                            text = "${stringResource(R.string.label_recommended_buyer_tag)}: ${stringResource(lot.buyerNameRes)}",
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.SemiBold,
                             color = AgriGreenPrimary

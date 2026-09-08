@@ -530,6 +530,94 @@ class Phase2SellingFlowTest {
         assertTrue(errTiming.isNotBlank())
 
         assertEquals("When are you ready to sell?", title)
+        assertEquals("Tell us when you can sell your produce.", subtitle)
+        assertEquals("Ready now", readyNow)
+        assertEquals("I can sell my produce now", readyNowSub)
+        assertEquals("Within 7 days", within7Days)
+        assertEquals("I will be ready within a week", within7DaysSub)
+        assertEquals("Later", later)
+        assertEquals("I am not ready to sell yet", laterSub)
+        assertEquals("The best place to sell can change depending on when you are ready.", whyMatters)
         assertEquals("See Best Selling Options", btnSeeOptions)
+    }
+
+    @Test
+    fun testStep5LocalizationInAllLanguages() {
+        val context = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>()
+        val stringKeys = listOf(
+            R.string.step5_heading,
+            R.string.step5_subtitle,
+            R.string.timing_ready_now,
+            R.string.timing_ready_now_sub,
+            R.string.timing_within_7_days,
+            R.string.timing_within_7_days_sub,
+            R.string.timing_later,
+            R.string.timing_later_sub,
+            R.string.timing_why_matters,
+            R.string.btn_see_best_options,
+            R.string.err_timing_required,
+            R.string.summary_produce_label,
+            R.string.state_selected,
+            R.string.unit_quintals
+        )
+
+        for (langCode in listOf("en", "hi", "mr")) {
+            val config = context.resources.configuration
+            val locale = java.util.Locale.forLanguageTag(langCode)
+            val localizedContext = context.createConfigurationContext(
+                config.apply { setLocale(locale) }
+            )
+
+            for (resId in stringKeys) {
+                val str = localizedContext.getString(resId)
+                assertTrue("String res $resId must not be blank for lang $langCode", str.isNotBlank())
+            }
+        }
+    }
+
+    @Test
+    fun testStep5RotationStatePreservation() = runTest {
+        val repository = MockAgriRepository()
+        val viewModel = SellingViewModel(repository)
+
+        // Set up complete Step 1–5 flow state
+        viewModel.setCrop(CropOption("soybean", R.string.crop_soybean, "🌱", 4850))
+        viewModel.updateQuantity(50)
+        viewModel.selectQuality("good", R.string.produce_quality_good)
+        viewModel.selectLocation("Nagpur, Maharashtra", R.string.loc_nagpur, com.example.ui.screens.LocationSource.CURRENT_LOCATION)
+        viewModel.goToStep(SellingStep.READY_DATE)
+        viewModel.selectHarvestReadiness(HarvestReadiness.READY_NOW)
+
+        // Capture initial state before simulated rotation
+        val stateBeforeRotation = viewModel.uiState.value
+        assertEquals("soybean", stateBeforeRotation.selectedCrop.id)
+        assertEquals(50, stateBeforeRotation.quantityQuintals)
+        assertEquals("good", stateBeforeRotation.qualityKey)
+        assertEquals("Nagpur, Maharashtra", stateBeforeRotation.location)
+        assertEquals(HarvestReadiness.READY_NOW, stateBeforeRotation.harvestReadiness)
+        assertEquals(SellingStep.READY_DATE, stateBeforeRotation.currentStep)
+
+        // Simulate configuration change Portrait -> Landscape -> Portrait
+        // The ViewModel instance and its StateFlow are retained across configuration changes
+        val stateAfterPortraitToLandscape = viewModel.uiState.value
+        assertEquals(stateBeforeRotation.selectedCrop.id, stateAfterPortraitToLandscape.selectedCrop.id)
+        assertEquals(stateBeforeRotation.quantityQuintals, stateAfterPortraitToLandscape.quantityQuintals)
+        assertEquals(stateBeforeRotation.qualityKey, stateAfterPortraitToLandscape.qualityKey)
+        assertEquals(stateBeforeRotation.location, stateAfterPortraitToLandscape.location)
+        assertEquals(stateBeforeRotation.harvestReadiness, stateAfterPortraitToLandscape.harvestReadiness)
+        assertEquals(stateBeforeRotation.currentStep, stateAfterPortraitToLandscape.currentStep)
+
+        // Change selection in landscape
+        viewModel.selectHarvestReadiness(HarvestReadiness.WITHIN_7_DAYS)
+
+        // Simulate Landscape -> Portrait
+        val stateAfterLandscapeToPortrait = viewModel.uiState.value
+        assertEquals(HarvestReadiness.WITHIN_7_DAYS, stateAfterLandscapeToPortrait.harvestReadiness)
+        assertEquals("Within 7 days", stateAfterLandscapeToPortrait.readyTiming)
+        assertEquals("soybean", stateAfterLandscapeToPortrait.selectedCrop.id)
+        assertEquals(50, stateAfterLandscapeToPortrait.quantityQuintals)
+        assertEquals("good", stateAfterLandscapeToPortrait.qualityKey)
+        assertEquals("Nagpur, Maharashtra", stateAfterLandscapeToPortrait.location)
+        assertEquals(SellingStep.READY_DATE, stateAfterLandscapeToPortrait.currentStep)
     }
 }

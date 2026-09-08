@@ -10,6 +10,7 @@ import com.example.model.Offer
 import com.example.model.OfferStatus
 import com.example.model.ProduceItem
 import com.example.model.ProduceLot
+import com.example.model.LotStatus
 import com.example.model.SellingOpportunity
 import com.example.model.TransactionStatus
 import com.example.model.GrievanceIssue
@@ -55,13 +56,41 @@ interface AgriRepository : TransactionRepository, LogisticsRepository, PaymentRe
     fun getAvailableCrops(): List<CropOption>
     fun getMyLots(): Flow<List<ProduceLot>>
     fun getHelpCategories(): List<HelpCategory>
-    suspend fun addLot(cropRes: Int, emoji: String, quantity: Int, qualityRes: Int, buyerNameRes: Int? = null): ProduceLot
+    suspend fun addLot(
+        cropRes: Int,
+        emoji: String,
+        quantity: Int,
+        qualityRes: Int,
+        buyerNameRes: Int? = null,
+        location: String = "Nagpur, Maharashtra",
+        readyTiming: String = "Ready now",
+        expectedPricePerQ: Int = 4850,
+        estimatedNetPerQ: Int = 4700,
+        photos: List<String> = emptyList(),
+        statusRes: Int = R.string.lot_status_waiting,
+        customLotId: String? = null,
+        autoGenerateOffers: Boolean = true
+    ): ProduceLot
+    suspend fun publishLot(
+        cropRes: Int,
+        emoji: String,
+        quantity: Int,
+        qualityRes: Int,
+        buyerNameRes: Int? = null,
+        location: String = "Nagpur, Maharashtra",
+        readyTiming: String = "Ready now",
+        expectedPricePerQ: Int = 4850,
+        estimatedNetPerQ: Int = 4700,
+        photos: List<String> = emptyList()
+    ): ProduceLot
     
     // Phase 3 & 4: Buyers, Offers & Transactions
     fun getBuyers(): Flow<List<Buyer>>
+    fun getMatchingBuyersForLot(lotId: String): Flow<List<Buyer>>
     fun getBuyerById(id: String): Buyer?
     fun getOffersForLot(lotId: String): Flow<List<Offer>>
     fun getOfferById(offerId: String): Offer?
+    fun generateOffersForLot(lotId: String): List<Offer>
     suspend fun acceptOffer(offerId: String): Result<AgriTransaction>
     suspend fun rejectOffer(offerId: String): Result<Unit>
     fun getLotById(lotId: String): ProduceLot?
@@ -137,7 +166,10 @@ class MockAgriRepository(
             farmerRating = 4.7,
             neededTimelineRes = R.string.timeline_this_week,
             disputeRatePct = 0.8,
-            averagePaymentDays = 2
+            averagePaymentDays = 2,
+            distanceKm = 28,
+            reliabilityTextRes = R.string.reliability_very_reliable,
+            buysCommodities = listOf(R.string.crop_soybean, R.string.crop_wheat, R.string.crop_maize)
         ),
         Buyer(
             id = "buyer_xyz",
@@ -148,14 +180,17 @@ class MockAgriRepository(
             currentDemandMinQ = 30,
             currentDemandMaxQ = 80,
             requiredQualityRes = R.string.produce_quality_good,
-            quotedPricePerQ = 4800,
+            quotedPricePerQ = 4900,
             paymentDaysDescriptionRes = R.string.payment_within_3_days,
             onTimePaymentPct = 92,
             completedTransactions = 84,
             farmerRating = 4.5,
             neededTimelineRes = R.string.timeline_this_week,
             disputeRatePct = 1.2,
-            averagePaymentDays = 3
+            averagePaymentDays = 3,
+            distanceKm = 45,
+            reliabilityTextRes = R.string.reliability_good,
+            buysCommodities = listOf(R.string.crop_soybean, R.string.crop_cotton)
         ),
         Buyer(
             id = "buyer_nagpur_agro",
@@ -173,7 +208,10 @@ class MockAgriRepository(
             farmerRating = 4.3,
             neededTimelineRes = R.string.timeline_this_week,
             disputeRatePct = 1.5,
-            averagePaymentDays = 4
+            averagePaymentDays = 4,
+            distanceKm = 18,
+            reliabilityTextRes = R.string.reliability_regulated_market,
+            buysCommodities = listOf(R.string.crop_soybean, R.string.crop_wheat, R.string.crop_chana)
         )
     )
 
@@ -247,31 +285,73 @@ class MockAgriRepository(
         emoji: String,
         quantity: Int,
         qualityRes: Int,
-        buyerNameRes: Int?
+        buyerNameRes: Int?,
+        location: String,
+        readyTiming: String,
+        expectedPricePerQ: Int,
+        estimatedNetPerQ: Int,
+        photos: List<String>,
+        statusRes: Int,
+        customLotId: String?,
+        autoGenerateOffers: Boolean
     ): ProduceLot {
-        val lotId = "Lot #AG-$nextLotSeq"
-        nextLotSeq++
+        val lotId = customLotId ?: "Lot #AG-$nextLotSeq".also { nextLotSeq++ }
         val newLot = ProduceLot(
             lotId = lotId,
             cropNameRes = cropRes,
             iconEmoji = emoji,
             quantityQuintals = quantity,
             qualityRes = qualityRes,
-            statusRes = R.string.lot_status_waiting,
+            statusRes = statusRes,
             dateCreated = "Just now",
             buyerNameRes = buyerNameRes,
-            location = "Nagpur, Maharashtra",
-            readyTiming = "Ready now",
-            expectedPricePerQ = 4850,
-            estimatedNetPerQ = 4700
+            location = location,
+            readyTiming = readyTiming,
+            expectedPricePerQ = expectedPricePerQ,
+            estimatedNetPerQ = estimatedNetPerQ,
+            photos = photos,
+            lotStatus = if (statusRes == R.string.lot_status_draft) LotStatus.DRAFT else LotStatus.PUBLISHED
         )
         lotsFlow.value = listOf(newLot) + lotsFlow.value
 
-        // Automatically generate realistic mock offers for this lot
-        val initialOffers = createOffersForLot(lotId, quantity)
-        offersFlow.value = offersFlow.value + initialOffers
+        if (autoGenerateOffers) {
+            val initialOffers = createOffersForLot(lotId, quantity)
+            offersFlow.value = offersFlow.value + initialOffers
+        }
 
         return newLot
+    }
+
+    private var nextPublishedSeq = 1
+
+    override suspend fun publishLot(
+        cropRes: Int,
+        emoji: String,
+        quantity: Int,
+        qualityRes: Int,
+        buyerNameRes: Int?,
+        location: String,
+        readyTiming: String,
+        expectedPricePerQ: Int,
+        estimatedNetPerQ: Int,
+        photos: List<String>
+    ): ProduceLot {
+        val lotId = "LOT-AGL-2026-${String.format(java.util.Locale.US, "%04d", nextPublishedSeq++)}"
+        return addLot(
+            cropRes = cropRes,
+            emoji = emoji,
+            quantity = quantity,
+            qualityRes = qualityRes,
+            buyerNameRes = buyerNameRes,
+            location = location,
+            readyTiming = readyTiming,
+            expectedPricePerQ = expectedPricePerQ,
+            estimatedNetPerQ = estimatedNetPerQ,
+            photos = photos,
+            statusRes = R.string.lot_status_published,
+            customLotId = lotId,
+            autoGenerateOffers = false
+        )
     }
 
     private fun createOffersForLot(lotId: String, quantity: Int): List<Offer> {
@@ -280,15 +360,17 @@ class MockAgriRepository(
         val abcOtherTotal = 30 * quantity       // ₹1,500 for 50q
         val abcNet = abcGross - abcTransportTotal - abcOtherTotal // ₹2,35,000 for 50q
 
-        val xyzGross = 4800 * quantity
-        val xyzTransportTotal = 140 * quantity
-        val xyzOtherTotal = 30 * quantity
-        val xyzNet = xyzGross - xyzTransportTotal - xyzOtherTotal
+        // XYZ Traders quotes a HIGHER raw price (₹4,900) but has much higher transport (₹250/q),
+        // resulting in ₹2,31,000 net realization (₹4,000 less than ABC Foods).
+        val xyzGross = 4900 * quantity
+        val xyzTransportTotal = 250 * quantity  // ₹12,500 for 50q
+        val xyzOtherTotal = 30 * quantity       // ₹1,500 for 50q
+        val xyzNet = xyzGross - xyzTransportTotal - xyzOtherTotal // ₹2,31,000 for 50q
 
         val ngpGross = 4760 * quantity
-        val ngpTransportTotal = 150 * quantity
-        val ngpOtherTotal = 30 * quantity
-        val ngpNet = ngpGross - ngpTransportTotal - ngpOtherTotal
+        val ngpTransportTotal = 50 * quantity   // ₹2,500 for 50q
+        val ngpOtherTotal = 30 * quantity       // ₹1,500 for 50q
+        val ngpNet = ngpGross - ngpTransportTotal - ngpOtherTotal // ₹2,34,000 for 50q
 
         return listOf(
             Offer(
@@ -309,27 +391,16 @@ class MockAgriRepository(
                 qualityRequirementsRes = R.string.buyer_quality_requirement,
                 status = OfferStatus.PENDING,
                 createdAt = "Today",
-                expiresAt = "Valid for 24 hours"
-            ),
-            Offer(
-                id = "offer_${lotId}_xyz",
-                lotId = lotId,
-                buyerId = "buyer_xyz",
-                buyerNameRes = R.string.buyer_xyz_traders,
-                isVerifiedBuyer = true,
-                farmerRating = 4.5,
-                pricePerQuintal = 4800,
-                quantityQuintals = quantity,
-                quotedTotalAmount = xyzGross,
-                transportExpensePerQ = 140,
-                otherExpensePerQ = 30,
-                estimatedNetAmount = xyzNet,
-                paymentTermsRes = R.string.payment_within_3_days,
-                deliveryRequirementsRes = R.string.buyer_delivery_center_or_farmgate,
-                qualityRequirementsRes = R.string.buyer_quality_requirement,
-                status = OfferStatus.PENDING,
-                createdAt = "Today",
-                expiresAt = "Valid for 24 hours"
+                expiresAt = "Valid for 24 hours",
+                distanceKm = 28,
+                reliabilityTextRes = R.string.reliability_very_reliable,
+                isBestOffer = true,
+                whyBetterReasons = listOf(
+                    R.string.reason_higher_net,
+                    R.string.reason_verified_buyer_check,
+                    R.string.reason_reliable_payment_check,
+                    R.string.reason_suitable_quantity_check
+                )
             ),
             Offer(
                 id = "offer_${lotId}_ngp",
@@ -341,7 +412,7 @@ class MockAgriRepository(
                 pricePerQuintal = 4760,
                 quantityQuintals = quantity,
                 quotedTotalAmount = ngpGross,
-                transportExpensePerQ = 150,
+                transportExpensePerQ = 50,
                 otherExpensePerQ = 30,
                 estimatedNetAmount = ngpNet,
                 paymentTermsRes = R.string.payment_within_4_days,
@@ -349,12 +420,53 @@ class MockAgriRepository(
                 qualityRequirementsRes = R.string.buyer_quality_requirement,
                 status = OfferStatus.PENDING,
                 createdAt = "Today",
-                expiresAt = "Valid for 24 hours"
+                expiresAt = "Valid for 24 hours",
+                distanceKm = 18,
+                reliabilityTextRes = R.string.reliability_regulated_market,
+                isBestOffer = false,
+                whyBetterReasons = emptyList()
+            ),
+            Offer(
+                id = "offer_${lotId}_xyz",
+                lotId = lotId,
+                buyerId = "buyer_xyz",
+                buyerNameRes = R.string.buyer_xyz_traders,
+                isVerifiedBuyer = true,
+                farmerRating = 4.5,
+                pricePerQuintal = 4900,
+                quantityQuintals = quantity,
+                quotedTotalAmount = xyzGross,
+                transportExpensePerQ = 250,
+                otherExpensePerQ = 30,
+                estimatedNetAmount = xyzNet,
+                paymentTermsRes = R.string.payment_within_3_days,
+                deliveryRequirementsRes = R.string.buyer_delivery_center_or_farmgate,
+                qualityRequirementsRes = R.string.buyer_quality_requirement,
+                status = OfferStatus.PENDING,
+                createdAt = "Today",
+                expiresAt = "Valid for 24 hours",
+                distanceKm = 45,
+                reliabilityTextRes = R.string.reliability_good,
+                isBestOffer = false,
+                whyBetterReasons = emptyList()
             )
         )
     }
 
     override fun getBuyers(): Flow<List<Buyer>> = buyersFlow.asStateFlow()
+
+    override fun getMatchingBuyersForLot(lotId: String): Flow<List<Buyer>> {
+        return buyersFlow.map { allBuyers ->
+            val lot = getLotById(lotId)
+            if (lot != null) {
+                allBuyers.filter { buyer ->
+                    buyer.buysCommodities.contains(lot.cropNameRes) || buyer.commodityRes == lot.cropNameRes
+                }
+            } else {
+                allBuyers
+            }
+        }
+    }
 
     override fun getBuyerById(id: String): Buyer? {
         return buyersList.firstOrNull { it.id == id }
@@ -363,12 +475,27 @@ class MockAgriRepository(
     override fun getOffersForLot(lotId: String): Flow<List<Offer>> {
         return offersFlow.map { allOffers ->
             val forLot = allOffers.filter { it.lotId == lotId }
-            if (forLot.isEmpty()) {
-                createOffersForLot(lotId, 50)
+            val resolvedOffers = if (forLot.isEmpty() && (lotId == "Lot #AG-1024" || lotId.startsWith("Lot #AG-"))) {
+                val lot = getLotById(lotId)
+                val qty = lot?.quantityQuintals ?: 50
+                createOffersForLot(lotId, qty).also { newOffers ->
+                    offersFlow.value = offersFlow.value + newOffers
+                }
             } else {
                 forLot
             }
+            resolvedOffers.sortedByDescending { it.estimatedNetAmount }
         }
+    }
+
+    override fun generateOffersForLot(lotId: String): List<Offer> {
+        val existing = offersFlow.value.filter { it.lotId == lotId }
+        if (existing.isNotEmpty()) return existing
+        val lot = getLotById(lotId)
+        val qty = lot?.quantityQuintals ?: 50
+        val newOffers = createOffersForLot(lotId, qty)
+        offersFlow.value = offersFlow.value + newOffers
+        return newOffers
     }
 
     override fun getOfferById(offerId: String): Offer? {
@@ -411,13 +538,14 @@ class MockAgriRepository(
         if (lotIndex != -1) {
             currentLots[lotIndex] = currentLots[lotIndex].copy(
                 statusRes = R.string.status_offer_accepted,
-                buyerNameRes = targetOffer.buyerNameRes
+                buyerNameRes = targetOffer.buyerNameRes,
+                lotStatus = LotStatus.OFFER_ACCEPTED
             )
             lotsFlow.value = currentLots
         }
 
         // 4. Create and persist Transaction in transactionsFlow
-        val txnId = if (targetOffer.lotId == "Lot #AG-1024") "AG-TXN-1024" else "AG-TXN-${targetOffer.lotId.replace("Lot #AG-", "")}"
+        val txnId = if (targetOffer.lotId == "Lot #AG-1024") "AG-TXN-1024" else "AG-TXN-${targetOffer.lotId.replace("Lot #AG-", "").replace("LOT-AGL-2026-", "")}"
         val transaction = AgriTransaction(
             id = txnId,
             lotId = targetOffer.lotId,
@@ -429,8 +557,8 @@ class MockAgriRepository(
             quantityQuintals = targetOffer.quantityQuintals,
             agreedPricePerQ = targetOffer.pricePerQuintal,
             grossProduceValue = targetOffer.quantityQuintals * targetOffer.pricePerQuintal,
-            transportDeduction = targetOffer.quantityQuintals * 120,
-            otherDeductions = targetOffer.quantityQuintals * 30,
+            transportDeduction = targetOffer.quantityQuintals * targetOffer.transportExpensePerQ,
+            otherDeductions = targetOffer.quantityQuintals * targetOffer.otherExpensePerQ,
             estimatedNetAmount = targetOffer.estimatedNetAmount,
             status = TransactionStatus.OFFER_ACCEPTED,
             paymentStatus = PaymentStatus.PENDING,

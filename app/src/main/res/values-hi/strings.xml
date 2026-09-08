@@ -72,6 +72,8 @@
     <string name="crop_wheat">गेहूं</string>
     <string name="crop_rice">धान / चावल</string>
     <string name="crop_maize">मक्का</string>
+    <string name="crop_cotton">कपास (Cotton)</string>
+    <string name="crop_chana">चना (Gram)</string>
     <string name="crop_other">अन्य</string>
     <string name="step2_qty_heading">चरण 2: आपके पास कितनी मात्रा है?</string>
     <string name="unit_quintals">क्विंटल</string>
@@ -136,7 +138,7 @@
     <string name="step4_subtitle">अपनी उपज का स्थान बताएं ताकि हम सबसे अच्छा बिक्री विकल्प ढूंढ सकें।</string>
     <string name="step5_title">यह कब तैयार होगी?</string>
     <string name="step5_heading">आप कब बेचने के लिए तैयार हैं?</string>
-    <string name="step5_subtitle">बताएं कि आपकी फसल कब बिक्री के लिए उपलब्ध होगी।</string>
+    <string name="step5_subtitle">बताएं कि आप अपनी उपज कब बेच सकते हैं।</string>
     <string name="timing_ready_now_sub">मैं अपनी उपज अभी बेच सकता हूँ</string>
     <string name="timing_within_7_days">7 दिनों के भीतर</string>
     <string name="timing_within_7_days_sub">मैं एक सप्ताह में तैयार हो जाऊंगा</string>
@@ -193,7 +195,8 @@
     <string name="review_timing_label">तैयारी का समय</string>
 
     <!-- Analysis / Loading State -->
-    <string name="analysis_loading_title">आपके लिए सबसे अच्छा विकल्प खोज रहे हैं…</string>
+    <string name="analysis_loading_title">आपके लिए सबसे अच्छी जगह खोजी जा रही है…</string>
+    <string name="analysis_loading_subtitle">भाव, अंतर, ढुलाई खर्च और खरीदार की मांग की जांच हो रही है।</string>
     <string name="analysis_check_prices">आज के बाजार भाव जांच रहे हैं</string>
     <string name="analysis_compare_markets">आस-पास की मंडियों की तुलना</string>
     <string name="analysis_check_demand">खरीदारों की मांग की जांच</string>
@@ -201,15 +204,39 @@
     <string name="analysis_compare_realization">हाथ में आने वाली शुद्ध रकम का मिलान</string>
 
     <!-- Recommendations Screen -->
+    <string name="header_best_place_to_sell">बेचने के लिए सबसे अच्छी जगह</string>
     <string name="rec_results_title">आपके लिए सर्वोत्तम विकल्प</string>
     <string name="rec_results_subtitle">सभी खर्चों के बाद आपकी जेब में आने वाले अनुमानित मुनाफे के अनुसार</string>
+    <string name="rec_comparison_explanation">एग्रीलिंक भाव की तुलना आपके आने-जाने और बेचने के खर्च से करता है ताकि यह पता चले कि आपको वास्तव में कितनी रकम मिलेगी।</string>
     <string name="badge_top_pick">⭐ सबसे अच्छा विकल्प</string>
     <string name="badge_other_options">अन्य अच्छे विकल्प</string>
     <string name="label_quoted_price_short">भाव</string>
     <string name="label_after_expenses_short">अनुमानित खर्चों के बाद</string>
-    <string name="label_estimated_total_short">कुल अनुमानित राशि</string>
+    <string name="label_estimated_total_short">अनुमानित राशि</string>
+    <string name="label_estimated_in_pocket">आपकी जेब में आने वाली अनुमानित रकम</string>
+    <string name="label_estimated_expenses_deduction">ढुलाई + अन्य खर्च</string>
+    <string name="label_for_quintals_total">%1$d क्विंटल के लिए</string>
     <string name="btn_why_this_option">यह विकल्प क्यों?</string>
+    <string name="btn_why_this_suggestion">यह सुझाव क्यों?</string>
     <string name="btn_hide_details">विवरण छुपाएं</string>
+    <string name="why_suggestion_title">एग्रीलिंक ने यह विकल्प कैसे चुना</string>
+    <string name="why_factor_price">बाजार भाव: सत्यापित खरीदारों और मंडियों के वर्तमान भावों की तुलना करता है।</string>
+    <string name="why_factor_transport">ढुलाई खर्च: आपके स्थान और दूरी के आधार पर वाहन खर्च की गणना करता है।</string>
+    <string name="why_factor_demand">खरीदार मांग: आपकी फसल तुरंत खरीदने के लिए तैयार सक्रिय खरीदारों को खोजता है।</string>
+    <string name="why_factor_quality">गुणवत्ता आवश्यकता: ऐसे खरीदार मिलाता है जो आपकी गुणवत्ता की फसल चाहते हैं।</string>
+    <string name="why_factor_quantity">मात्रा मिलान: यह सुनिश्चित करता है कि खरीदार आपका पूरा माल बिना बांटे खरीद सके।</string>
+    <string name="why_factor_reliability">खरीदार विश्वसनीयता: समय पर भुगतान और पारदर्शी शर्तों का रिकॉर्ड जांचता है।</string>
+    <string name="destination_type_buyer">सत्यापित खरीदार</string>
+    <string name="destination_type_market">मंडी</string>
+    <string name="buyer_payment_timeline_days">आमतौर पर %1$d दिनों में भुगतान</string>
+    <string name="buyer_completed_tx_count">पूर्ण हुए सौदे: %1$d</string>
+    <string name="btn_see_all_options">सभी विकल्प देखें</string>
+    <string name="btn_change_details">विवरण बदलें</string>
+    <string name="error_no_selling_options">हम अभी बेचने के विकल्प नहीं ढूंढ पाए।</string>
+    <string name="estimate_disclaimer">वर्तमान दरों और औसत ढुलाई खर्च पर आधारित अनुमानित राशि। अंतिम भुगतान तौल और गुणवत्ता जांच पर निर्भर करेगा।</string>
+    <string name="status_very_good_match">बहुत अच्छा मिलान</string>
+    <string name="reason_low_transport_cost">कम ढुलाई खर्च</string>
+    <string name="reason_reliable_payment_history">विश्वसनीय भुगतान इतिहास</string>
     <string name="detail_distance">दूरी</string>
     <string name="detail_transport">अनुमानित परिवहन खर्च</string>
     <string name="detail_handling">हमाली व मंडी शुल्क</string>
@@ -513,4 +540,152 @@
     <string name="chart_day_today">आज</string>
     <string name="label_todays_benchmark">आज का मुख्य संदर्भ भाव</string>
     <string name="label_mandi_distance">%1$d किमी दूर</string>
- </resources>
+
+    <!-- Stage 7: Lot Creation & Publishing Strings -->
+    <string name="step_progress_indicator">चरण %1$d/%2$d</string>
+    <string name="lot_step1_title">आपकी फसल</string>
+    <string name="lot_step1_heading">आपकी फसल</string>
+    <string name="lot_step1_subtitle">आप जो बेचना चाहते हैं उसका विवरण</string>
+    <string name="lot_btn_change_details">विवरण बदलें</string>
+    <string name="lot_label_ready_timing">कटाई की तैयारी</string>
+    <string name="lot_step2_title">विवरण जांचें</string>
+    <string name="lot_step2_heading">अनुशंसित खरीदार</string>
+    <string name="lot_step2_subtitle">अनुशंसित बिक्री विकल्प और अनुमानित कमाई की समीक्षा करें</string>
+    <string name="lot_estimate_disclaimer">यह एक अनुमान है। वजन, गुणवत्ता जांच और अंतिम समझौते के बाद अंतिम राशि बदल सकती है।</string>
+    <string name="lot_label_pickup_location">उठाव का स्थान</string>
+    <string name="lot_step3_title">फ़ोटो जोड़ें (वैकल्पिक)</string>
+    <string name="lot_add_photos_title">अपनी फसल की तस्वीरें जोड़ें</string>
+    <string name="lot_add_photos_subtitle">तस्वीरें खरीदारों को ऑफ़र देने से पहले आपकी उपज को समझने में मदद करती हैं।</string>
+    <string name="lot_btn_add_photo">+ फ़ोटो जोड़ें</string>
+    <string name="lot_btn_add_another_photo">+ अन्य फ़ोटो जोड़ें</string>
+    <string name="lot_btn_skip_photos">अभी छोड़ें</string>
+    <string name="lot_btn_remove_photo">हटाएं</string>
+    <string name="lot_btn_view_photo">देखें</string>
+    <string name="lot_photos_count">%1$d फ़ोटो जोड़ी गई</string>
+    <string name="camera_permission_dialog_title">कैमरा अनुमति आवश्यक है</string>
+    <string name="camera_permission_dialog_msg">खरीदारों के लिए आपकी उपज की स्पष्ट तस्वीरें लेने के लिए एग्रीलिंक को कैमरा अनुमति की आवश्यकता है।</string>
+    <string name="btn_choose_gallery">गैलरी से चुनें</string>
+    <string name="btn_take_camera">फ़ोटो खींचें</string>
+    <string name="btn_add_sample_photo">नमूना फसल फ़ोटो जोड़ें</string>
+    <string name="lot_step4_title">लॉट प्रकाशित करें</string>
+    <string name="lot_ready_to_sell_title">बेचने के लिए तैयार हैं?</string>
+    <string name="lot_selling_preference_label">बिक्री प्राथमिकता</string>
+    <string name="lot_publish_explanation">लॉट प्रकाशित करने से उपयुक्त खरीदार आपकी फसल देख सकते हैं और ऑफ़र भेज सकते हैं।</string>
+    <string name="btn_publish_lot">लॉट प्रकाशित करें</string>
+    <string name="publishing_lot_progress">आपका लॉट प्रकाशित हो रहा है…</string>
+    <string name="lot_publish_error_title">आपका लॉट प्रकाशित नहीं किया जा सका।</string>
+    <string name="lot_published_badge">✓ लॉट प्रकाशित हुआ</string>
+    <string name="lot_published_success_title">लॉट प्रकाशित हुआ</string>
+    <string name="lot_published_success_msg">आपका %1$s लॉट अब उपयुक्त खरीदारों के लिए उपलब्ध है।</string>
+    <string name="lot_label_lot_id">लॉट आईडी</string>
+    <string name="btn_see_offers">ऑफ़र देखें</string>
+    <string name="btn_go_home">होम पर जाएं</string>
+    <string name="lot_status_published">प्रकाशित</string>
+    <string name="lot_status_draft">ड्राफ्ट</string>
+    <string name="validation_select_crop">कृपया अपनी फसल चुनें।</string>
+    <string name="validation_enter_quantity">कृपया मात्रा दर्ज करें।</string>
+    <string name="validation_select_quality">कृपया अपनी उपज की गुणवत्ता चुनें।</string>
+    <string name="validation_confirm_location">कृपया अपने स्थान की पुष्टि करें।</string>
+    <string name="validation_select_destination">कृपया एक बिक्री विकल्प चुनें।</string>
+    <string name="label_selling_preference">बिक्री प्राथमिकता</string>
+    <string name="section_lot_photos">आपकी फसल की तस्वीरें</string>
+    <string name="label_recommended_buyer_tag">अनुशंसित खरीदार</string>
+
+    <string name="status_published_waiting">प्रकाशित • ऑफ़र की प्रतीक्षा</string>
+    <string name="status_published_desc">आपका लॉट लाइव है और सत्यापित खरीदारों को दिखाई दे रहा है</string>
+    <string name="title_photos">तस्वीरें</string>
+    <string name="no_photos_added">कोई तस्वीर नहीं जोड़ी गई</string>
+    <string name="photos_attached_count">%1$d तस्वीर संलग्न</string>
+    <string name="title_step_produce_summary">उपज सारांश</string>
+    <string name="header_your_produce">आपकी उपज</string>
+    <string name="header_recommended_buyer">अनुशंसित खरीदार</string>
+    <string name="badge_verified_buyer">सत्यापित खरीदार</string>
+    <string name="label_net_expected">अपेक्षित शुद्ध</string>
+    <string name="title_step_check_details">विवरण जांचें</string>
+    <string name="label_harvest_readiness">फसल की तैयारी</string>
+    <string name="disclaimer_estimate_text">यह एक अनुमान है। वजन, गुणवत्ता जांच और अंतिम समझौते के बाद अंतिम राशि बदल सकती है।</string>
+    <string name="title_add_photos">अपनी उपज की तस्वीरें जोड़ें</string>
+    <string name="subtitle_add_photos">तस्वीरें खरीदारों को ऑफ़र देने से पहले आपकी उपज को समझने में मदद कर सकती हैं।</string>
+    <string name="btn_add_photo">+ तस्वीर जोड़ें</string>
+    <string name="photo_thumbnail">उपज तस्वीर %1$d</string>
+    <string name="btn_view_photo">तस्वीर देखें</string>
+    <string name="btn_remove_photo">तस्वीर हटाएं</string>
+    <string name="btn_add_another_photo">+ अन्य तस्वीर जोड़ें</string>
+    <string name="camera_permission_explanation">उपज की तस्वीरें लेने के लिए कैमरे की अनुमति आवश्यक है।</string>
+    <string name="btn_skip_photos">अभी छोड़ें</string>
+    <string name="btn_take_photo">तस्वीर खींचें</string>
+    <string name="sample_photo_attached">नमूना फसल तस्वीर</string>
+    <string name="title_ready_to_sell">बेचने के लिए तैयार हैं?</string>
+    <string name="desc_publishing_explanation">लॉट प्रकाशित करने से उपयुक्त खरीदार आपकी फसल देख सकते हैं और ऑफ़र भेज सकते हैं।</string>
+    <string name="label_estimated_after_expenses_short">खर्चों के बाद अनुमानित</string>
+    <string name="status_publishing_lot">लॉट प्रकाशित हो रहा है…</string>
+    <string name="badge_lot_published">✓ लॉट प्रकाशित हुआ</string>
+    <string name="success_lot_published_msg">आपका %1$s लॉट अब उपयुक्त खरीदारों के लिए उपलब्ध है।</string>
+    <string name="label_expected_price_short">अपेक्षित मूल्य</string>
+
+    <!-- Stage 8: Buyer Marketplace & Offers -->
+    <string name="title_buyer_marketplace">मेरी फसल कौन खरीदना चाहता है?</string>
+    <string name="subtitle_buyer_marketplace">आपके क्षेत्र में फसल तलाश रहे सत्यापित खरीदार</string>
+    <string name="badge_verified_buyer_check">✓ सत्यापित खरीदार</string>
+    <string name="label_buyer_wants">मांग: %1$s</string>
+    <string name="label_buyer_needs">ज़रूरत: %1$d–%2$d क्विंटल</string>
+    <string name="label_buyer_offer">ऑफ़र: ₹%1$s / क्विंटल</string>
+    <string name="label_buyer_payment">भुगतान: %1$s</string>
+    <string name="label_buyer_distance">%1$d किमी</string>
+    <string name="label_buyer_reliability">विश्वसनीयता: %1$s</string>
+    <string name="reliability_very_reliable">अत्यंत विश्वसनीय</string>
+    <string name="reliability_good">अच्छी विश्वसनीयता</string>
+    <string name="reliability_regulated_market">विनियमित मंडी</string>
+    
+    <string name="header_matching_buyers_title">आपके लॉट के लिए खरीदार</string>
+    <string name="matching_buyers_sub">ये खरीदार आपके लॉट की विशिष्टताओं से मेल खाते हैं। इन्होंने अभी ऑफ़र नहीं दिया है।</string>
+    <string name="matching_lot_context">मेल खाता लॉट: %3$s में %1$d क्विंटल %2$s</string>
+    
+    <string name="buyer_profile_buys">खरीदते हैं: %1$s</string>
+    <string name="buyer_profile_current_req">वर्तमान आवश्यकता: %1$d क्विंटल %2$s</string>
+    <string name="buyer_profile_payment_desc">भुगतान: सामान्यतः %1$d दिनों के भीतर</string>
+    <string name="buyer_profile_completed_purchases">पूर्ण खरीद: %1$d</string>
+    <string name="buyer_profile_ontime_rate">समय पर भुगतान: %1$d%%</string>
+    <string name="buyer_profile_rating">रेटिंग: %1$.1f / 5</string>
+    <string name="buyer_profile_verification_notice">एग्रीलिंक खरीदार की जानकारी सत्यापित करता है और पिछले लेनदेन का रिकॉर्ड दिखाता है।</string>
+    <string name="btn_view_profile">प्रोफाइल देखें</string>
+    
+    <string name="title_offers_for_produce">आपकी उपज के लिए ऑफ़र</string>
+    <string name="badge_best_offer">सर्वोत्तम ऑफ़र</string>
+    <string name="badge_best_for_you">आपके लिए सर्वोत्तम</string>
+    <string name="why_this_offer_better">यह ऑफ़र बेहतर क्यों है</string>
+    <string name="reason_higher_net">✓ भाड़ा घटाने के बाद अधिक रकम</string>
+    <string name="reason_verified_buyer_check">✓ सत्यापित खरीदार</string>
+    <string name="reason_reliable_payment_check">✓ समय पर भुगतान का रिकॉर्ड</string>
+    <string name="reason_suitable_quantity_check">✓ आपकी पूरी मात्रा के अनुकूल</string>
+    <string name="compare_net_realization_title">हाथ में आने वाली शुद्ध रकम की तुलना</string>
+    <string name="compare_net_realization_desc">मंडी में दिया गया भाव ही अंतिम कमाई नहीं है। अधिक भाव में अधिक भाड़ा कट सकता है।</string>
+    <string name="label_other_offers">अन्य ऑफ़र</string>
+    
+    <string name="offer_detail_from_header">खरीदार की ओर से ऑफ़र</string>
+    <string name="offer_detail_for_lot_header">आपके लॉट के लिए</string>
+    <string name="offer_detail_offer_header">ऑफ़र दर</string>
+    <string name="offer_detail_costs_header">अनुमानित खर्च</string>
+    <string name="offer_detail_net_header">खर्च घटाकर अनुमानित रकम</string>
+    <string name="offer_detail_cost_transport">परिवहन: ₹%1$s / क्विंटल</string>
+    <string name="offer_detail_cost_other">अन्य खर्च: ₹%1$s / क्विंटल</string>
+    <string name="offer_detail_disclaimer">वजन, गुणवत्ता जांच और अंतिम समझौते के बाद अंतिम रकम बदल सकती है।</string>
+    <string name="btn_not_yet">अभी नहीं</string>
+    <string name="dialog_accept_title">क्या यह ऑफ़र स्वीकार करें?</string>
+    <string name="dialog_accept_msg">स्वीकार करने के बाद, यह ऑफ़र आपकी चुनी हुई बिक्री बन जाएगा। इसके बाद आप डिलीवरी की व्यवस्था कर सकते हैं।</string>
+    
+    <string name="transport_placeholder_note">परिवहन की व्यवस्था अगले चरण में की जाएगी।</string>
+    <string name="lot_has_offers_count">ऑफ़र: %1$d ऑफ़र</string>
+    <string name="lot_no_offers_yet">अभी कोई ऑफ़र नहीं</string>
+    <string name="lot_next_arrange_transport">अगला: परिवहन व्यवस्था करें</string>
+    <string name="btn_find_buyers">खरीदार खोजें</string>
+    <string name="btn_check_offers">ऑफ़र जांचें</string>
+    
+    <string name="home_new_offers_header">नए ऑफ़र</string>
+    <string name="home_new_offers_msg">%1$d खरीदार आपकी %2$s में रुचि रखते हैं।</string>
+    <string name="home_best_offer_rate">सर्वोत्तम ऑफ़र: ₹%1$s/क्विंटल</string>
+    <string name="home_your_sale_header">आपकी बिक्री</string>
+    <string name="home_offer_accepted_label">ऑफ़र स्वीकार किया गया</string>
+    <string name="home_btn_view_sale">बिक्री देखें</string>
+    <string name="offer_status_closed">बंद हुआ</string>
+</resources>

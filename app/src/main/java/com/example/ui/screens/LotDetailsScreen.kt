@@ -60,6 +60,7 @@ fun LotDetailsScreen(
     onBack: () -> Unit,
     onViewOffers: (String) -> Unit,
     onViewActiveSale: (String) -> Unit,
+    onFindBuyers: ((String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val lots by repository.getMyLots().collectAsState(initial = emptyList())
@@ -205,6 +206,15 @@ fun LotDetailsScreen(
                         )
                     }
                 }
+                if (lot?.buyerNameRes != null) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "${stringResource(R.string.label_recommended_buyer_tag)}: ${stringResource(lot.buyerNameRes)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriGreenPrimary
+                    )
+                }
             }
         }
 
@@ -230,6 +240,8 @@ fun LotDetailsScreen(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 val isOfferAccepted = lot?.statusRes == R.string.status_offer_accepted || activeTx != null
+                val isPublished = lot?.statusRes == R.string.lot_status_published || lot?.lotStatus == com.example.model.LotStatus.PUBLISHED
+
                 if (isOfferAccepted) {
                     Row(
                         modifier = Modifier
@@ -262,6 +274,36 @@ fun LotDetailsScreen(
                             }
                         }
                     }
+                } else if (isPublished) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(AgriGreenContainer)
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = AgriGreenPrimary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column {
+                            Text(
+                                text = stringResource(R.string.status_published_waiting),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = AgriGreenText
+                            )
+                            Text(
+                                text = stringResource(R.string.status_published_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = AgriTextSecondary
+                            )
+                        }
+                    }
                 } else {
                     Row(
                         modifier = Modifier
@@ -292,6 +334,65 @@ fun LotDetailsScreen(
                             )
                         }
                     }
+                }
+            }
+        }
+
+        // Section: PHOTOS
+        Card(
+            modifier = Modifier.fillMaxWidth().testTag("lot_details_photos_card"),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            border = CardDefaults.outlinedCardBorder()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.title_photos),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = AgriTextSecondary,
+                    letterSpacing = 0.5.sp
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+
+                if (lot?.photos.isNullOrEmpty()) {
+                    Text(
+                        text = stringResource(R.string.no_photos_added),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = AgriTextSecondary
+                    )
+                } else {
+                    val photos = lot!!.photos
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        photos.forEachIndexed { idx, photo ->
+                            Box(
+                                modifier = Modifier
+                                    .size(70.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(AgriGreenContainer),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = lot.iconEmoji,
+                                    fontSize = 28.sp
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = stringResource(R.string.photos_attached_count, photos.size),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AgriGreenPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
@@ -408,6 +509,43 @@ fun LotDetailsScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = AgriTextSecondary
                     )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Button(
+                        onClick = {
+                            repository.generateOffersForLot(lotId)
+                            onViewOffers(lotId)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .testTag("btn_check_offers_lot_detail"),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.btn_check_offers),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+                    if (onFindBuyers != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        androidx.compose.material3.OutlinedButton(
+                            onClick = { onFindBuyers(lotId) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .testTag("btn_find_buyers_lot_detail"),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.btn_find_buyers),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -19,8 +19,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocalOffer
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -49,6 +54,7 @@ import com.example.ui.theme.AgriCardBorder
 import com.example.ui.theme.AgriGreenContainer
 import com.example.ui.theme.AgriGreenPrimary
 import com.example.ui.theme.AgriGreenText
+import com.example.ui.theme.AgriHeroGreenBorder
 import com.example.ui.theme.AgriTextMuted
 import com.example.ui.theme.AgriTextPrimary
 import com.example.ui.theme.AgriTextSecondary
@@ -60,9 +66,18 @@ fun BuyersScreen(
     repository: AgriRepository,
     onViewBuyer: (String) -> Unit,
     onSellToBuyer: (String) -> Unit,
+    lotId: String? = null,
+    onBack: (() -> Unit)? = null,
+    onViewOffers: ((String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    val buyers by repository.getBuyers().collectAsState(initial = emptyList())
+    val buyers by if (lotId != null) {
+        repository.getMatchingBuyersForLot(lotId).collectAsState(initial = emptyList())
+    } else {
+        repository.getBuyers().collectAsState(initial = emptyList())
+    }
+
+    val matchingLot = lotId?.let { repository.getLotById(it) }
 
     LazyColumn(
         modifier = modifier
@@ -73,19 +88,127 @@ fun BuyersScreen(
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         item {
-            Column(modifier = Modifier.padding(bottom = 6.dp)) {
-                Text(
-                    text = stringResource(R.string.title_buyers),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = AgriTextPrimary
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.subtitle_buyers),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AgriTextSecondary
-                )
+            Column(modifier = Modifier.padding(bottom = 4.dp)) {
+                if (onBack != null) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(Color.White)
+                                .clickable { onBack() }
+                                .testTag("btn_back_buyers"),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.btn_back),
+                                tint = AgriTextPrimary
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = if (matchingLot != null) {
+                                stringResource(R.string.header_matching_buyers_title)
+                            } else {
+                                stringResource(R.string.title_buyer_marketplace)
+                            },
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = AgriTextPrimary
+                        )
+                    }
+                } else {
+                    Text(
+                        text = if (matchingLot != null) {
+                            stringResource(R.string.header_matching_buyers_title)
+                        } else {
+                            stringResource(R.string.title_buyer_marketplace)
+                        },
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = AgriTextPrimary
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.subtitle_buyer_marketplace),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = AgriTextSecondary
+                    )
+                }
+
+                // Matching lot banner if lotId is present
+                if (matchingLot != null) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                            .testTag("matching_lot_banner"),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = CardDefaults.cardColors(containerColor = AgriGreenContainer),
+                        border = CardDefaults.outlinedCardBorder()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = matchingLot.iconEmoji,
+                                    fontSize = 20.sp
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = stringResource(
+                                        R.string.matching_lot_context,
+                                        matchingLot.quantityQuintals,
+                                        stringResource(matchingLot.cropNameRes),
+                                        matchingLot.location
+                                    ),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = AgriGreenText
+                                )
+                            }
+                            Text(
+                                text = stringResource(R.string.matching_buyers_sub),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = AgriTextSecondary
+                            )
+                            if (onViewOffers != null) {
+                                Spacer(modifier = Modifier.height(2.dp))
+                                OutlinedButton(
+                                    onClick = { onViewOffers(matchingLot.lotId) },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(40.dp)
+                                        .testTag("btn_view_offers_from_buyers"),
+                                    shape = RoundedCornerShape(8.dp),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = AgriGreenPrimary)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.LocalOffer,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = stringResource(R.string.btn_view_offers),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -125,8 +248,17 @@ fun BuyersScreen(
             items(buyers, key = { it.id }) { buyer ->
                 BuyerCard(
                     buyer = buyer,
+                    lotId = lotId,
                     onViewBuyer = { onViewBuyer(buyer.id) },
-                    onSellToBuyer = { onSellToBuyer(buyer.id) }
+                    onSellToBuyer = {
+                        if (lotId != null) {
+                            // Generate offers for this lot and navigate to view offers
+                            repository.generateOffersForLot(lotId)
+                            onViewOffers?.invoke(lotId)
+                        } else {
+                            onSellToBuyer(buyer.id)
+                        }
+                    }
                 )
             }
         }
@@ -140,6 +272,7 @@ fun BuyersScreen(
 @Composable
 fun BuyerCard(
     buyer: Buyer,
+    lotId: String? = null,
     onViewBuyer: () -> Unit,
     onSellToBuyer: () -> Unit,
     modifier: Modifier = Modifier
@@ -175,6 +308,23 @@ fun BuyerCard(
                         fontWeight = FontWeight.ExtraBold,
                         color = AgriTextPrimary
                     )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(top = 2.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = null,
+                            tint = AgriTextSecondary,
+                            modifier = Modifier.size(13.dp)
+                        )
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Text(
+                            text = "${stringResource(buyer.locationRes)} • ${stringResource(R.string.label_buyer_distance, buyer.distanceKm)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AgriTextSecondary
+                        )
+                    }
                 }
                 if (buyer.isVerified) {
                     Box(
@@ -183,21 +333,12 @@ fun BuyerCard(
                             .background(AgriGreenContainer)
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.CheckCircle,
-                                contentDescription = null,
-                                tint = AgriGreenPrimary,
-                                modifier = Modifier.size(13.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = stringResource(R.string.buyer_verified),
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = AgriGreenText
-                            )
-                        }
+                        Text(
+                            text = stringResource(R.string.badge_verified_buyer_check),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriGreenText
+                        )
                     }
                 }
             }
@@ -206,12 +347,7 @@ fun BuyerCard(
 
             // Demand row: Crop & quantity
             Text(
-                text = stringResource(
-                    R.string.buyer_needs_range,
-                    stringResource(buyer.commodityRes),
-                    buyer.currentDemandMinQ,
-                    buyer.currentDemandMaxQ
-                ),
+                text = "${stringResource(R.string.label_buyer_wants, stringResource(buyer.commodityRes))} • ${stringResource(R.string.label_buyer_needs, buyer.currentDemandMinQ, buyer.currentDemandMaxQ)}",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = AgriTextPrimary
@@ -222,21 +358,45 @@ fun BuyerCard(
             // Quoted price
             Row(
                 modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.buyer_offer_rate, formattedPrice),
-                    style = MaterialTheme.typography.bodyLarge,
+                    text = stringResource(R.string.label_buyer_offer, formattedPrice),
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.ExtraBold,
                     color = AgriGreenPrimary
                 )
+
+                // Reliability badge
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(Color(0xFFF3F4F6))
+                        .padding(horizontal = 6.dp, vertical = 3.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Shield,
+                        contentDescription = null,
+                        tint = AgriGreenPrimary,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(
+                        text = stringResource(buyer.reliabilityTextRes),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Medium,
+                        color = AgriTextPrimary
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(6.dp))
 
             // Payment speed
             Text(
-                text = stringResource(R.string.buyer_payment_speed, stringResource(buyer.paymentDaysDescriptionRes)),
+                text = stringResource(R.string.label_buyer_payment, stringResource(buyer.paymentDaysDescriptionRes)),
                 style = MaterialTheme.typography.bodySmall,
                 color = AgriTextSecondary
             )
@@ -288,7 +448,7 @@ fun BuyerCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Actions
+            // Actions (Minimum 48dp touch target)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -297,12 +457,12 @@ fun BuyerCard(
                     onClick = onViewBuyer,
                     modifier = Modifier
                         .weight(1f)
-                        .height(44.dp)
+                        .height(48.dp)
                         .testTag("btn_view_buyer_${buyer.id}"),
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.btn_view_buyer),
+                        text = stringResource(R.string.btn_view_profile),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -312,13 +472,17 @@ fun BuyerCard(
                     onClick = onSellToBuyer,
                     modifier = Modifier
                         .weight(1.3f)
-                        .height(44.dp)
+                        .height(48.dp)
                         .testTag("btn_sell_buyer_${buyer.id}"),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
                 ) {
                     Text(
-                        text = stringResource(R.string.btn_sell_to_buyer),
+                        text = if (lotId != null) {
+                            stringResource(R.string.btn_view_offers)
+                        } else {
+                            stringResource(R.string.btn_sell_to_buyer)
+                        },
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -328,3 +492,4 @@ fun BuyerCard(
         }
     }
 }
+

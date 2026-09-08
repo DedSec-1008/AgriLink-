@@ -18,6 +18,18 @@ data class MarketPriceInfo(
     val isPositiveChange: Boolean
 )
 
+enum class DestinationType {
+    BUYER,
+    MARKET
+}
+
+enum class RecommendationCalculationState {
+    IDLE,
+    CALCULATING,
+    SUCCESS,
+    ERROR
+}
+
 data class SellingOpportunity(
     val id: String = "opp_1",
     val buyerNameRes: Int,
@@ -41,8 +53,28 @@ data class SellingOpportunity(
     val cautionsRes: List<Int> = emptyList(),
     val quantityMatch: Boolean = true,
     val qualityMatch: Boolean = true,
-    val isVerifiedBuyer: Boolean = true
-)
+    val isVerifiedBuyer: Boolean = true,
+    val destinationType: DestinationType = DestinationType.BUYER,
+    val destinationName: String = "",
+    val matchQualityRes: Int = R.string.status_strong_rec,
+    val paymentDaysEstimate: Int = 2,
+    val completedTransactionsCount: Int = 128
+) {
+    val totalExpensePerQ: Int
+        get() = transportExpensePerQ + otherExpensePerQ
+
+    val estimatedNetPricePerQ: Int
+        get() = netRealizationPerQ
+
+    val isMarket: Boolean
+        get() = destinationType == DestinationType.MARKET
+}
+
+enum class LotStatus(val labelRes: Int) {
+    DRAFT(R.string.lot_status_draft),
+    PUBLISHED(R.string.lot_status_published),
+    OFFER_ACCEPTED(R.string.status_offer_accepted)
+}
 
 data class ProduceLot(
     val lotId: String,
@@ -56,8 +88,14 @@ data class ProduceLot(
     val location: String = "Nagpur, Maharashtra",
     val readyTiming: String = "Ready now",
     val expectedPricePerQ: Int = 4850,
-    val estimatedNetPerQ: Int = 4700
-)
+    val estimatedNetPerQ: Int = 4700,
+    val photos: List<String> = emptyList(),
+    val farmerId: String = "farmer_nagpur_01",
+    val lotStatus: LotStatus = LotStatus.PUBLISHED
+) {
+    val estimatedTotalAmount: Int
+        get() = estimatedNetPerQ * quantityQuintals
+}
 
 data class Buyer(
     val id: String,
@@ -78,7 +116,10 @@ data class Buyer(
     val averagePaymentDays: Int = 2,
     val paymentTermsRes: Int = R.string.buyer_payment_terms_direct,
     val deliveryTermsRes: Int = R.string.buyer_delivery_center_or_farmgate,
-    val qualityRequirementsRes: Int = R.string.buyer_quality_requirement
+    val qualityRequirementsRes: Int = R.string.buyer_quality_requirement,
+    val distanceKm: Int = 28,
+    val reliabilityTextRes: Int = R.string.reliability_very_reliable,
+    val buysCommodities: List<Int> = listOf(R.string.crop_soybean, R.string.crop_wheat, R.string.crop_maize)
 )
 
 data class BuyerRequirement(
@@ -97,7 +138,8 @@ enum class OfferStatus(val labelRes: Int) {
     ACCEPTED(R.string.offer_status_accepted),
     REJECTED(R.string.offer_status_rejected),
     EXPIRED(R.string.offer_status_expired),
-    CANCELLED(R.string.offer_status_cancelled)
+    CANCELLED(R.string.offer_status_cancelled),
+    CLOSED(R.string.offer_status_closed)
 }
 
 data class Offer(
@@ -118,8 +160,18 @@ data class Offer(
     val qualityRequirementsRes: Int,
     val status: OfferStatus = OfferStatus.PENDING,
     val createdAt: String = "Today",
-    val expiresAt: String = "Valid for 24 hours"
-)
+    val expiresAt: String = "Valid for 24 hours",
+    val distanceKm: Int = 28,
+    val reliabilityTextRes: Int = R.string.reliability_very_reliable,
+    val isBestOffer: Boolean = false,
+    val whyBetterReasons: List<Int> = emptyList()
+) {
+    val estimatedNetPricePerQ: Int
+        get() = pricePerQuintal - transportExpensePerQ - otherExpensePerQ
+
+    val totalExpensesPerQ: Int
+        get() = transportExpensePerQ + otherExpensePerQ
+}
 
 enum class TransactionStatus(val labelRes: Int) {
     OFFER_ACCEPTED(R.string.tx_status_offer_accepted),

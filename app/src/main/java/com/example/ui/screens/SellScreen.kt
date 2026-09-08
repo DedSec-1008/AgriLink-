@@ -18,6 +18,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -46,6 +47,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
@@ -56,11 +59,15 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -69,6 +76,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -106,6 +114,7 @@ import androidx.compose.ui.unit.sp
 import com.example.R
 import com.example.data.AgriRepository
 import com.example.model.CropOption
+import com.example.model.DestinationType
 import com.example.model.SellingOpportunity
 import com.example.ui.theme.AgriBackground
 import com.example.ui.theme.AgriCardBorder
@@ -128,7 +137,9 @@ fun SellScreen(
     viewModel: SellingViewModel,
     onNavigateToMyLots: () -> Unit,
     onNavigateToHome: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onViewLotDetails: ((String) -> Unit)? = null,
+    onViewOffers: ((String) -> Unit)? = null
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -142,7 +153,8 @@ fun SellScreen(
             .fillMaxSize()
             .background(AgriBackground)
             .verticalScroll(rememberScrollState())
-            .padding(16.dp)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Render step by step
         when (uiState.currentStep) {
@@ -221,13 +233,30 @@ fun SellScreen(
 
             SellingStep.CONFIRM_SELL -> StepConfirmSellScreen(
                 uiState = uiState,
+                viewModel = viewModel,
+                onEditDetails = { viewModel.goToStep(SellingStep.REVIEW) },
                 onConfirm = { viewModel.confirmCreateLot() },
                 onBack = { viewModel.goBack() }
             )
 
             SellingStep.LOT_CREATED -> StepLotCreatedScreen(
                 uiState = uiState,
-                onViewMyLot = onNavigateToMyLots,
+                onViewMyLot = {
+                    val lotId = uiState.createdLot?.lotId
+                    if (lotId != null && onViewLotDetails != null) {
+                        onViewLotDetails(lotId)
+                    } else {
+                        onNavigateToMyLots()
+                    }
+                },
+                onViewOffers = {
+                    val lotId = uiState.createdLot?.lotId
+                    if (lotId != null && onViewOffers != null) {
+                        onViewOffers(lotId)
+                    } else {
+                        onNavigateToMyLots()
+                    }
+                },
                 onDone = {
                     viewModel.resetFlow()
                     onNavigateToHome()
@@ -2483,20 +2512,23 @@ private fun StepReadyDateScreen(
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val screenWidthDp = configuration.screenWidthDp
     val canContinue = harvestReadiness != HarvestReadiness.NONE
 
-    if (isLandscape) {
+    // Use two-column layout in landscape when width is sufficient (>= 560dp)
+    val useTwoColumn = isLandscape && screenWidthDp >= 560
+
+    if (useTwoColumn) {
         Row(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .widthIn(max = 960.dp)
                 .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             // Left Column: Step header, produce summary context, and why timing matters
             Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState()),
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 StepHeaderWithProgress(
@@ -2519,9 +2551,7 @@ private fun StepReadyDateScreen(
 
             // Right Column: Options & Action Button
             Column(
-                modifier = Modifier
-                    .weight(1.2f)
-                    .verticalScroll(rememberScrollState()),
+                modifier = Modifier.weight(1.2f),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 ReadinessOptionsList(
@@ -2541,8 +2571,7 @@ private fun StepReadyDateScreen(
         // Portrait Layout
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .fillMaxWidth()
                 .widthIn(max = 680.dp)
                 .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
@@ -2597,15 +2626,26 @@ private fun Step5ProduceContextCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            Text(
+                text = stringResource(R.string.summary_produce_label),
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = AgriGreenPrimary,
+                letterSpacing = 0.5.sp
+            )
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f, fill = false)
+                ) {
                     Text(text = selectedCrop.emoji, fontSize = 28.sp)
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
@@ -2616,7 +2656,7 @@ private fun Step5ProduceContextCard(
                             color = AgriTextPrimary
                         )
                         Text(
-                            text = "$quantity quintals",
+                            text = "$quantity ${stringResource(R.string.unit_quintals)}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = AgriTextSecondary
                         )
@@ -2629,7 +2669,7 @@ private fun Step5ProduceContextCard(
                     border = BorderStroke(1.dp, AgriGreenLight)
                 ) {
                     Text(
-                        text = stringResource(qualityRes),
+                        text = stringResource(if (qualityRes != 0) qualityRes else R.string.produce_quality_good),
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
@@ -2638,26 +2678,24 @@ private fun Step5ProduceContextCard(
                 }
             }
 
-            if (selectedLocation.isNotBlank()) {
-                HorizontalDivider(color = AgriHeroGreenBorder.copy(alpha = 0.5f), thickness = 1.dp)
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 2.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        tint = AgriGreenPrimary,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = selectedLocation,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = AgriTextPrimary
-                    )
-                }
+            HorizontalDivider(color = AgriHeroGreenBorder.copy(alpha = 0.4f), thickness = 1.dp)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 2.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null,
+                    tint = AgriGreenPrimary,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = selectedLocation.ifBlank { stringResource(R.string.loc_nagpur) },
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = AgriTextPrimary
+                )
             }
         }
     }
@@ -2759,16 +2797,17 @@ private fun HarvestReadinessCard(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 72.dp)
-            .semantics {
-                role = Role.RadioButton
-                selected = isSelected
-            }
+            .clip(RoundedCornerShape(16.dp))
             .border(
                 width = if (isSelected) 2.dp else 1.dp,
                 color = if (isSelected) AgriGreenPrimary else AgriCardBorder,
                 shape = RoundedCornerShape(16.dp)
             )
             .clickable(onClick = onSelect)
+            .semantics {
+                role = Role.RadioButton
+                selected = isSelected
+            }
             .testTag(testTag),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
@@ -2871,7 +2910,7 @@ private fun Step5ContinueSection(
             enabled = isEnabled,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(54.dp)
+                .heightIn(min = 54.dp)
                 .testTag("continue_step5_button"),
             shape = RoundedCornerShape(14.dp),
             colors = ButtonDefaults.buttonColors(
@@ -3076,6 +3115,7 @@ private fun StepAnalysisScreen(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .testTag("analysis_loading_container")
             .padding(vertical = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -3093,6 +3133,16 @@ private fun StepAnalysisScreen(
             fontWeight = FontWeight.Bold,
             color = AgriTextPrimary,
             textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = stringResource(R.string.analysis_loading_subtitle),
+            style = MaterialTheme.typography.bodyMedium,
+            color = AgriTextSecondary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         Spacer(modifier = Modifier.height(28.dp))
@@ -3143,7 +3193,7 @@ private fun StepAnalysisScreen(
 }
 
 // -------------------------------------------------------------------------
-// STEP 8 — RECOMMENDATION RESULTS & COMPARISON (Section 14-17, 25)
+// STEP 6 — INTELLIGENT SELLING RECOMMENDATION
 // -------------------------------------------------------------------------
 @Composable
 private fun StepRecommendationsScreen(
@@ -3154,11 +3204,11 @@ private fun StepRecommendationsScreen(
     onBack: () -> Unit
 ) {
     if (uiState.recommendationError) {
-        // Error State (Section 25)
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.5.dp, AgriCardBorder, RoundedCornerShape(18.dp)),
+                .border(1.5.dp, AgriCardBorder, RoundedCornerShape(18.dp))
+                .testTag("rec_error_container"),
             shape = RoundedCornerShape(18.dp),
             colors = CardDefaults.cardColors(containerColor = AgriSurface)
         ) {
@@ -3176,19 +3226,45 @@ private fun StepRecommendationsScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = stringResource(R.string.error_rec_title),
+                    text = stringResource(R.string.error_no_selling_options),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = AgriTextPrimary,
                     textAlign = TextAlign.Center
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.error_rec_desc),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AgriTextSecondary,
+                    textAlign = TextAlign.Center
+                )
                 Spacer(modifier = Modifier.height(20.dp))
-                Button(
-                    onClick = onRetry,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text(text = stringResource(R.string.btn_try_again), fontWeight = FontWeight.Bold)
+                    OutlinedButton(
+                        onClick = onBack,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                            .testTag("rec_go_back_button"),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(text = stringResource(R.string.btn_back), fontWeight = FontWeight.Bold)
+                    }
+                    Button(
+                        onClick = onRetry,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                            .testTag("rec_try_again_button"),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                    ) {
+                        Text(text = stringResource(R.string.btn_try_again), fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }
@@ -3196,11 +3272,11 @@ private fun StepRecommendationsScreen(
     }
 
     if (uiState.recommendations.isEmpty()) {
-        // Empty State (Section 25)
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.5.dp, AgriCardBorder, RoundedCornerShape(18.dp)),
+                .border(1.5.dp, AgriCardBorder, RoundedCornerShape(18.dp))
+                .testTag("rec_empty_container"),
             shape = RoundedCornerShape(18.dp),
             colors = CardDefaults.cardColors(containerColor = AgriSurface)
         ) {
@@ -3227,70 +3303,310 @@ private fun StepRecommendationsScreen(
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(
                     onClick = onEditDetails,
+                    modifier = Modifier
+                        .height(48.dp)
+                        .testTag("change_details_button"),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
                 ) {
-                    Text(text = stringResource(R.string.review_edit), fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.btn_change_details), fontWeight = FontWeight.Bold)
                 }
             }
         }
         return
     }
 
-    // Results Header
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = stringResource(R.string.rec_results_title),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.ExtraBold,
-                color = AgriTextPrimary
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = stringResource(R.string.rec_results_subtitle),
-                style = MaterialTheme.typography.bodySmall,
-                color = AgriTextSecondary
-            )
-        }
-        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(R.string.btn_back), tint = AgriGreenPrimary)
-        }
+    val topOption = uiState.bestRecommendation
+        ?: uiState.recommendations.firstOrNull { it.isTopRecommendation }
+        ?: uiState.recommendations.first()
+    val otherOptions = if (uiState.alternativeRecommendations.isNotEmpty()) {
+        uiState.alternativeRecommendations
+    } else {
+        uiState.recommendations.filter { it.id != topOption.id }
     }
 
-    Spacer(modifier = Modifier.height(18.dp))
-
-    val topOption = uiState.recommendations.firstOrNull { it.isTopRecommendation } ?: uiState.recommendations.first()
-    val otherOptions = uiState.recommendations.filter { it.id != topOption.id }
-
-    // Primary Recommendation Card (⭐ BEST OPTION)
-    TopRecommendationCard(
-        opportunity = topOption,
-        onSellHere = { onSelectOpportunity(topOption) }
-    )
-
-    // Other Good Options (Stacked Cards)
-    if (otherOptions.isNotEmpty()) {
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = stringResource(R.string.badge_other_options),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = AgriTextPrimary
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            otherOptions.forEach { opp ->
-                AlternativeOpportunityCard(
-                    opportunity = opp,
-                    onSellHere = { onSelectOpportunity(opp) }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .widthIn(max = 760.dp)
+    ) {
+        // Results Header
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.rec_results_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = AgriTextPrimary
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = stringResource(R.string.rec_results_subtitle),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AgriTextSecondary
                 )
             }
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier
+                    .size(48.dp)
+                    .testTag("rec_back_button")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = stringResource(R.string.btn_back),
+                    tint = AgriGreenPrimary
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // Compact Input Summary Card (Section 1)
+        ProduceSummaryCard(
+            uiState = uiState,
+            onEditDetails = onEditDetails
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Comparison Explanation Banner (Section 8)
+        ComparisonExplanationBanner()
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Responsive Body: Single column for portrait, two columns for wide/landscape (Section 16)
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val isWideLayout = maxWidth >= 680.dp
+
+            if (isWideLayout) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Column(modifier = Modifier.weight(1.1f)) {
+                        TopRecommendationCard(
+                            opportunity = topOption,
+                            onSellHere = { onSelectOpportunity(topOption) }
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier.weight(0.9f),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        if (otherOptions.isNotEmpty()) {
+                            Text(
+                                text = stringResource(R.string.badge_other_options),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = AgriTextPrimary,
+                                modifier = Modifier.testTag("label_other_good_options")
+                            )
+                            otherOptions.forEach { opp ->
+                                AlternativeOpportunityCard(
+                                    opportunity = opp,
+                                    onSellHere = { onSelectOpportunity(opp) }
+                                )
+                            }
+                        }
+
+                        // Secondary Change Details Action
+                        OutlinedButton(
+                            onClick = onEditDetails,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .testTag("change_details_button_secondary"),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.btn_change_details),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    TopRecommendationCard(
+                        opportunity = topOption,
+                        onSellHere = { onSelectOpportunity(topOption) }
+                    )
+
+                    if (otherOptions.isNotEmpty()) {
+                        Text(
+                            text = stringResource(R.string.badge_other_options),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextPrimary,
+                            modifier = Modifier.testTag("label_other_good_options")
+                        )
+
+                        otherOptions.forEach { opp ->
+                            AlternativeOpportunityCard(
+                                opportunity = opp,
+                                onSellHere = { onSelectOpportunity(opp) }
+                            )
+                        }
+                    }
+
+                    // Secondary Change Details Action
+                    OutlinedButton(
+                        onClick = onEditDetails,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .testTag("change_details_button_secondary"),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.btn_change_details),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProduceSummaryCard(
+    uiState: SellingUiState,
+    onEditDetails: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(1.dp, AgriCardBorder, RoundedCornerShape(14.dp))
+            .testTag("step6_produce_summary"),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = AgriSurface)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text(
+                    text = uiState.selectedCrop.emoji,
+                    fontSize = 24.sp
+                )
+                Column {
+                    val cropName = stringResource(uiState.selectedCrop.nameRes)
+                    val qualityName = if (uiState.qualityRes != 0) {
+                        stringResource(uiState.qualityRes)
+                    } else {
+                        stringResource(R.string.produce_quality_good)
+                    }
+                    val locName = if (uiState.locationRes != 0) {
+                        stringResource(uiState.locationRes)
+                    } else {
+                        uiState.location.ifEmpty { "Nagpur, Maharashtra" }
+                    }
+                    val timingName = if (uiState.readyTimingRes != 0) {
+                        stringResource(uiState.readyTimingRes)
+                    } else {
+                        uiState.readyTiming.ifEmpty { stringResource(R.string.timing_ready_now) }
+                    }
+
+                    Text(
+                        text = "$cropName • ${uiState.quantityQuintals} q",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriTextPrimary
+                    )
+                    Text(
+                        text = "$qualityName • $locName • $timingName",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AgriTextSecondary
+                    )
+                }
+            }
+
+            TextButton(
+                onClick = onEditDetails,
+                modifier = Modifier
+                    .height(48.dp)
+                    .testTag("change_details_button")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = stringResource(R.string.btn_change_details),
+                    tint = AgriGreenPrimary,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = stringResource(R.string.btn_change_details),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = AgriGreenPrimary
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ComparisonExplanationBanner(
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag("rec_comparison_explanation_banner"),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = AgriGreenContainer.copy(alpha = 0.55f)),
+        border = BorderStroke(1.dp, AgriGreenLight.copy(alpha = 0.35f))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = null,
+                tint = AgriGreenPrimary,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = stringResource(R.string.rec_comparison_explanation),
+                style = MaterialTheme.typography.bodySmall,
+                color = AgriOnGreenContainer,
+                lineHeight = 18.sp
+            )
         }
     }
 }
@@ -3306,13 +3622,14 @@ private fun TopRecommendationCard(
         modifier = Modifier
             .fillMaxWidth()
             .border(2.dp, AgriGreenPrimary, RoundedCornerShape(20.dp))
-            .testTag("top_recommendation_card"),
+            .testTag("top_recommendation_card")
+            .testTag("best_recommendation_card"),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = AgriSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-            // Star Badge: ⭐ BEST OPTION
+            // Header: BEST PLACE TO SELL & Match quality badge
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -3323,76 +3640,171 @@ private fun TopRecommendationCard(
                         .clip(RoundedCornerShape(8.dp))
                         .background(AgriGreenPrimary)
                         .padding(horizontal = 10.dp, vertical = 5.dp)
+                        .testTag("best_rec_header")
                 ) {
                     Text(
-                        text = stringResource(R.string.badge_top_pick),
+                        text = stringResource(R.string.header_best_place_to_sell),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.ExtraBold,
                         color = Color.White
                     )
                 }
 
-                Text(
-                    text = stringResource(opportunity.statusTextRes),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = AgriGreenLight
-                )
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(AgriGreenContainer)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .testTag("best_rec_strength_badge")
+                ) {
+                    Text(
+                        text = stringResource(opportunity.matchQualityRes),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriOnGreenContainer
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Buyer Name & Verification
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(opportunity.buyerNameRes),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = AgriTextPrimary
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    imageVector = Icons.Default.Verified,
-                    contentDescription = stringResource(R.string.verified_buyer_tag),
-                    tint = AgriGreenLight,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            // Key Financials
+            // Destination Name & Type Badge
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f, fill = false)
+                ) {
                     Text(
-                        text = stringResource(R.string.label_quoted_price_short),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = AgriTextMuted
-                    )
-                    Text(
-                        text = "₹${formatCurrency(opportunity.quotedPricePerQ)} / q",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = AgriTextSecondary
+                        text = stringResource(opportunity.buyerNameRes),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = AgriTextPrimary,
+                        modifier = Modifier.testTag("best_rec_destination_name")
                     )
                 }
 
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = stringResource(R.string.label_after_expenses_short),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = AgriGreenPrimary
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Destination Type Pill
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(if (opportunity.isMarket) AgriGoldContainer else AgriGreenContainer)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .testTag("best_rec_destination_type")
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = if (opportunity.isMarket) Icons.Default.Storefront else Icons.Default.Verified,
+                            contentDescription = null,
+                            tint = if (opportunity.isMarket) AgriGoldSecondary else AgriGreenPrimary,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = if (opportunity.isMarket) {
+                                stringResource(R.string.tag_market_apmc)
+                            } else {
+                                stringResource(R.string.tag_verified_buyer)
+                            },
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = if (opportunity.isMarket) AgriOnGoldContainer else AgriOnGreenContainer
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Produce Info & Distance
+            Text(
+                text = "${stringResource(opportunity.cropNameRes)} • ${opportunity.quantityQuintals} ${stringResource(R.string.unit_quintals)} • ${opportunity.distanceKm} km",
+                style = MaterialTheme.typography.bodySmall,
+                color = AgriTextSecondary
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Key Financials: Quoted, Deductions, and In Pocket
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = AgriGreenContainer.copy(alpha = 0.35f)),
+                border = BorderStroke(1.dp, AgriCardBorder.copy(alpha = 0.6f))
+            ) {
+                Column(modifier = Modifier.padding(14.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            Text(
+                                text = stringResource(R.string.label_quoted_price_short),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = AgriTextMuted
+                            )
+                            Text(
+                                text = "₹${formatCurrency(opportunity.quotedPricePerQ)} / q",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = AgriTextSecondary,
+                                modifier = Modifier.testTag("best_rec_quoted_price")
+                            )
+                        }
+
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = stringResource(R.string.label_estimated_expenses_deduction),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = AgriTextMuted
+                            )
+                            Text(
+                                text = "- ₹${opportunity.totalExpensePerQ} / q",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = AgriTextSecondary,
+                                modifier = Modifier.testTag("best_rec_deductions")
+                            )
+                        }
+                    }
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 10.dp),
+                        color = AgriCardBorder.copy(alpha = 0.5f)
                     )
-                    Text(
-                        text = "₹${formatCurrency(opportunity.netRealizationPerQ)} / q",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Black,
-                        color = AgriGreenPrimary
-                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                text = stringResource(R.string.label_estimated_in_pocket),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = AgriGreenPrimary
+                            )
+                            Text(
+                                text = stringResource(R.string.label_after_expenses_short),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = AgriTextMuted
+                            )
+                        }
+
+                        Text(
+                            text = "₹${formatCurrency(opportunity.netRealizationPerQ)} / q",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Black,
+                            color = AgriGreenPrimary,
+                            modifier = Modifier.testTag("best_rec_net_price")
+                        )
+                    }
                 }
             }
 
@@ -3411,30 +3823,127 @@ private fun TopRecommendationCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = stringResource(R.string.label_estimated_total_short),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = AgriOnGreenContainer
-                    )
+                    Column {
+                        Text(
+                            text = stringResource(R.string.label_for_quintals_total, opportunity.quantityQuintals),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = AgriOnGreenContainer
+                        )
+                        Text(
+                            text = stringResource(R.string.label_estimated_total_short),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriOnGreenContainer
+                        )
+                    }
                     Text(
                         text = "₹${formatCurrency(opportunity.estimatedTotalAmount)}",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Black,
-                        color = AgriGreenPrimary
+                        color = AgriGreenPrimary,
+                        modifier = Modifier.testTag("best_rec_total_amount")
                     )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Disclaimer text
+            Text(
+                text = stringResource(R.string.estimate_disclaimer),
+                style = MaterialTheme.typography.bodySmall,
+                color = AgriTextMuted,
+                fontSize = 11.sp
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Why this is recommended - Reason items with checkmarks (Section 6)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("best_rec_reasons_list")
+            ) {
+                Text(
+                    text = stringResource(R.string.header_why_recommended),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = AgriTextPrimary
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                opportunity.reasonsRes.take(4).forEach { reasonRes ->
+                    Row(
+                        modifier = Modifier.padding(vertical = 3.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = AgriGreenPrimary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(reasonRes),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AgriTextPrimary
+                        )
+                    }
+                }
+            }
+
+            // Buyer Trust Info (Section 11)
+            if (!opportunity.isMarket) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("buyer_trust_info"),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = CardDefaults.cardColors(containerColor = AgriSurface),
+                    border = BorderStroke(1.dp, AgriCardBorder.copy(alpha = 0.7f))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Verified,
+                                contentDescription = null,
+                                tint = AgriGreenLight,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = stringResource(R.string.buyer_payment_timeline_days, opportunity.paymentDaysEstimate),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = AgriTextSecondary
+                            )
+                        }
+
+                        Text(
+                            text = stringResource(R.string.buyer_completed_tx_count, opportunity.completedTransactionsCount),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextSecondary
+                        )
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Action Button: Sell Here
+            // Action Button: Sell Here (Primary Action)
             Button(
                 onClick = onSellHere,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp)
-                    .testTag("sell_here_top_button"),
+                    .testTag("sell_here_best_button"),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
             ) {
@@ -3445,16 +3954,23 @@ private fun TopRecommendationCard(
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Expandable: "Why this option?"
+            // Expandable: "Why this suggestion?"
             TextButton(
                 onClick = { isExpanded = !isExpanded },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .testTag("why_this_suggestion_button")
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = if (isExpanded) stringResource(R.string.btn_hide_details) else stringResource(R.string.btn_why_this_option),
+                        text = if (isExpanded) {
+                            stringResource(R.string.btn_hide_details)
+                        } else {
+                            stringResource(R.string.btn_why_this_suggestion)
+                        },
                         fontWeight = FontWeight.Bold,
                         color = AgriGreenLight
                     )
@@ -3472,37 +3988,94 @@ private fun TopRecommendationCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp)
+                        .testTag("why_suggestion_explanation_card")
                 ) {
-                    // Explanations
-                    opportunity.reasonsRes.forEach { reasonRes ->
-                        Row(
-                            modifier = Modifier.padding(vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = AgriSurface),
+                        border = BorderStroke(1.dp, AgriCardBorder)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = null,
-                                tint = AgriGreenPrimary,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = stringResource(reasonRes),
-                                style = MaterialTheme.typography.bodyMedium,
+                                text = stringResource(R.string.why_suggestion_engine_title),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
                                 color = AgriTextPrimary
                             )
+                            WhyFactorRow(
+                                title = stringResource(R.string.why_factor_price_title),
+                                desc = stringResource(R.string.why_factor_price_desc)
+                            )
+                            WhyFactorRow(
+                                title = stringResource(R.string.why_factor_travel_title),
+                                desc = stringResource(R.string.why_factor_travel_desc, opportunity.distanceKm)
+                            )
+                            WhyFactorRow(
+                                title = stringResource(R.string.why_factor_demand_title),
+                                desc = stringResource(R.string.why_factor_demand_desc)
+                            )
+                            WhyFactorRow(
+                                title = stringResource(R.string.why_factor_quality_title),
+                                desc = stringResource(R.string.why_factor_quality_desc)
+                            )
+                            WhyFactorRow(
+                                title = stringResource(R.string.why_factor_quantity_title),
+                                desc = stringResource(R.string.why_factor_quantity_desc, opportunity.quantityQuintals)
+                            )
+                            WhyFactorRow(
+                                title = stringResource(R.string.why_factor_reliability_title),
+                                desc = stringResource(R.string.why_factor_reliability_desc)
+                            )
+
+                            HorizontalDivider(
+                                modifier = Modifier.padding(vertical = 4.dp),
+                                color = AgriCardBorder.copy(alpha = 0.5f)
+                            )
+
+                            DetailRow(stringResource(R.string.detail_distance), "${opportunity.distanceKm} km")
+                            DetailRow(stringResource(R.string.detail_transport), "₹${opportunity.transportExpensePerQ} / q")
+                            DetailRow(stringResource(R.string.detail_handling), "₹${opportunity.otherExpensePerQ} / q")
+                            DetailRow(stringResource(R.string.detail_payment), stringResource(opportunity.paymentReliabilityRes))
                         }
                     }
-
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = AgriCardBorder.copy(alpha = 0.5f))
-
-                    // Secondary Details (Section 16)
-                    DetailRow(stringResource(R.string.detail_distance), "${opportunity.distanceKm} km")
-                    DetailRow(stringResource(R.string.detail_transport), "₹${opportunity.transportExpensePerQ} / q")
-                    DetailRow(stringResource(R.string.detail_handling), "₹${opportunity.otherExpensePerQ} / q")
-                    DetailRow(stringResource(R.string.detail_payment), stringResource(opportunity.paymentReliabilityRes))
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun WhyFactorRow(title: String, desc: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Top
+    ) {
+        Icon(
+            imageVector = Icons.Default.Check,
+            contentDescription = null,
+            tint = AgriGreenPrimary,
+            modifier = Modifier
+                .padding(top = 2.dp)
+                .size(14.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Column {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Bold,
+                color = AgriTextPrimary
+            )
+            Text(
+                text = desc,
+                style = MaterialTheme.typography.bodySmall,
+                color = AgriTextSecondary,
+                fontSize = 12.sp
+            )
         }
     }
 }
@@ -3517,7 +4090,8 @@ private fun AlternativeOpportunityCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.5.dp, AgriCardBorder, RoundedCornerShape(18.dp)),
+            .border(1.5.dp, AgriCardBorder, RoundedCornerShape(18.dp))
+            .testTag("alternative_card_${opportunity.id}"),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = AgriSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
@@ -3528,23 +4102,35 @@ private fun AlternativeOpportunityCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = stringResource(opportunity.buyerNameRes),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = AgriTextPrimary
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(opportunity.buyerNameRes),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriTextPrimary
+                    )
+                    Text(
+                        text = "${opportunity.distanceKm} km • ${stringResource(opportunity.cropNameRes)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AgriTextSecondary
+                    )
+                }
+
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .background(AgriGoldContainer)
+                        .background(if (opportunity.isMarket) AgriGoldContainer else AgriGreenContainer)
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = stringResource(opportunity.statusTextRes),
+                        text = if (opportunity.isMarket) {
+                            stringResource(R.string.tag_market_apmc)
+                        } else {
+                            stringResource(R.string.tag_verified_buyer)
+                        },
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        color = AgriOnGoldContainer
+                        color = if (opportunity.isMarket) AgriOnGoldContainer else AgriOnGreenContainer
                     )
                 }
             }
@@ -3568,11 +4154,19 @@ private fun AlternativeOpportunityCard(
                         fontWeight = FontWeight.Bold,
                         color = AgriGreenPrimary
                     )
+                    Text(
+                        text = "₹${formatCurrency(opportunity.estimatedTotalAmount)} (${opportunity.quantityQuintals} q)",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = AgriTextSecondary
+                    )
                 }
 
                 Button(
                     onClick = onSellHere,
-                    modifier = Modifier.height(44.dp),
+                    modifier = Modifier
+                        .height(48.dp)
+                        .testTag("sell_here_alt_${opportunity.id}"),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
                 ) {
@@ -3585,11 +4179,16 @@ private fun AlternativeOpportunityCard(
                 onClick = { isExpanded = !isExpanded },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 6.dp)
+                    .height(48.dp)
+                    .padding(top = 4.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = if (isExpanded) stringResource(R.string.btn_hide_details) else stringResource(R.string.btn_why_this_option),
+                        text = if (isExpanded) {
+                            stringResource(R.string.btn_hide_details)
+                        } else {
+                            stringResource(R.string.btn_why_this_option)
+                        },
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp,
                         color = AgriGreenLight
@@ -3627,6 +4226,7 @@ private fun AlternativeOpportunityCard(
                     Spacer(modifier = Modifier.height(6.dp))
                     DetailRow(stringResource(R.string.detail_distance), "${opportunity.distanceKm} km")
                     DetailRow(stringResource(R.string.detail_transport), "₹${opportunity.transportExpensePerQ} / q")
+                    DetailRow(stringResource(R.string.detail_handling), "₹${opportunity.otherExpensePerQ} / q")
                 }
             }
         }
@@ -3647,177 +4247,328 @@ private fun DetailRow(label: String, value: String) {
 }
 
 // -------------------------------------------------------------------------
-// STEP 9 — "SELL HERE" CONFIRMATION (Section 18)
+// STEP 9 — GUIDED LOT CREATION & PUBLISHING (Stage 7)
 // -------------------------------------------------------------------------
 @Composable
 private fun StepConfirmSellScreen(
     uiState: SellingUiState,
+    viewModel: SellingViewModel,
+    onEditDetails: () -> Unit,
     onConfirm: () -> Unit,
     onBack: () -> Unit
 ) {
     val opp = uiState.selectedOpportunity ?: return
+    val currentStep = uiState.lotCreationStep
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = stringResource(R.string.label_sell_to).uppercase(),
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Black,
-            color = AgriGreenPrimary,
-            letterSpacing = 1.sp
+        // Progress Header: e.g. "Step 1 of 4 • Produce Summary"
+        LotProgressHeader(
+            stepNumber = currentStep.stepNumber,
+            totalSteps = 4,
+            title = stringResource(currentStep.stepTitleRes)
         )
-        Spacer(modifier = Modifier.height(2.dp))
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        when (currentStep) {
+            LotCreationStep.PRODUCE_SUMMARY -> {
+                LotStep1ProduceSummary(
+                    uiState = uiState,
+                    opp = opp,
+                    onContinue = { viewModel.nextLotCreationStep() },
+                    onEditDetails = onEditDetails,
+                    onBack = onBack
+                )
+            }
+            LotCreationStep.CHECK_DETAILS -> {
+                LotStep2CheckDetails(
+                    uiState = uiState,
+                    opp = opp,
+                    onContinue = { viewModel.nextLotCreationStep() },
+                    onEditDetails = onEditDetails,
+                    onBack = { viewModel.previousLotCreationStep() }
+                )
+            }
+            LotCreationStep.ADD_PHOTOS -> {
+                LotStep3AddPhotos(
+                    uiState = uiState,
+                    onAddPhoto = { uri -> viewModel.addPhoto(uri) },
+                    onRemovePhoto = { uri -> viewModel.removePhoto(uri) },
+                    onContinue = { viewModel.nextLotCreationStep() },
+                    onSkip = { viewModel.nextLotCreationStep() },
+                    onBack = { viewModel.previousLotCreationStep() }
+                )
+            }
+            LotCreationStep.READY_TO_PUBLISH -> {
+                LotStep4ReadyToPublish(
+                    uiState = uiState,
+                    opp = opp,
+                    isPublishing = uiState.isPublishingLot,
+                    error = uiState.lotPublishError,
+                    onPublish = { viewModel.publishLot() },
+                    onRetry = { viewModel.publishLot() },
+                    onBack = { viewModel.previousLotCreationStep() }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LotProgressHeader(
+    stepNumber: Int,
+    totalSteps: Int,
+    title: String
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.step_progress_indicator, stepNumber, totalSteps),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = AgriGreenPrimary
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = AgriTextSecondary
+            )
+        }
+        Spacer(modifier = Modifier.height(6.dp))
+        LinearProgressIndicator(
+            progress = { stepNumber / totalSteps.toFloat() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp)
+                .clip(RoundedCornerShape(3.dp)),
+            color = AgriGreenPrimary,
+            trackColor = AgriGreenContainer
+        )
+    }
+}
+
+// -------------------------------------------------------------------------
+// LOT STEP 1 — PRODUCE SUMMARY
+// -------------------------------------------------------------------------
+@Composable
+private fun LotStep1ProduceSummary(
+    uiState: SellingUiState,
+    opp: SellingOpportunity,
+    onContinue: () -> Unit,
+    onEditDetails: () -> Unit,
+    onBack: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = stringResource(opp.buyerNameRes),
-            style = MaterialTheme.typography.headlineMedium,
+            text = stringResource(R.string.title_step_produce_summary),
+            style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.ExtraBold,
             color = AgriTextPrimary
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = "${stringResource(uiState.selectedCrop.nameRes)} • ${uiState.quantityQuintals} ${stringResource(R.string.unit_quintals)}",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = AgriGreenLight
+            text = "Review your crop details and selected buyer before creating your lot.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = AgriTextSecondary
         )
-
-        Spacer(modifier = Modifier.height(18.dp))
-
-        // Summary Card highlighting Expected amount and transport
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(1.5.dp, AgriGreenLight.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = AgriGreenContainer)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = stringResource(R.string.label_expected_amount_after_expenses),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = AgriOnGreenContainer
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "₹${formatCurrency(opp.estimatedTotalAmount)}",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Black,
-                    color = AgriGreenPrimary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = stringResource(R.string.label_estimated_transport),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AgriTextSecondary
-                    )
-                    Text(
-                        text = "₹${formatCurrency(opp.transportExpensePerQ * uiState.quantityQuintals)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Bold,
-                        color = AgriTextPrimary
-                    )
-                }
-            }
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Calculation Breakdown Card
+        // Card 1: Produce Summary
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.5.dp, AgriCardBorder, RoundedCornerShape(20.dp)),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = AgriSurface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                .border(1.5.dp, AgriCardBorder, RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
-                Text(
-                    text = stringResource(R.string.breakdown_title),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Black,
-                    color = AgriGreenPrimary,
-                    letterSpacing = 1.sp
-                )
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                val grossTotal = opp.quotedPricePerQ * uiState.quantityQuintals
-                val transportTotal = opp.transportExpensePerQ * uiState.quantityQuintals
-                val handlingTotal = opp.otherExpensePerQ * uiState.quantityQuintals
-
-                BreakdownRow(
-                    label = stringResource(R.string.breakdown_gross),
-                    sub = "₹${formatCurrency(opp.quotedPricePerQ)} × ${uiState.quantityQuintals} q",
-                    value = "₹${formatCurrency(grossTotal)}",
-                    isNegative = false
-                )
-
-                BreakdownRow(
-                    label = stringResource(R.string.breakdown_transport),
-                    sub = "₹${opp.transportExpensePerQ} × ${uiState.quantityQuintals} q",
-                    value = "- ₹${formatCurrency(transportTotal)}",
-                    isNegative = true
-                )
-
-                BreakdownRow(
-                    label = stringResource(R.string.breakdown_handling),
-                    sub = "₹${opp.otherExpensePerQ} × ${uiState.quantityQuintals} q",
-                    value = "- ₹${formatCurrency(handlingTotal)}",
-                    isNegative = true
-                )
-
-                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = AgriCardBorder)
-
+            Column(modifier = Modifier.padding(16.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = stringResource(R.string.breakdown_net),
-                        style = MaterialTheme.typography.titleMedium,
+                        text = stringResource(R.string.header_your_produce),
+                        style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.ExtraBold,
-                        color = AgriGreenPrimary
+                        color = AgriTextSecondary,
+                        letterSpacing = 0.5.sp
+                    )
+                    TextButton(
+                        onClick = onEditDetails,
+                        modifier = Modifier.testTag("lot_btn_change_details")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null,
+                            tint = AgriGreenPrimary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.btn_change_details),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriGreenPrimary
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .background(AgriGreenContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = uiState.selectedCrop.emoji, fontSize = 24.sp)
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = stringResource(uiState.selectedCrop.nameRes),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextPrimary
+                        )
+                        Text(
+                            text = "${uiState.quantityQuintals} ${stringResource(R.string.unit_quintals)} • ${stringResource(uiState.qualityRes)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+                HorizontalDivider(color = AgriCardBorder.copy(alpha = 0.5f))
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "📍 ${uiState.location.ifBlank { "Nagpur, Maharashtra" }}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = AgriTextSecondary
                     )
                     Text(
-                        text = "₹${formatCurrency(opp.estimatedTotalAmount)}",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Black,
+                        text = uiState.readinessTiming,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
                         color = AgriGreenPrimary
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
-        Text(
-            text = stringResource(R.string.label_note_share_details),
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Medium,
-            color = AgriTextSecondary,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
+        // Card 2: Recommended / Selected Buyer
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.5.dp, AgriGreenLight.copy(alpha = 0.4f), RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = AgriGreenContainer)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.header_recommended_buyer),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Black,
+                        color = AgriOnGreenContainer,
+                        letterSpacing = 0.5.sp
+                    )
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(AgriGreenPrimary.copy(alpha = 0.15f))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.badge_verified_buyer),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriGreenPrimary
+                        )
+                    }
+                }
 
-        Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
+                Text(
+                    text = stringResource(opp.buyerNameRes),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = AgriTextPrimary
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.label_quoted_price),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "₹${formatCurrency(opp.quotedPricePerQ)} / q",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextPrimary
+                        )
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(
+                            text = stringResource(R.string.label_net_expected),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "₹${formatCurrency(opp.estimatedNetPricePerQ)} / q",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = AgriGreenPrimary
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Continue Button
         Button(
-            onClick = onConfirm,
+            onClick = onContinue,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(54.dp)
-                .testTag("create_lot_confirm_button"),
+                .testTag("btn_lot_step1_continue"),
             shape = RoundedCornerShape(14.dp),
             colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
         ) {
             Text(
-                text = stringResource(R.string.btn_create_lot),
+                text = stringResource(R.string.btn_continue),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -3830,6 +4581,878 @@ private fun StepConfirmSellScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
+                .testTag("btn_lot_step1_back"),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.btn_go_back),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = AgriTextSecondary
+            )
+        }
+    }
+}
+
+// -------------------------------------------------------------------------
+// LOT STEP 2 — CHECK DETAILS
+// -------------------------------------------------------------------------
+@Composable
+private fun LotStep2CheckDetails(
+    uiState: SellingUiState,
+    opp: SellingOpportunity,
+    onContinue: () -> Unit,
+    onEditDetails: () -> Unit,
+    onBack: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.title_step_check_details),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.ExtraBold,
+            color = AgriTextPrimary
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "Verify your location, readiness and expected net return.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = AgriTextSecondary
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.5.dp, AgriCardBorder, RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                // Location row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.label_pickup_location),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextSecondary
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = uiState.location.ifBlank { "Nagpur, Maharashtra" },
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextPrimary
+                        )
+                    }
+                    TextButton(onClick = onEditDetails) {
+                        Text(
+                            text = stringResource(R.string.btn_change_details),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriGreenPrimary
+                        )
+                    }
+                }
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = AgriCardBorder.copy(alpha = 0.5f))
+
+                // Readiness row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.label_harvest_readiness),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextSecondary
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = uiState.readinessTiming,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = AgriTextPrimary
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = AgriGreenPrimary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = AgriCardBorder.copy(alpha = 0.5f))
+
+                // Logistics / Pickup mode
+                Column {
+                    Text(
+                        text = "Transport & Handling",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriTextSecondary
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "Direct pickup from farm by ${stringResource(opp.buyerNameRes)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = AgriTextPrimary
+                    )
+                    Text(
+                        text = "Estimated transport expense: ₹${formatCurrency(opp.transportExpensePerQ * uiState.quantityQuintals)} (deducted at settlement)",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AgriTextSecondary
+                    )
+                }
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = AgriCardBorder.copy(alpha = 0.5f))
+
+                // Net expected total
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.label_expected_amount_after_expenses),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "Net estimated return",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AgriTextSecondary
+                        )
+                    }
+                    Text(
+                        text = "₹${formatCurrency(opp.estimatedTotalAmount)}",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Black,
+                        color = AgriGreenPrimary
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Estimate Disclaimer Note
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(AgriGoldContainer.copy(alpha = 0.5f))
+                .padding(12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = null,
+                tint = AgriGoldSecondary,
+                modifier = Modifier
+                    .size(18.dp)
+                    .padding(top = 1.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = stringResource(R.string.disclaimer_estimate_text),
+                style = MaterialTheme.typography.bodySmall,
+                color = AgriTextPrimary
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = onContinue,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(54.dp)
+                .testTag("btn_lot_step2_continue"),
+            shape = RoundedCornerShape(14.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+        ) {
+            Text(
+                text = stringResource(R.string.btn_continue),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        OutlinedButton(
+            onClick = onBack,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .testTag("btn_lot_step2_back"),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.btn_go_back),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = AgriTextSecondary
+            )
+        }
+    }
+}
+
+// -------------------------------------------------------------------------
+// LOT STEP 3 — OPTIONAL PHOTOS
+// -------------------------------------------------------------------------
+@Composable
+private fun LotStep3AddPhotos(
+    uiState: SellingUiState,
+    onAddPhoto: (String) -> Unit,
+    onRemovePhoto: (String) -> Unit,
+    onContinue: () -> Unit,
+    onSkip: () -> Unit,
+    onBack: () -> Unit
+) {
+    val context = LocalContext.current
+    var showAddPhotoDialog by remember { mutableStateOf(false) }
+    var previewPhotoUri by remember { mutableStateOf<String?>(null) }
+    var cameraPermissionDenied by remember { mutableStateOf(false) }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            cameraPermissionDenied = false
+            val photoUri = "content://media/photo_${System.currentTimeMillis()}"
+            onAddPhoto(photoUri)
+            showAddPhotoDialog = false
+        } else {
+            cameraPermissionDenied = true
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.title_add_photos),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.ExtraBold,
+            color = AgriTextPrimary
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.subtitle_add_photos),
+            style = MaterialTheme.typography.bodyMedium,
+            color = AgriTextSecondary
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.5.dp, AgriCardBorder, RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                if (uiState.lotPhotos.isEmpty()) {
+                    // Empty photo placeholder
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(64.dp)
+                                .clip(CircleShape)
+                                .background(AgriGreenContainer),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.PhotoCamera,
+                                contentDescription = null,
+                                tint = AgriGreenPrimary,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = stringResource(R.string.no_photos_added),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextPrimary
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Take a clear photo of your grain or storage bag",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AgriTextSecondary
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = { showAddPhotoDialog = true },
+                            modifier = Modifier
+                                .height(46.dp)
+                                .testTag("btn_add_photo"),
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = stringResource(R.string.btn_add_photo),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                } else {
+                    // Photos list
+                    Text(
+                        text = stringResource(R.string.photos_attached_count, uiState.lotPhotos.size),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriGreenPrimary
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        uiState.lotPhotos.forEachIndexed { index, uri ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(AgriSurface)
+                                    .padding(8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(54.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(AgriGreenContainer),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(text = uiState.selectedCrop.emoji, fontSize = 24.sp)
+                                    }
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column {
+                                        Text(
+                                            text = stringResource(R.string.photo_thumbnail, index + 1),
+                                            style = MaterialTheme.typography.titleSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = AgriTextPrimary
+                                        )
+                                        Text(
+                                            text = "Attached for buyers",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = AgriTextSecondary
+                                        )
+                                    }
+                                }
+
+                                Row {
+                                    IconButton(
+                                        onClick = { previewPhotoUri = uri },
+                                        modifier = Modifier.testTag("btn_view_photo_$index")
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Visibility,
+                                            contentDescription = stringResource(R.string.btn_view_photo),
+                                            tint = AgriGreenPrimary
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { onRemovePhoto(uri) },
+                                        modifier = Modifier.testTag("btn_remove_photo_$index")
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = stringResource(R.string.btn_remove_photo),
+                                            tint = Color(0xFFDC2626)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    OutlinedButton(
+                        onClick = { showAddPhotoDialog = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(46.dp)
+                            .testTag("btn_add_another_photo"),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null,
+                            tint = AgriGreenPrimary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = stringResource(R.string.btn_add_another_photo),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriGreenPrimary
+                        )
+                    }
+                }
+            }
+        }
+
+        if (cameraPermissionDenied) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = stringResource(R.string.camera_permission_explanation),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color(0xFFDC2626)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Main action: Continue if photos exist, Skip if empty
+        if (uiState.lotPhotos.isNotEmpty()) {
+            Button(
+                onClick = onContinue,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(54.dp)
+                    .testTag("btn_continue_photos"),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+            ) {
+                Text(
+                    text = stringResource(R.string.btn_continue),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        } else {
+            Button(
+                onClick = onSkip,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(54.dp)
+                    .testTag("btn_skip_photos"),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+            ) {
+                Text(
+                    text = stringResource(R.string.btn_skip_photos),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        OutlinedButton(
+            onClick = onBack,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .testTag("btn_lot_step3_back"),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.btn_go_back),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = AgriTextSecondary
+            )
+        }
+    }
+
+    // Add Photo Selection Dialog
+    if (showAddPhotoDialog) {
+        AlertDialog(
+            onDismissRequest = { showAddPhotoDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.title_add_photos),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            val hasCamera = ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.CAMERA
+                            ) == PackageManager.PERMISSION_GRANTED
+                            if (hasCamera) {
+                                val photoUri = "content://media/photo_${System.currentTimeMillis()}"
+                                onAddPhoto(photoUri)
+                                showAddPhotoDialog = false
+                            } else {
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .testTag("dialog_btn_take_photo"),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                    ) {
+                        Icon(imageVector = Icons.Default.PhotoCamera, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = stringResource(R.string.btn_take_photo), fontWeight = FontWeight.Bold)
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            val photoUri = "content://gallery/photo_${System.currentTimeMillis()}"
+                            onAddPhoto(photoUri)
+                            showAddPhotoDialog = false
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .testTag("dialog_btn_gallery"),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(imageVector = Icons.Default.PhotoLibrary, contentDescription = null, tint = AgriGreenPrimary)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.btn_choose_gallery),
+                            fontWeight = FontWeight.Bold,
+                            color = AgriGreenPrimary
+                        )
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            val sampleUri = "android.resource://sample_harvest_${System.currentTimeMillis()}"
+                            onAddPhoto(sampleUri)
+                            showAddPhotoDialog = false
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .testTag("dialog_btn_sample_photo"),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.btn_add_sample_photo),
+                            fontWeight = FontWeight.SemiBold,
+                            color = AgriTextSecondary
+                        )
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { showAddPhotoDialog = false }) {
+                    Text(text = "Cancel", color = AgriTextSecondary)
+                }
+            }
+        )
+    }
+
+    // Photo Preview Dialog
+    if (previewPhotoUri != null) {
+        AlertDialog(
+            onDismissRequest = { previewPhotoUri = null },
+            title = {
+                Text(
+                    text = "Photo Preview",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(160.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(AgriGreenContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = uiState.selectedCrop.emoji, fontSize = 64.sp)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = stringResource(R.string.sample_photo_attached),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = AgriTextPrimary
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { previewPhotoUri = null },
+                    colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                ) {
+                    Text(text = "Close")
+                }
+            }
+        )
+    }
+}
+
+// -------------------------------------------------------------------------
+// LOT STEP 4 — READY TO PUBLISH
+// -------------------------------------------------------------------------
+@Composable
+private fun LotStep4ReadyToPublish(
+    uiState: SellingUiState,
+    opp: SellingOpportunity,
+    isPublishing: Boolean,
+    error: String?,
+    onPublish: () -> Unit,
+    onRetry: () -> Unit,
+    onBack: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.title_ready_to_sell),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.ExtraBold,
+            color = AgriTextPrimary
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.desc_publishing_explanation),
+            style = MaterialTheme.typography.bodyMedium,
+            color = AgriTextSecondary
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Final Recap Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.5.dp, AgriCardBorder, RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        ) {
+            Column(modifier = Modifier.padding(18.dp)) {
+                // Crop & Quantity
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .clip(CircleShape)
+                            .background(AgriGreenContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = uiState.selectedCrop.emoji, fontSize = 26.sp)
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = stringResource(uiState.selectedCrop.nameRes),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextPrimary
+                        )
+                        Text(
+                            text = "${uiState.quantityQuintals} ${stringResource(R.string.unit_quintals)} • ${stringResource(uiState.qualityRes)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                            color = AgriTextSecondary
+                        )
+                    }
+                }
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = AgriCardBorder.copy(alpha = 0.5f))
+
+                // Location & Readiness
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text(
+                            text = "Location",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = uiState.location.ifBlank { "Nagpur, Maharashtra" },
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = AgriTextPrimary
+                        )
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(
+                            text = "Target Buyer",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = stringResource(opp.buyerNameRes),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriGreenPrimary
+                        )
+                    }
+                }
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = AgriCardBorder.copy(alpha = 0.5f))
+
+                // Expected Net Total
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.label_estimated_after_expenses_short),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "₹${formatCurrency(opp.quotedPricePerQ)} / q quoted",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AgriTextSecondary
+                        )
+                    }
+                    Text(
+                        text = "₹${formatCurrency(opp.estimatedTotalAmount)}",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Black,
+                        color = AgriGreenPrimary
+                    )
+                }
+
+                if (uiState.lotPhotos.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "📷 ${stringResource(R.string.photos_attached_count, uiState.lotPhotos.size)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AgriGreenPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+
+        // Error message if publishing failed
+        if (error != null) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(0xFFFEE2E2))
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ErrorOutline,
+                    contentDescription = null,
+                    tint = Color(0xFFDC2626)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = error,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF991B1B)
+                    )
+                }
+                TextButton(onClick = onRetry) {
+                    Text("Retry", color = Color(0xFFDC2626), fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Publish Button with loading indicator
+        Button(
+            onClick = onPublish,
+            enabled = !isPublishing,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(54.dp)
+                .testTag("btn_publish_lot")
+                .testTag("create_lot_confirm_button"),
+            shape = RoundedCornerShape(14.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+        ) {
+            if (isPublishing) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(22.dp),
+                    color = Color.White,
+                    strokeWidth = 2.5.dp
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = stringResource(R.string.status_publishing_lot),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.btn_publish_lot),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        OutlinedButton(
+            onClick = onBack,
+            enabled = !isPublishing,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .testTag("btn_publish_go_back")
                 .testTag("btn_go_back"),
             shape = RoundedCornerShape(14.dp)
         ) {
@@ -3843,40 +5466,14 @@ private fun StepConfirmSellScreen(
     }
 }
 
-@Composable
-private fun BreakdownRow(
-    label: String,
-    sub: String,
-    value: String,
-    isNegative: Boolean
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column {
-            Text(text = label, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = AgriTextPrimary)
-            Text(text = sub, style = MaterialTheme.typography.labelSmall, color = AgriTextMuted)
-        }
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = if (isNegative) AgriGoldSecondary else AgriTextPrimary
-        )
-    }
-}
-
 // -------------------------------------------------------------------------
-// STEP 10 — LOT CREATED (Section 19 & 20)
+// STEP 10 — LOT PUBLISHED SUCCESS (Stage 7 Section 10 & 11)
 // -------------------------------------------------------------------------
 @Composable
 private fun StepLotCreatedScreen(
     uiState: SellingUiState,
     onViewMyLot: () -> Unit,
+    onViewOffers: () -> Unit,
     onDone: () -> Unit
 ) {
     val lot = uiState.createdLot
@@ -3884,7 +5481,7 @@ private fun StepLotCreatedScreen(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 20.dp),
+            .padding(vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
@@ -3902,42 +5499,46 @@ private fun StepLotCreatedScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // Status badge: ✓ Lot published
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .background(AgriGreenContainer)
+                .padding(horizontal = 12.dp, vertical = 6.dp)
+                .testTag("badge_lot_published")
+        ) {
+            Text(
+                text = stringResource(R.string.badge_lot_published),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Black,
+                color = AgriGreenPrimary
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = stringResource(R.string.title_lot_created).uppercase(),
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Black,
-            color = AgriGreenPrimary,
-            letterSpacing = 1.2.sp
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = stringResource(R.string.success_lot_created),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.ExtraBold,
-            color = AgriTextPrimary
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            text = stringResource(R.string.success_lot_msg),
-            style = MaterialTheme.typography.bodyMedium,
-            color = AgriTextSecondary,
+            text = stringResource(
+                R.string.success_lot_published_msg,
+                stringResource(uiState.selectedCrop.nameRes)
+            ),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = AgriTextPrimary,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
+        // Published Lot Card
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .border(1.5.dp, AgriCardBorder, RoundedCornerShape(20.dp)),
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = AgriSurface),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
@@ -3947,23 +5548,24 @@ private fun StepLotCreatedScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = lot?.lotId ?: "Lot #AG-1024",
+                        text = lot?.lotId ?: "LOT-AGL-2026-...",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Black,
-                        color = AgriGreenPrimary
+                        color = AgriGreenPrimary,
+                        modifier = Modifier.testTag("published_lot_id")
                     )
 
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(AgriGoldContainer)
+                            .background(AgriGreenContainer)
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.lot_status_waiting),
+                            text = stringResource(lot?.statusRes ?: R.string.lot_status_published),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = AgriGoldSecondary
+                            color = AgriGreenPrimary
                         )
                     }
                 }
@@ -3993,22 +5595,79 @@ private fun StepLotCreatedScreen(
                             style = MaterialTheme.typography.bodyMedium,
                             color = AgriTextSecondary
                         )
-                        if (lot?.buyerNameRes != null) {
-                            Spacer(modifier = Modifier.height(2.dp))
+                        if (lot?.location?.isNotBlank() == true) {
                             Text(
-                                text = "${stringResource(R.string.label_buyer)}: ${stringResource(lot.buyerNameRes)}",
+                                text = "📍 ${lot.location}",
                                 style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.Bold,
-                                color = AgriGreenPrimary
+                                color = AgriTextSecondary
                             )
                         }
                     }
                 }
+
+                if (lot?.buyerNameRes != null) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    HorizontalDivider(color = AgriCardBorder.copy(alpha = 0.5f))
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = stringResource(R.string.label_recommended_buyer_tag),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = stringResource(lot.buyerNameRes),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriGreenPrimary
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = stringResource(R.string.label_expected_price_short),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AgriTextSecondary
+                    )
+                    Text(
+                        text = "₹${formatCurrency(lot?.expectedPricePerQ ?: 4850)}/q",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriTextPrimary
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = stringResource(R.string.label_estimated_after_expenses_short),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AgriTextSecondary
+                    )
+                    Text(
+                        text = "₹${formatCurrency(lot?.estimatedTotalAmount ?: 235000)}",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = AgriGreenPrimary
+                    )
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
+        // Primary Action: View My Lot
         Button(
             onClick = onViewMyLot,
             modifier = Modifier
@@ -4025,19 +5684,39 @@ private fun StepLotCreatedScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
+        // Tertiary / Secondary: See Offers
         OutlinedButton(
-            onClick = onDone,
+            onClick = onViewOffers,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
-                .testTag("done_lot_button"),
+                .testTag("see_offers_lot_button"),
             shape = RoundedCornerShape(14.dp)
         ) {
             Text(
-                text = stringResource(R.string.btn_done),
+                text = stringResource(R.string.btn_see_offers),
                 style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = AgriGreenPrimary
+            )
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Done / Go Home
+        TextButton(
+            onClick = onDone,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(46.dp)
+                .testTag("done_lot_button")
+                .testTag("btn_go_home")
+        ) {
+            Text(
+                text = stringResource(R.string.btn_go_home),
+                style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = AgriTextSecondary
             )

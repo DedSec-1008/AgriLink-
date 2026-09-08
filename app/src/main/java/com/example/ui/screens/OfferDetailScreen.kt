@@ -1,6 +1,7 @@
 package com.example.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +21,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -32,10 +34,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +49,7 @@ import com.example.model.OfferStatus
 import com.example.ui.theme.AgriGreenContainer
 import com.example.ui.theme.AgriGreenPrimary
 import com.example.ui.theme.AgriGreenText
+import com.example.ui.theme.AgriHeroGreenBorder
 import com.example.ui.theme.AgriTextMuted
 import com.example.ui.theme.AgriTextPrimary
 import com.example.ui.theme.AgriTextSecondary
@@ -112,10 +111,80 @@ fun OfferDetailScreen(
                     color = AgriTextPrimary
                 )
                 Text(
-                    text = stringResource(R.string.title_offer_details),
+                    text = "${offer.distanceKm} km • ${stringResource(offer.reliabilityTextRes)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = AgriTextSecondary
                 )
+            }
+        }
+
+        // Best Offer Banner if applicable
+        if (offer.isBestOffer) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF0FDF4)),
+                border = androidx.compose.foundation.BorderStroke(1.5.dp, AgriHeroGreenBorder)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "⭐ ${stringResource(R.string.badge_best_offer)}",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = AgriGreenPrimary
+                        )
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(AgriGreenContainer)
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.badge_best_for_you),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = AgriGreenText
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(2.dp))
+
+                    Text(
+                        text = stringResource(R.string.why_this_offer_better),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriGreenText
+                    )
+                    val reasons = if (offer.whyBetterReasons.isNotEmpty()) {
+                        offer.whyBetterReasons
+                    } else {
+                        listOf(
+                            R.string.reason_higher_net,
+                            R.string.reason_verified_buyer_check,
+                            R.string.reason_reliable_payment_check,
+                            R.string.reason_suitable_quantity_check
+                        )
+                    }
+                    reasons.forEach { reasonRes ->
+                        Text(
+                            text = stringResource(reasonRes),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AgriTextPrimary,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
         }
 
@@ -153,7 +222,7 @@ fun OfferDetailScreen(
             }
         }
 
-        // Net Earnings Card (Hero)
+        // Net Earnings Hero Card
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -180,8 +249,9 @@ fun OfferDetailScreen(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "For ${offer.quantityQuintals} quintals (₹${numberFormat.format(offer.pricePerQuintal - offer.transportExpensePerQ - offer.otherExpensePerQ)}/q net)",
+                    text = "For ${offer.quantityQuintals} quintals (₹${numberFormat.format(offer.estimatedNetPricePerQ)}/q net in your pocket)",
                     style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
                     color = AgriTextSecondary
                 )
             }
@@ -363,6 +433,27 @@ fun OfferDetailScreen(
             }
         }
 
+        // Disclaimer Note
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = null,
+                tint = AgriTextMuted,
+                modifier = Modifier
+                    .size(16.dp)
+                    .padding(top = 2.dp)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = stringResource(R.string.offer_detail_disclaimer),
+                style = MaterialTheme.typography.bodySmall,
+                color = AgriTextMuted
+            )
+        }
+
         Spacer(modifier = Modifier.height(4.dp))
 
         // Actions if pending
@@ -392,7 +483,7 @@ fun OfferDetailScreen(
                     onClick = { onDeclineOffer(offer.id) },
                     modifier = Modifier
                         .weight(1f)
-                        .height(46.dp)
+                        .height(48.dp)
                         .testTag("btn_decline_in_details"),
                     shape = RoundedCornerShape(10.dp)
                 ) {
@@ -408,7 +499,7 @@ fun OfferDetailScreen(
                     onClick = onContactBuyer,
                     modifier = Modifier
                         .weight(1.2f)
-                        .height(46.dp)
+                        .height(48.dp)
                         .testTag("btn_contact_in_details"),
                     shape = RoundedCornerShape(10.dp)
                 ) {

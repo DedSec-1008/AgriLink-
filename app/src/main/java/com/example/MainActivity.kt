@@ -179,7 +179,9 @@ fun AgriLinkFarmerApp() {
                                     repository = repository,
                                     viewModel = sellingViewModel,
                                     onNavigateToMyLots = { currentDestination = FarmerNavDestination.MY_LOTS },
-                                    onNavigateToHome = { currentDestination = FarmerNavDestination.HOME }
+                                    onNavigateToHome = { currentDestination = FarmerNavDestination.HOME },
+                                    onViewLotDetails = { lotId -> currentScreen = AppScreen.LotDetails(lotId) },
+                                    onViewOffers = { lotId -> currentScreen = AppScreen.Offers(lotId) }
                                 )
                                 FarmerNavDestination.MY_LOTS -> MyLotsScreen(
                                     repository = repository,
@@ -231,7 +233,8 @@ fun AgriLinkFarmerApp() {
                                     currentDestination = FarmerNavDestination.MY_LOTS
                                 },
                                 onViewOffers = { lotId -> currentScreen = AppScreen.Offers(lotId) },
-                                onViewActiveSale = { txId -> currentScreen = AppScreen.TransactionDetail(txId) }
+                                onViewActiveSale = { txId -> currentScreen = AppScreen.TransactionDetail(txId) },
+                                onFindBuyers = { currentScreen = AppScreen.BuyersDirectory }
                             )
                         }
                         is AppScreen.Offers -> {
@@ -241,7 +244,8 @@ fun AgriLinkFarmerApp() {
                                 repository = repository,
                                 onBack = { currentScreen = AppScreen.LotDetails(screen.lotId) },
                                 onViewOfferDetails = { offerId -> currentScreen = AppScreen.OfferDetails(offerId) },
-                                onAcceptOfferClicked = { offerId -> currentScreen = AppScreen.AcceptOfferConfirm(offerId) }
+                                onAcceptOfferClicked = { offerId -> currentScreen = AppScreen.AcceptOfferConfirm(offerId) },
+                                onFindBuyers = { currentScreen = AppScreen.BuyersDirectory }
                             )
                         }
                         is AppScreen.OfferDetails -> {

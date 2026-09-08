@@ -231,24 +231,32 @@ fun AcceptOfferConfirmScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFF9FAFB)),
-            border = CardDefaults.outlinedCardBorder()
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF0FDF4)),
+            border = androidx.compose.foundation.BorderStroke(1.dp, com.example.ui.theme.AgriHeroGreenBorder)
         ) {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
-                verticalAlignment = Alignment.Top
+                    .padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Info,
-                    contentDescription = null,
-                    tint = AgriGreenPrimary,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        tint = AgriGreenPrimary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Status will change to: ${stringResource(R.string.status_offer_accepted)}",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriGreenText
+                    )
+                }
                 Text(
-                    text = "Accepting reserves your produce for this buyer. You can arrange transport or request buyer pickup next.",
+                    text = "Accepting reserves your produce for this buyer. Transport will be arranged in the next step.",
                     style = MaterialTheme.typography.bodySmall,
                     color = AgriTextSecondary
                 )

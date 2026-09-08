@@ -6,6 +6,7 @@ import com.example.R
 import com.example.data.AgriRepository
 import com.example.model.CropOption
 import com.example.model.ProduceLot
+import com.example.model.RecommendationCalculationState
 import com.example.model.SellingOpportunity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,6 +41,13 @@ enum class SellingStep(val stepNumber: Int) {
     LOT_CREATED(10)
 }
 
+enum class LotCreationStep(val stepNumber: Int, val stepTitleRes: Int) {
+    PRODUCE_SUMMARY(1, R.string.title_step_produce_summary),
+    CHECK_DETAILS(2, R.string.title_step_check_details),
+    ADD_PHOTOS(3, R.string.title_add_photos),
+    READY_TO_PUBLISH(4, R.string.title_ready_to_sell)
+}
+
 data class SellingUiState(
     val currentStep: SellingStep = SellingStep.CROP,
     val selectedCrop: CropOption = CropOption("soybean", R.string.crop_soybean, "🌱", 4850),
@@ -54,11 +62,26 @@ data class SellingUiState(
     val readyTimingRes: Int = 0,
     val analysisProgressIndex: Int = 0,
     val recommendations: List<SellingOpportunity> = emptyList(),
+    val bestRecommendation: SellingOpportunity? = null,
+    val alternativeRecommendations: List<SellingOpportunity> = emptyList(),
+    val calculationState: RecommendationCalculationState = RecommendationCalculationState.IDLE,
     val selectedOpportunity: SellingOpportunity? = null,
     val isLoadingRecommendations: Boolean = false,
     val recommendationError: Boolean = false,
-    val createdLot: ProduceLot? = null
-)
+    val createdLot: ProduceLot? = null,
+    val lotCreationStep: LotCreationStep = LotCreationStep.PRODUCE_SUMMARY,
+    val lotPhotos: List<String> = emptyList(),
+    val isPublishingLot: Boolean = false,
+    val publishError: Boolean = false,
+    val publishErrorMessageRes: Int? = null,
+    val publishErrorMessage: String? = null
+) {
+    val lotPublishError: String?
+        get() = publishErrorMessage
+
+    val readinessTiming: String
+        get() = readyTiming.ifBlank { "Ready now" }
+}
 
 class SellingViewModel(
     private val repository: AgriRepository
@@ -143,6 +166,10 @@ class SellingViewModel(
 
     fun goBack(): Boolean {
         val currentState = _uiState.value
+        if (currentState.currentStep == SellingStep.CONFIRM_SELL && currentState.lotCreationStep != LotCreationStep.PRODUCE_SUMMARY) {
+            previousLotCreationStep()
+            return true
+        }
         val prevStep = when (currentState.currentStep) {
             SellingStep.CROP -> null
             SellingStep.QUANTITY -> SellingStep.CROP
@@ -170,13 +197,14 @@ class SellingViewModel(
                     currentStep = SellingStep.ANALYSIS,
                     isLoadingRecommendations = true,
                     recommendationError = false,
+                    calculationState = RecommendationCalculationState.CALCULATING,
                     analysisProgressIndex = 0
                 )
             }
 
             // Step through reassuring progress stages
             for (stage in 1..4) {
-                delay(260)
+                delay(200)
                 _uiState.update { it.copy(analysisProgressIndex = stage) }
             }
 
@@ -190,19 +218,43 @@ class SellingViewModel(
             )
 
             result.onSuccess { recs ->
-                _uiState.update {
-                    it.copy(
-                        recommendations = recs,
-                        selectedOpportunity = recs.firstOrNull(),
-                        isLoadingRecommendations = false,
-                        currentStep = SellingStep.RECOMMENDATIONS
-                    )
+                if (recs.isEmpty()) {
+                    _uiState.update {
+                        it.copy(
+                            recommendations = emptyList(),
+                            bestRecommendation = null,
+                            alternativeRecommendations = emptyList(),
+                            selectedOpportunity = null,
+                            isLoadingRecommendations = false,
+                            recommendationError = true,
+                            calculationState = RecommendationCalculationState.ERROR
+                        )
+                    }
+                } else {
+                    val top = recs.firstOrNull { it.isTopRecommendation } ?: recs.first()
+                    val alternatives = recs.filter { it.id != top.id }
+                    _uiState.update {
+                        it.copy(
+                            recommendations = recs,
+                            bestRecommendation = top,
+                            alternativeRecommendations = alternatives,
+                            selectedOpportunity = top,
+                            isLoadingRecommendations = false,
+                            recommendationError = false,
+                            calculationState = RecommendationCalculationState.SUCCESS,
+                            currentStep = SellingStep.RECOMMENDATIONS
+                        )
+                    }
                 }
             }.onFailure {
                 _uiState.update {
                     it.copy(
+                        recommendations = emptyList(),
+                        bestRecommendation = null,
+                        alternativeRecommendations = emptyList(),
                         isLoadingRecommendations = false,
-                        recommendationError = true
+                        recommendationError = true,
+                        calculationState = RecommendationCalculationState.ERROR
                     )
                 }
             }
@@ -213,7 +265,144 @@ class SellingViewModel(
         _uiState.update {
             it.copy(
                 selectedOpportunity = opportunity,
-                currentStep = SellingStep.CONFIRM_SELL
+                currentStep = SellingStep.CONFIRM_SELL,
+                lotCreationStep = LotCreationStep.PRODUCE_SUMMARY,
+                publishError = false,
+                publishErrorMessageRes = null,
+                publishErrorMessage = null,
+                isPublishingLot = false
+            )
+        }
+    }
+
+    fun goToLotCreationStep(step: LotCreationStep) {
+        _uiState.update { it.copy(lotCreationStep = step) }
+    }
+
+    fun nextLotCreationStep() {
+        val next = when (_uiState.value.lotCreationStep) {
+            LotCreationStep.PRODUCE_SUMMARY -> LotCreationStep.CHECK_DETAILS
+            LotCreationStep.CHECK_DETAILS -> LotCreationStep.ADD_PHOTOS
+            LotCreationStep.ADD_PHOTOS -> LotCreationStep.READY_TO_PUBLISH
+            LotCreationStep.READY_TO_PUBLISH -> LotCreationStep.READY_TO_PUBLISH
+        }
+        _uiState.update { it.copy(lotCreationStep = next) }
+    }
+
+    fun previousLotCreationStep() {
+        when (_uiState.value.lotCreationStep) {
+            LotCreationStep.PRODUCE_SUMMARY -> {
+                _uiState.update { it.copy(currentStep = SellingStep.RECOMMENDATIONS) }
+            }
+            LotCreationStep.CHECK_DETAILS -> {
+                _uiState.update { it.copy(lotCreationStep = LotCreationStep.PRODUCE_SUMMARY) }
+            }
+            LotCreationStep.ADD_PHOTOS -> {
+                _uiState.update { it.copy(lotCreationStep = LotCreationStep.CHECK_DETAILS) }
+            }
+            LotCreationStep.READY_TO_PUBLISH -> {
+                _uiState.update { it.copy(lotCreationStep = LotCreationStep.ADD_PHOTOS) }
+            }
+        }
+    }
+
+    fun addPhoto(photoUri: String) {
+        if (photoUri.isNotBlank()) {
+            _uiState.update { it.copy(lotPhotos = it.lotPhotos + photoUri) }
+        }
+    }
+
+    fun removePhoto(index: Int) {
+        _uiState.update {
+            val updated = it.lotPhotos.toMutableList()
+            if (index in updated.indices) {
+                updated.removeAt(index)
+            }
+            it.copy(lotPhotos = updated)
+        }
+    }
+
+    fun removePhoto(uri: String) {
+        _uiState.update { it.copy(lotPhotos = it.lotPhotos - uri) }
+    }
+
+    fun clearPhotos() {
+        _uiState.update { it.copy(lotPhotos = emptyList()) }
+    }
+
+    fun validateLotCreation(): Int? {
+        val state = _uiState.value
+        if (state.selectedCrop.id.isBlank()) return R.string.validation_select_crop
+        if (state.quantityQuintals <= 0) return R.string.validation_enter_quantity
+        if (state.qualityKey.isBlank() && state.qualityRes == 0) return R.string.validation_select_quality
+        if (state.location.isBlank() && state.locationRes == 0) return R.string.validation_confirm_location
+        if (state.selectedOpportunity == null && state.bestRecommendation == null) return R.string.validation_select_destination
+        return null
+    }
+
+    fun publishLot() {
+        // Prevent duplicate publishing
+        if (_uiState.value.createdLot != null && _uiState.value.currentStep == SellingStep.LOT_CREATED) {
+            return
+        }
+        val errorRes = validateLotCreation()
+        if (errorRes != null) {
+            _uiState.update { it.copy(publishError = true, publishErrorMessageRes = errorRes) }
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isPublishingLot = true, publishError = false, publishErrorMessageRes = null, publishErrorMessage = null) }
+            try {
+                val state = _uiState.value
+                val opp = state.selectedOpportunity ?: state.bestRecommendation
+                val buyerRes = opp?.buyerNameRes ?: R.string.buyer_abc_foods
+                val quotedPrice = opp?.quotedPricePerQ ?: 4850
+                val estimatedNet = opp?.estimatedNetPricePerQ ?: 4700
+
+                val lot = repository.publishLot(
+                    cropRes = state.selectedCrop.nameRes,
+                    emoji = state.selectedCrop.emoji,
+                    quantity = state.quantityQuintals,
+                    qualityRes = state.qualityRes,
+                    buyerNameRes = buyerRes,
+                    location = state.location.ifBlank { "Nagpur, Maharashtra" },
+                    readyTiming = state.readyTiming.ifBlank { "Ready now" },
+                    expectedPricePerQ = quotedPrice,
+                    estimatedNetPerQ = estimatedNet,
+                    photos = state.lotPhotos
+                )
+                _uiState.update {
+                    it.copy(
+                        createdLot = lot,
+                        isPublishingLot = false,
+                        publishError = false,
+                        currentStep = SellingStep.LOT_CREATED
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isPublishingLot = false,
+                        publishError = true,
+                        publishErrorMessage = e.message ?: "Failed to publish lot"
+                    )
+                }
+            }
+        }
+    }
+
+    fun setRecommendationsForTest(recs: List<SellingOpportunity>) {
+        val top = recs.firstOrNull { it.isTopRecommendation } ?: recs.firstOrNull()
+        val alternatives = if (top != null) recs.filter { it.id != top.id } else emptyList()
+        _uiState.update {
+            it.copy(
+                recommendations = recs,
+                bestRecommendation = top,
+                alternativeRecommendations = alternatives,
+                selectedOpportunity = top,
+                calculationState = RecommendationCalculationState.SUCCESS,
+                currentStep = SellingStep.RECOMMENDATIONS
             )
         }
     }
