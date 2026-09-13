@@ -1,13 +1,15 @@
 <resources>
-    <string name="app_name">एग्रीलिंक</string>
+    <string name="app_name">किसानसेतु</string>
     <string name="greeting_farmer">नमस्ते, किसान भाई</string>
+    <string name="greeting_farmer_short">नमस्कार! 👋</string>
+    <string name="greeting_question">आज क्या बेचना है?</string>
     <string name="location_nagpur">नागपुर, महाराष्ट्र</string>
     
     <!-- Navigation -->
     <string name="nav_home">होम</string>
     <string name="nav_prices">भाव</string>
     <string name="nav_sell">बेचें</string>
-    <string name="nav_my_lots">मेरे सौदे</string>
+    <string name="nav_my_lots">मेरी फसल</string>
     <string name="nav_help">मदद</string>
 
     <!-- Home Sections -->
@@ -22,37 +24,65 @@
     <string name="produce_qty_50">50 क्विंटल</string>
     <string name="produce_quality_good">उत्तम गुणवत्ता</string>
 
+    <!-- Today's Price Section -->
     <string name="section_todays_price">आज का भाव</string>
+    <string name="label_todays_price">आज का भाव</string>
     <string name="price_soybean_modal">₹4,850 / क्विंटल</string>
     <string name="market_nagpur">नागपुर मंडी</string>
     <string name="price_change_yesterday">↑ कल से ₹120 अधिक</string>
+    <string name="price_trend_rising">↑ भाव बढ़ रहा है</string>
+    <string name="price_trend_steady">→ भाव लगभग स्थिर है</string>
+    <string name="price_trend_falling">↓ भाव कम हो रहा है</string>
+    <string name="per_quintal_unit">प्रति क्विंटल</string>
 
-    <!-- Best Selling Opportunity Card -->
+    <!-- Best Selling Opportunity Card (Hero) -->
     <string name="badge_best_opportunity">सर्वोत्तम बिक्री अवसर</string>
+    <string name="hero_badge_best_option">⭐ आपके लिए अच्छा विकल्प</string>
     <string name="buyer_abc_foods">एबीसी फूड्स</string>
-    <string name="verified_buyer_tag">सत्यापित खरीदार</string>
+    <string name="verified_buyer_tag">सत्यापित खरीदार ✓</string>
     <string name="label_quoted_price">मंडी में खरीदार का भाव</string>
+    <string name="label_buyer_quoted_rate">खरीदार का भाव</string>
     <string name="quoted_price_val">₹4,850 / क्विंटल</string>
-    <string name="label_after_expenses">खर्च घटाकर आपके हाथ में</string>
+    <string name="label_transport_charge">परिवहन खर्च</string>
+    <string name="transport_val">₹120 / क्विंटल</string>
+    <string name="label_other_expenses">अन्य खर्च</string>
+    <string name="other_expenses_val">₹30 / क्विंटल</string>
+    <string name="label_approx_receive">आपको लगभग मिल सकता है:</string>
+    <string name="label_after_expenses">खर्च निकालने के बाद</string>
     <string name="net_price_val">₹4,700 / क्विंटल</string>
-    <string name="label_estimated_total">कुल अनुमानित हाथ में राशि</string>
+    <string name="label_estimated_total">कुल लगभग:</string>
     <string name="total_payout_val">₹2,35,000</string>
-    <string name="status_strong_rec">मजबूत सिफारिश</string>
-    <string name="reason_verified_buyer">सत्यापित खरीदार</string>
-    <string name="reason_good_price">अच्छा भाव</string>
-    <string name="reason_affordable_transport">किफायती परिवहन</string>
-    <string name="reason_suitable_qty">मात्रा के अनुकूल</string>
-    <string name="btn_find_best_place">बेचने के लिए सही जगह खोजें</string>
+    <string name="status_strong_rec">बहुत अच्छा विकल्प</string>
+    <string name="reason_verified_buyer">भरोसेमंद खरीदार</string>
+    <string name="reason_good_price">अच्छी कीमत</string>
+    <string name="reason_affordable_transport">उचित परिवहन खर्च</string>
+    <string name="reason_suitable_qty">आपकी मात्रा के लिए सही</string>
+    <string name="btn_find_best_place">बेचने के लिए जगह देखें</string>
     <string name="btn_sell_here">यहाँ बेचें</string>
+    <string name="btn_why_this_suggestion">यह सुझाव क्यों?</string>
+    <string name="why_suggestion_title">एबीसी फूड्स ही क्यों?</string>
+    <string name="why_suggestion_explanation">एबीसी फूड्स भरोसेमंद खरीदार है, सीधे बैंक खाते में सुरक्षित भुगतान करता है, परिवहन खर्च कम है और आपकी 50 क्विंटल मात्रा के लिए बिल्कुल सही है।</string>
     <string name="label_net_realization_hero">हाथ में शुद्ध मुनाफा</string>
     <string name="label_deduction_note">₹150/क्विंटल अनुमानित भाड़ा व मंडी शुल्क</string>
+    <string name="contextual_help_net_title">खर्च निकालने के बाद</string>
+    <string name="contextual_help_net_desc">यह वह अनुमानित राशि है जो परिवहन और अन्य खर्च निकालने के बाद बच सकती है।</string>
 
     <!-- Quick Actions -->
     <string name="section_quick_actions">त्वरित कार्य</string>
     <string name="action_check_prices">भाव देखें</string>
     <string name="action_sell_produce">उपज बेचें</string>
-    <string name="action_my_lots">मेरे सौदे</string>
+    <string name="action_my_lots">मेरी फसल</string>
     <string name="action_get_help">मदद लें</string>
+    <string name="quick_prices_label">भाव देखें</string>
+    <string name="quick_lots_label">मेरी फसल</string>
+    <string name="quick_help_label">मदद</string>
+
+    <!-- State Handling -->
+    <string name="home_loading_message">आपके लिए सबसे अच्छा विकल्प ढूँढ रहे हैं...</string>
+    <string name="home_error_message">जानकारी अभी नहीं मिल सकी।</string>
+    <string name="home_btn_retry">फिर कोशिश करें</string>
+    <string name="home_empty_crop_title">अभी कोई फसल नहीं जोड़ी गई है।</string>
+    <string name="home_empty_crop_action">फसल बेचने के लिए शुरू करें</string>
 
     <!-- Prices Screen -->
     <string name="title_prices">मंडी भाव</string>
@@ -217,9 +247,8 @@
     <string name="label_estimated_expenses_deduction">ढुलाई + अन्य खर्च</string>
     <string name="label_for_quintals_total">%1$d क्विंटल के लिए</string>
     <string name="btn_why_this_option">यह विकल्प क्यों?</string>
-    <string name="btn_why_this_suggestion">यह सुझाव क्यों?</string>
     <string name="btn_hide_details">विवरण छुपाएं</string>
-    <string name="why_suggestion_title">एग्रीलिंक ने यह विकल्प कैसे चुना</string>
+    <string name="why_suggestion_choice_title">एग्रीलिंक ने यह विकल्प कैसे चुना</string>
     <string name="why_factor_price">बाजार भाव: सत्यापित खरीदारों और मंडियों के वर्तमान भावों की तुलना करता है।</string>
     <string name="why_factor_transport">ढुलाई खर्च: आपके स्थान और दूरी के आधार पर वाहन खर्च की गणना करता है।</string>
     <string name="why_factor_demand">खरीदार मांग: आपकी फसल तुरंत खरीदने के लिए तैयार सक्रिय खरीदारों को खोजता है।</string>
@@ -442,25 +471,69 @@
     <string name="recommended_transport_header">अनुशंसित परिवहन</string>
     <string name="transporter_shree_agro">श्री एग्रो ट्रांसपोर्ट</string>
     <string name="vehicle_small_medium">छोटा/मध्यम माल वाहन</string>
+    <string name="vehicle_truck">ट्रक</string>
+    <string name="vehicle_mini_truck">मिनी ट्रक</string>
+    <string name="capacity_quintals_val">क्षमता: %1$d क्विंटल</string>
+    <string name="delivery_today">आज</string>
+    <string name="delivery_tomorrow">कल</string>
+    <string name="delivery_label_val">डिलीवरी: %1$s</string>
+    <string name="btn_select">चुनें</string>
+    <string name="btn_selected">चुना गया</string>
+    <string name="nearby_transport_header">नज़दीकी परिवहन</string>
+    <string name="no_transport_available">अभी कोई परिवहन विकल्प उपलब्ध नहीं है</string>
+    <string name="dialog_confirm_transport_title">परिवहन की पुष्टि करें</string>
+    <string name="dialog_confirm_transport_msg">परिवहन लागत एक अनुमान है और पुष्टि के बाद बदल सकती है।</string>
+    <string name="btn_confirm_transport">परिवहन पक्का करें</string>
     <string name="estimated_pickup_time">कल सुबह 8:00 बजे</string>
     <string name="btn_book_transport">परिवहन बुक करें</string>
     <string name="transport_arranged_header">परिवहन व्यवस्था हो गई ✓</string>
     <string name="transport_failure_msg">वर्तमान में परिवहन उपलब्ध नहीं है।</string>
     <string name="btn_choose_another">अन्य विकल्प चुनें</string>
+    <string name="label_your_sale">आपकी बिक्री</string>
+    <string name="label_your_active_sale">आपकी सक्रिय बिक्री</string>
+    <string name="step_state_completed">पूर्ण</string>
+    <string name="step_state_current">वर्तमान</string>
+    <string name="step_state_upcoming">आगामी</string>
+    <string name="buyer_price_breakdown_label">खरीदार मूल्य: ₹%1$s/क्विं</string>
+    <string name="transport_deduction_label">अनुमानित परिवहन: − ₹%1$s/क्विं</string>
+    <string name="other_costs_deduction_label">अन्य ज्ञात खर्च: − ₹%1$s/क्विं</string>
+    <string name="pocket_realization_label">हाथ में आने वाली अनुमानित राशि: ₹%1$s/क्विं</string>
+    <string name="pocket_total_label">%1$d क्विंटल के लिए: ₹%2$s</string>
 
     <!-- Phase 4: Pickup & Dispatch Screen -->
     <string name="title_produce_pickup">फसल उठाव</string>
     <string name="msg_transporter_ready">आपका ट्रांसपोर्टर तैयार है।</string>
     <string name="btn_confirm_pickup">फसल उठाव की पुष्टि करें</string>
+    <string name="btn_mark_as_picked_up">उठाव दर्ज करें</string>
     <string name="pickup_success_snack">फसल उठाई गई। स्थिति: रास्ते में।</string>
+    <string name="dialog_pickup_confirm_title">क्या आपकी फसल उठा ली गई है?</string>
+    <string name="dialog_pickup_confirm_msg">कृपया केवल वाहन में फसल सुरक्षित लोड होने के बाद ही पुष्टि करें।</string>
+    <string name="btn_yes_picked_up">हाँ, उठाई गई</string>
+    <string name="btn_not_yet">अभी नहीं</string>
+    <string name="status_picked_up">उठाई गई</string>
+    <string name="status_out_for_delivery">डिलीवरी के लिए निकली</string>
+    <string name="produce_being_transported_msg">फसल खरीदार तक पहुंचाई जा रही है।</string>
 
     <!-- Phase 4: In-Transit & Delivery Screen -->
     <string name="title_produce_in_transit">आपकी फसल रास्ते में है</string>
+    <string name="title_delivery_confirmation">डिलीवरी की पुष्टि</string>
+    <string name="delivery_note_msg">डिलीवरी की पुष्टि होने के बाद भुगतान की प्रक्रिया शुरू होगी।</string>
+    <string name="title_produce_delivered_prompt">क्या फसल पहुंच गई?</string>
     <string name="status_in_transit">🚚 रास्ते में है</string>
     <string name="expected_delivery_today">अनुमानित डिलीवरी: आज</string>
     <string name="title_produce_delivered">फसल पहुंचाई गई ✓</string>
     <string name="delivered_today">डिलीवरी: आज</string>
     <string name="btn_confirm_delivery">डिलीवरी की पुष्टि करें</string>
+    <string name="btn_mark_as_delivered">डिलीवरी दर्ज करें</string>
+    <string name="dialog_delivery_confirm_title">क्या खरीदार को आपकी फसल मिल गई है?</string>
+    <string name="dialog_delivery_confirm_msg">कृपया खरीदार द्वारा फसल प्राप्ति की पुष्टि करने के बाद ही दर्ज करें।</string>
+    <string name="btn_yes_delivered">हाँ, पहुंच गई</string>
+    <string name="delivery_completed_title">डिलीवरी पूर्ण</string>
+    <string name="produce_delivered_check">✓ फसल पहुंचाई गई</string>
+    <string name="payment_processing_msg">भुगतान की प्रक्रिया जारी है।</string>
+    <string name="payment_status_will_appear">आपकी भुगतान स्थिति यहाँ दिखाई देगी।</string>
+    <string name="payment_pending_badge">भुगतान लंबित</string>
+    <string name="expected_amount_net_label">अपेक्षित राशि: ₹%1$s</string>
 
     <!-- Phase 4: Payment Screen & Transparency -->
     <string name="title_payment">भुगतान</string>
@@ -540,6 +613,9 @@
     <string name="chart_day_today">आज</string>
     <string name="label_todays_benchmark">आज का मुख्य संदर्भ भाव</string>
     <string name="label_mandi_distance">%1$d किमी दूर</string>
+    <string name="quick_decision_rising">बेचने का अच्छा समय • स्थानीय बाजारों में भाव बढ़ रहे हैं</string>
+    <string name="quick_decision_steady">स्थिर बाजार • आज भाव स्थिर हैं</string>
+    <string name="quick_decision_falling">विकल्पों की तुलना करें • भाव थोड़े कम हैं; नजदीकी बाजार बेहतर दाम दे सकते हैं</string>
 
     <!-- Stage 7: Lot Creation & Publishing Strings -->
     <string name="step_progress_indicator">चरण %1$d/%2$d</string>
@@ -670,7 +746,6 @@
     <string name="offer_detail_cost_transport">परिवहन: ₹%1$s / क्विंटल</string>
     <string name="offer_detail_cost_other">अन्य खर्च: ₹%1$s / क्विंटल</string>
     <string name="offer_detail_disclaimer">वजन, गुणवत्ता जांच और अंतिम समझौते के बाद अंतिम रकम बदल सकती है।</string>
-    <string name="btn_not_yet">अभी नहीं</string>
     <string name="dialog_accept_title">क्या यह ऑफ़र स्वीकार करें?</string>
     <string name="dialog_accept_msg">स्वीकार करने के बाद, यह ऑफ़र आपकी चुनी हुई बिक्री बन जाएगा। इसके बाद आप डिलीवरी की व्यवस्था कर सकते हैं।</string>
     
@@ -688,4 +763,73 @@
     <string name="home_offer_accepted_label">ऑफ़र स्वीकार किया गया</string>
     <string name="home_btn_view_sale">बिक्री देखें</string>
     <string name="offer_status_closed">बंद हुआ</string>
+
+    <!-- Farmer Profile & Dialog -->
+    <string name="topbar_profile_desc">किसान प्रोफाइल</string>
+    <string name="profile_avatar_desc">किसान प्रोफाइल</string>
+    <string name="profile_farmer_name">राजेश पाटील</string>
+    <string name="profile_farmer_role">किसान</string>
+    <string name="profile_farmer_name_with_role">%1$s (%2$s)</string>
+    <string name="profile_fpo_label">FPO: %1$s</string>
+    <string name="profile_fpo_name">विदर्भ एग्रो किसान उत्पादक संघ</string>
+    <string name="profile_member_id_label">सदस्य क्रमांक: %1$s</string>
+    <string name="profile_helpline_format">किसान हेल्पलाइन: %1$s (टोल फ्री)</string>
+    <string name="btn_ok">ठीक है</string>
+
+    <!-- Phase 4: Best Selling Recommendation & Buyer Experience -->
+    <string name="buyer_verified_badge">✓ सत्यापित खरीदार</string>
+    <string name="buyer_verified_desc">किसानसेतु द्वारा पहचान और व्यवसाय लाइसेंस सत्यापित</string>
+    <string name="buyer_quoted_directly_desc">सीधी और तुरंत खरीद के लिए दिया गया भाव</string>
+    <string name="label_payment_terms_colon">भुगतान शर्तें: %1$s</string>
+    <string name="label_delivery_colon">डिलीवरी: %1$s</string>
+    <string name="label_quality_standards_colon">गुणवत्ता मानक: %1$s</string>
+    <string name="btn_select_this_buyer">इस खरीदार को चुनें</string>
+    <string name="label_buyer_label">खरीदार</string>
+    <string name="label_crop_label">फसल</string>
+    <string name="label_quantity_label">मात्रा</string>
+    <string name="label_quoted_price_label">भाव</string>
+    <string name="label_payment_label">भुगतान</string>
+    <string name="label_net_in_pocket_desc">परिवहन और हमाली खर्च के बाद आपकी जेब में</string>
+    <string name="label_offer_status_will_change">स्थिति बदलकर यह होगी: %1$s</string>
+    <string name="label_accept_offer_terms_notice">प्रस्ताव स्वीकार करने पर आपकी फसल इस खरीदार के लिए आरक्षित हो जाएगी। अगले चरण में वाहन की व्यवस्था की जाएगी।</string>
+    <string name="btn_yes_confirm_accept">हाँ, प्रस्ताव स्वीकार करें</string>
+    <string name="empty_buyers_guidance">नजदीकी बाजार देखें या बाद में फिर प्रयास करें।</string>
+    <string name="loading_buyers_title">आपके लिए सही खरीदार ढूँढ रहे हैं...</string>
+    <string name="loading_buyers_subtitle">चालू भाव, दूरी और मांग की जांच की जा रही है।</string>
+    <string name="error_buyers_title">खरीदारों की जानकारी अभी नहीं मिल सकी।</string>
+    <string name="btn_view_nearby_markets">नजदीकी बाजार देखें</string>
+    <string name="comparison_advantage_format">इस विकल्प में अन्य विकल्पों की तुलना में खर्च निकालने के बाद लगभग ₹%1$s प्रति क्विंटल अधिक मिल सकता है।</string>
+    <string name="tag_top_option">⭐ बहुत अच्छा विकल्प</string>
+    <string name="tag_good_option">👍 अच्छा विकल्प</string>
+    <string name="tag_suitable_for_crop">✓ आपकी फसल के लिए उपयुक्त</string>
+    <string name="label_approx_total_quintals">%1$d क्विंटल • लगभग कुल:</string>
+    <string name="label_who_is_buying">खरीदार कौन है?</string>
+    <string name="label_what_price">क्या भाव मिलेगा?</string>
+    <string name="label_what_will_receive">आपके हाथ में क्या आएगा?</string>
+    <string name="label_why_this_recommendation">यह सुझाव क्यों?</string>
+    <string name="label_what_should_do">अब क्या करें?</string>
+    <string name="why_rec_verified_buyer">✓ खरीदार verified (सत्यापित) है</string>
+    <string name="why_rec_quantity_fit">✓ आपकी %1$d क्विंटल मात्रा के लिए सही है</string>
+    <string name="why_rec_good_price">✓ कीमत अच्छी है</string>
+    <string name="why_rec_reasonable_transport">✓ परिवहन खर्च उचित है</string>
+    <string name="why_rec_good_payment">✓ भुगतान रिकॉर्ड अच्छा और समय पर है</string>
+    <string name="why_rec_quality_match">✓ आपकी फसल की गुणवत्ता खरीदार की जरूरत से मेल खाती है</string>
+    <string name="why_rec_market_demand">✓ बाजार में इस फसल की मांग अच्छी है</string>
+    <string name="confirm_select_buyer_title">क्या आप %1$s को चुनना चाहते हैं?</string>
+    <string name="btn_confirm_select_buyer">हाँ, चुनें</string>
+    <string name="btn_cancel">रद्द करें</string>
+    <string name="unit_quintals_short">क्विंटल</string>
+
+    <!-- Network & Remote API Strings -->
+    <string name="error_network_no_internet">इंटरनेट कनेक्शन नहीं है। सहेजी गई जानकारी दिखाई जा रही है।</string>
+    <string name="error_network_timeout">कनेक्शन में अधिक समय लगा। कृपया पुनः प्रयास करें।</string>
+    <string name="error_network_connection_failed">सर्वर से संपर्क नहीं हो सका। कृपया अपना कनेक्शन जांचें।</string>
+    <string name="error_network_server_error">जानकारी अभी लोड नहीं हो सकी। कृपया थोड़ी देर बाद पुनः प्रयास करें।</string>
+    <string name="error_network_unauthorized">आपका सत्र समाप्त हो गया है। कृपया पुनः साइन इन करें।</string>
+    <string name="error_network_forbidden">आपको इस कार्य की अनुमति नहीं है।</string>
+    <string name="error_network_not_found">अनुरोधित जानकारी नहीं मिली।</string>
+    <string name="error_network_conflict">यह अनुरोध पहले ही संसाधित हो चुका है या विरोध है।</string>
+    <string name="error_network_rate_limit">बहुत सारे अनुरोध। कृपया कुछ समय प्रतीक्षा करें।</string>
+    <string name="error_network_generic">जानकारी अभी लोड नहीं हो सकी। कृपया पुनः प्रयास करें।</string>
+    <string name="error_network_malformed">सर्वर से अप्रत्याशित जानकारी प्राप्त हुई।</string>
 </resources>

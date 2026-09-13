@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,22 +22,30 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,9 +60,11 @@ import com.example.R
 import com.example.data.AgriRepository
 import com.example.model.AgriTransaction
 import com.example.ui.components.OpportunityCard
+import com.example.ui.components.ProduceSummaryCard
 import com.example.ui.components.QuickActionGrid
 import com.example.ui.components.TodaysPriceCard
 import com.example.ui.components.WhatIHaveCard
+import com.example.ui.theme.AgriCardBorder
 import com.example.ui.theme.AgriGreenContainer
 import com.example.ui.theme.AgriGreenPrimary
 import com.example.ui.theme.AgriGreenText
@@ -61,6 +72,17 @@ import com.example.ui.theme.AgriHeroGreenBorder
 import com.example.ui.theme.AgriTextPrimary
 import com.example.ui.theme.AgriTextSecondary
 
+/**
+ * KisanSetu Farmer Home Screen:
+ * Follows the strict, farmer-first visual hierarchy:
+ * 1. Greeting ("नमस्कार! 👋 - आज क्या बेचना है?")
+ * 2. Active Sale status (if in progress)
+ * 3. Current Crop Summary ("आपकी फसल")
+ * 4. Today's Price Benchmark ("आज का भाव")
+ * 5. Best Selling Option Hero ("⭐ आपके लिए अच्छा विकल्प" + "यहाँ बेचें")
+ * 6. Quick Actions ("भाव देखें", "मेरी फसल", "मदद")
+ * 7. Browse Buyers Directory
+ */
 @Composable
 fun FarmerHomeScreen(
     repository: AgriRepository,
@@ -80,44 +102,7 @@ fun FarmerHomeScreen(
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-
     val scrollState = rememberSaveable(saver = ScrollState.Saver) { ScrollState(0) }
-
-    val inventorySection = @Composable {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (activeSale != null) {
-                ActiveSaleCard(
-                    activeSale = activeSale,
-                    onNavigateToActiveSale = onNavigateToActiveSale
-                )
-            }
-            WhatIHaveCard(produce = currentProduce)
-            TodaysPriceCard(priceInfo = todaysPrice)
-            if (isLandscape) {
-                BrowseBuyersCard(onNavigateToBuyers = onNavigateToBuyers)
-            }
-        }
-    }
-
-    val actionSection = @Composable {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            WhereShouldISellHeader()
-            OpportunityCard(
-                opportunity = bestOpportunity,
-                onSellHereClicked = onNavigateToSell,
-                onFindBestPlaceClicked = onNavigateToSell
-            )
-            QuickActionGrid(
-                onCheckPricesClicked = onNavigateToPrices,
-                onSellProduceClicked = onNavigateToSell,
-                onMyLotsClicked = onNavigateToMyLots,
-                onGetHelpClicked = onNavigateToHelp
-            )
-            if (!isLandscape) {
-                BrowseBuyersCard(onNavigateToBuyers = onNavigateToBuyers)
-            }
-        }
-    }
 
     Box(
         modifier = modifier
@@ -131,26 +116,79 @@ fun FarmerHomeScreen(
                 .widthIn(max = if (isLandscape) 1100.dp else 640.dp)
                 .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp, vertical = if (isLandscape) 10.dp else 16.dp),
-            verticalArrangement = Arrangement.spacedBy(if (isLandscape) 12.dp else 16.dp)
+            verticalArrangement = Arrangement.spacedBy(if (isLandscape) 12.dp else 14.dp)
         ) {
+            // 1. GREETING (Short, warm, location included)
             FarmerGreetingHeader()
 
+            // 2. ACTIVE SALE CARD (If farmer has an ongoing transaction)
+            if (activeSale != null) {
+                ActiveSaleCard(
+                    activeSale = activeSale,
+                    onNavigateToActiveSale = onNavigateToActiveSale
+                )
+            }
+
             if (isLandscape) {
+                // Two-column canonical landscape layout
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.Top
                 ) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        inventorySection()
+                    // Left Column: Current Crop & Today's Price & Quick Actions
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        WhatIHaveCard(produce = currentProduce)
+                        TodaysPriceCard(priceInfo = todaysPrice)
+                        QuickActionGrid(
+                            onCheckPricesClicked = onNavigateToPrices,
+                            onMyLotsClicked = onNavigateToMyLots,
+                            onGetHelpClicked = onNavigateToHelp,
+                            onSellProduceClicked = onNavigateToSell
+                        )
                     }
-                    Box(modifier = Modifier.weight(1f)) {
-                        actionSection()
+
+                    // Right Column: Best Selling Option (Hero) + Browse Buyers
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        OpportunityCard(
+                            opportunity = bestOpportunity,
+                            onSellHereClicked = onNavigateToSell,
+                            onFindBestPlaceClicked = onNavigateToSell
+                        )
+                        BrowseBuyersCard(onNavigateToBuyers = onNavigateToBuyers)
                     }
                 }
             } else {
-                inventorySection()
-                actionSection()
+                // Strict Single-Column Visual Hierarchy for Portrait
+                // 3. CURRENT CROP
+                WhatIHaveCard(produce = currentProduce)
+
+                // 4. TODAY'S PRICE
+                TodaysPriceCard(priceInfo = todaysPrice)
+
+                // 5. BEST SELLING OPTION (Hero + Primary Action)
+                OpportunityCard(
+                    opportunity = bestOpportunity,
+                    onSellHereClicked = onNavigateToSell,
+                    onFindBestPlaceClicked = onNavigateToSell
+                )
+
+                // 6. QUICK ACTIONS
+                QuickActionGrid(
+                    onCheckPricesClicked = onNavigateToPrices,
+                    onMyLotsClicked = onNavigateToMyLots,
+                    onGetHelpClicked = onNavigateToHelp,
+                    onSellProduceClicked = onNavigateToSell
+                )
+
+                // 7. BROWSE BUYERS (Secondary directory access)
+                BrowseBuyersCard(onNavigateToBuyers = onNavigateToBuyers)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -158,103 +196,64 @@ fun FarmerHomeScreen(
     }
 }
 
+/**
+ * Short, friendly farmer greeting header with immediate location visibility
+ */
 @Composable
 private fun FarmerGreetingHeader() {
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = stringResource(R.string.greeting_farmer),
+                text = stringResource(R.string.greeting_farmer_short),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.ExtraBold,
-                color = AgriTextPrimary
+                color = AgriTextPrimary,
+                fontSize = 24.sp
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(AgriGreenContainer)
-                    .border(1.dp, AgriHeroGreenBorder, RoundedCornerShape(8.dp))
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null,
-                    tint = AgriGreenPrimary,
-                    modifier = Modifier.size(14.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = stringResource(R.string.location_nagpur),
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = AgriGreenPrimary
-                )
-            }
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = stringResource(R.string.greeting_question),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = AgriGreenPrimary
+            )
         }
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = stringResource(R.string.home_greeting_subtitle),
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Medium,
-            color = AgriTextSecondary
-        )
-    }
-}
 
-@Composable
-private fun WhereShouldISellHeader() {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = AgriGreenContainer),
-        border = BorderStroke(1.dp, AgriHeroGreenBorder)
-    ) {
+        // Location pill badge
         Row(
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(AgriGreenContainer)
+                .border(1.dp, AgriHeroGreenBorder, RoundedCornerShape(20.dp))
+                .padding(horizontal = 10.dp, vertical = 6.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(AgriGreenPrimary),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.HelpOutline,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(10.dp))
-            Column {
-                Text(
-                    text = stringResource(R.string.home_hierarchy_step3),
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = AgriGreenPrimary,
-                    letterSpacing = 0.8.sp
-                )
-                Text(
-                    text = stringResource(R.string.home_primary_question),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = AgriTextPrimary
-                )
-            }
+            Icon(
+                imageVector = Icons.Default.LocationOn,
+                contentDescription = null,
+                tint = AgriGreenPrimary,
+                modifier = Modifier.size(15.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = stringResource(R.string.location_nagpur),
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = AgriGreenPrimary
+            )
         }
     }
 }
 
+/**
+ * Active Sale tracker card when the farmer has an ongoing transaction
+ */
 @Composable
 private fun ActiveSaleCard(
     activeSale: AgriTransaction,
@@ -263,10 +262,10 @@ private fun ActiveSaleCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.5.dp, AgriHeroGreenBorder, RoundedCornerShape(16.dp))
+            .border(1.5.dp, AgriHeroGreenBorder, RoundedCornerShape(18.dp))
             .testTag("card_active_sale"),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -288,9 +287,9 @@ private fun ActiveSaleCard(
                 )
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
+                        .clip(RoundedCornerShape(12.dp))
                         .background(AgriGreenContainer)
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
                     Text(
                         text = stringResource(activeSale.status.labelRes),
@@ -311,7 +310,7 @@ private fun ActiveSaleCard(
             )
 
             Text(
-                text = "${stringResource(activeSale.cropNameRes)} · ${activeSale.quantityQuintals} quintals",
+                text = "${stringResource(activeSale.cropNameRes)} · ${activeSale.quantityQuintals} ${stringResource(R.string.unit_quintals)}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = AgriTextSecondary
             )
@@ -341,22 +340,28 @@ private fun ActiveSaleCard(
                 onClick = { onNavigateToActiveSale(activeSale.id) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(44.dp)
+                    .heightIn(min = 48.dp)
                     .testTag("btn_view_active_sale_from_home"),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
             ) {
                 Text(
                     text = stringResource(R.string.btn_view_sale),
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
     }
 }
 
+/**
+ * Secondary browse buyers entry point
+ */
 @Composable
 private fun BrowseBuyersCard(
     onNavigateToBuyers: () -> Unit
@@ -364,11 +369,12 @@ private fun BrowseBuyersCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .heightIn(min = 52.dp)
             .clickable { onNavigateToBuyers() }
-            .testTag("card_browse_buyers"),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = CardDefaults.outlinedCardBorder()
+            .testTag("card_browse_buyers")
+            .border(1.dp, AgriCardBorder, RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
             modifier = Modifier
@@ -416,6 +422,156 @@ private fun BrowseBuyersCard(
                 tint = AgriTextSecondary,
                 modifier = Modifier.size(18.dp)
             )
+        }
+    }
+}
+
+/**
+ * Loading state representation for async data retrieval
+ */
+@Composable
+fun FarmerHomeLoadingState(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator(
+                color = AgriGreenPrimary,
+                modifier = Modifier.size(48.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.home_loading_message),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                color = AgriTextPrimary
+            )
+        }
+    }
+}
+
+/**
+ * Friendly error state with retry action
+ */
+@Composable
+fun FarmerHomeErrorState(
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.ErrorOutline,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier.size(56.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.home_error_message),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = AgriTextPrimary
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = onRetry,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                modifier = Modifier.heightIn(min = 48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.home_btn_retry),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Empty state when no produce/crop has been entered yet
+ */
+@Composable
+fun FarmerHomeEmptyState(
+    onAddCrop: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(72.dp)
+                    .clip(CircleShape)
+                    .background(AgriGreenContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Spa,
+                    contentDescription = null,
+                    tint = AgriGreenPrimary,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.home_empty_crop_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = AgriTextPrimary
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = onAddCrop,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                modifier = Modifier.heightIn(min = 52.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.home_empty_crop_action),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
 }

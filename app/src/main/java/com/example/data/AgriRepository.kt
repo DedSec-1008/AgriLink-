@@ -670,17 +670,34 @@ class MockAgriRepository(
     override fun getTransporterOptions(cropRes: Int, quantity: Int): List<TransporterOption> {
         return listOf(
             TransporterOption(
-                id = "transporter_shree_agro",
-                name = "Shree Agro Transport",
-                vehicleTypeRes = R.string.vehicle_small_medium,
+                id = "transporter_truck",
+                name = "Truck",
+                vehicleTypeRes = R.string.vehicle_truck,
                 isVerified = true,
-                rating = 4.6,
-                estimatedPickupTimeRes = R.string.estimated_pickup_time,
-                distanceKm = 42,
+                rating = 4.7,
+                estimatedPickupTimeRes = R.string.delivery_today,
+                distanceKm = 28,
                 totalCost = 6000,
                 costPerQuintal = 120,
                 pickupLocationRes = R.string.loc_nagpur,
-                deliveryLocation = "ABC Foods"
+                deliveryLocation = "ABC Foods",
+                capacityQuintals = 100,
+                deliveryTimingRes = R.string.delivery_today
+            ),
+            TransporterOption(
+                id = "transporter_mini_truck",
+                name = "Mini Truck",
+                vehicleTypeRes = R.string.vehicle_mini_truck,
+                isVerified = true,
+                rating = 4.5,
+                estimatedPickupTimeRes = R.string.delivery_tomorrow,
+                distanceKm = 28,
+                totalCost = 5500,
+                costPerQuintal = 110,
+                pickupLocationRes = R.string.loc_nagpur,
+                deliveryLocation = "ABC Foods",
+                capacityQuintals = 50,
+                deliveryTimingRes = R.string.delivery_tomorrow
             )
         )
     }
@@ -689,18 +706,25 @@ class MockAgriRepository(
         val tx = getTransactionById(transactionId)
             ?: return Result.failure(IllegalArgumentException("Transaction not found"))
 
+        val options = getTransporterOptions(tx.cropNameRes, tx.quantityQuintals)
+        val selected = options.find { it.id == transporterId }
+            ?: (if (transporterId.contains("mini", ignoreCase = true)) options.getOrNull(1) else null)
+            ?: options.first()
+
         val booking = TransportBooking(
             bookingId = "TR-BK-1024",
             transactionId = transactionId,
-            transporterName = "Shree Agro Transport",
-            vehicleTypeRes = R.string.vehicle_small_medium,
-            pickupLocation = "Nagpur, Maharashtra",
-            deliveryLocation = "ABC Foods",
-            pickupTime = "Tomorrow, 8:00 AM",
-            distanceKm = 42,
-            totalCost = 6000,
-            costPerQ = 120,
-            isConfirmed = true
+            transporterName = selected.name,
+            vehicleTypeRes = selected.vehicleTypeRes,
+            pickupLocation = "Your location",
+            deliveryLocation = selected.deliveryLocation,
+            pickupTime = "Today, 2:00 PM",
+            distanceKm = selected.distanceKm,
+            totalCost = selected.totalCost,
+            costPerQ = selected.costPerQuintal,
+            isConfirmed = true,
+            capacityQuintals = selected.capacityQuintals,
+            deliveryTimingRes = selected.deliveryTimingRes
         )
 
         // Progress transaction state if at OFFER_ACCEPTED
@@ -715,7 +739,11 @@ class MockAgriRepository(
         val list = transactionsFlow.value.toMutableList()
         val idx = list.indexOfFirst { it.id == transactionId }
         if (idx != -1) {
-            list[idx] = list[idx].copy(transporterBooking = booking)
+            list[idx] = list[idx].copy(
+                transporterBooking = booking,
+                transportDeduction = selected.totalCost,
+                estimatedNetAmount = list[idx].grossProduceValue - selected.totalCost - list[idx].otherDeductions
+            )
             transactionsFlow.value = list
         }
 

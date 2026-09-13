@@ -63,7 +63,10 @@ class PricesScreenTest {
             R.string.prices_sell_action_title,
             R.string.prices_sell_action_subtext,
             R.string.market_distance_nearby,
-            R.string.label_todays_benchmark
+            R.string.label_todays_benchmark,
+            R.string.quick_decision_rising,
+            R.string.quick_decision_steady,
+            R.string.quick_decision_falling
         )
 
         for (langCode in listOf("en", "hi", "mr")) {
@@ -93,6 +96,7 @@ class PricesScreenTest {
 
         // 1. Verify Top Benchmark Card is displayed
         composeTestRule.onNodeWithTag("card_todays_benchmark").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("prices_quick_decision_banner").assertExists()
 
         // 2. Verify 7-Day Trend Card exists in layout
         composeTestRule.onNodeWithTag("card_price_trend").assertExists()

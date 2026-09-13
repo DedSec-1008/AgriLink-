@@ -116,7 +116,7 @@ fun MyLotsScreen(
                         .fillMaxWidth()
                         .border(1.5.dp, AgriCardBorder, RoundedCornerShape(16.dp)),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
                     Column(
@@ -201,7 +201,7 @@ private fun ProduceLotCard(
             .border(1.5.dp, AgriCardBorder, RoundedCornerShape(16.dp))
             .testTag("lot_card_${lot.lotId}"),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

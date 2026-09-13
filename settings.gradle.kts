@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "AgriLink"
+rootProject.name = "KisanSetu"
 
 include(":app")

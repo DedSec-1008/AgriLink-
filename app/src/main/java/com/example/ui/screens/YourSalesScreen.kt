@@ -83,7 +83,7 @@ fun YourSalesScreen(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.surface)
                     .clickable { onBack() }
                     .testTag("btn_back_your_sales"),
                 contentAlignment = Alignment.Center
@@ -179,7 +179,7 @@ private fun TransactionItemCard(
             .clickable { onClick() }
             .testTag("card_sale_${transaction.id}"),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = CardDefaults.outlinedCardBorder()
     ) {
         Column(

@@ -200,11 +200,13 @@ data class TransporterOption(
     val isVerified: Boolean = true,
     val rating: Double = 4.6,
     val estimatedPickupTimeRes: Int = R.string.estimated_pickup_time,
-    val distanceKm: Int = 42,
+    val distanceKm: Int = 28,
     val totalCost: Int = 6000,
     val costPerQuintal: Int = 120,
     val pickupLocationRes: Int = R.string.loc_nagpur,
-    val deliveryLocation: String = "ABC Foods"
+    val deliveryLocation: String = "ABC Foods",
+    val capacityQuintals: Int = 100,
+    val deliveryTimingRes: Int = R.string.delivery_today
 )
 
 data class TransportBooking(
@@ -215,10 +217,12 @@ data class TransportBooking(
     val pickupLocation: String,
     val deliveryLocation: String,
     val pickupTime: String,
-    val distanceKm: Int = 42,
+    val distanceKm: Int = 28,
     val totalCost: Int = 6000,
     val costPerQ: Int = 120,
-    val isConfirmed: Boolean = true
+    val isConfirmed: Boolean = true,
+    val capacityQuintals: Int = 100,
+    val deliveryTimingRes: Int = R.string.delivery_today
 )
 
 data class PaymentDetails(

@@ -100,7 +100,7 @@ fun BuyersScreen(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(CircleShape)
-                                .background(Color.White)
+                                .background(MaterialTheme.colorScheme.surface)
                                 .clickable { onBack() }
                                 .testTag("btn_back_buyers"),
                             contentAlignment = Alignment.Center
@@ -219,7 +219,7 @@ fun BuyersScreen(
                         .fillMaxWidth()
                         .padding(vertical = 24.dp)
                         .testTag("empty_buyers_card"),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     shape = RoundedCornerShape(16.dp),
                     border = CardDefaults.outlinedCardBorder()
                 ) {
@@ -227,19 +227,38 @@ fun BuyersScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
+                        Box(
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(CircleShape)
+                                .background(AgriGreenContainer),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = null,
+                                tint = AgriGreenPrimary,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
                         Text(
                             text = stringResource(R.string.empty_buyers_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = AgriTextPrimary
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = stringResource(R.string.empty_buyers_desc),
                             style = MaterialTheme.typography.bodyMedium,
                             color = AgriTextSecondary
+                        )
+                        Text(
+                            text = stringResource(R.string.empty_buyers_guidance),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AgriTextMuted
                         )
                     }
                 }
@@ -286,7 +305,7 @@ fun BuyerCard(
             .testTag("buyer_card_${buyer.id}")
             .clickable { onViewBuyer() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         border = CardDefaults.outlinedCardBorder()
     ) {
@@ -329,16 +348,25 @@ fun BuyerCard(
                 if (buyer.isVerified) {
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
+                            .clip(RoundedCornerShape(8.dp))
                             .background(AgriGreenContainer)
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
-                        Text(
-                            text = stringResource(R.string.badge_verified_buyer_check),
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = AgriGreenText
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = AgriGreenPrimary,
+                                modifier = Modifier.size(13.dp)
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text(
+                                text = stringResource(R.string.badge_verified_buyer_check),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = AgriGreenText
+                            )
+                        }
                     }
                 }
             }
@@ -373,7 +401,7 @@ fun BuyerCard(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .background(Color(0xFFF3F4F6))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
                         .padding(horizontal = 6.dp, vertical = 3.dp)
                 ) {
                     Icon(
@@ -475,7 +503,10 @@ fun BuyerCard(
                         .height(48.dp)
                         .testTag("btn_sell_buyer_${buyer.id}"),
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
                     Text(
                         text = if (lotId != null) {
@@ -485,7 +516,7 @@ fun BuyerCard(
                         },
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }

@@ -3,8 +3,10 @@ package com.example
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -131,12 +133,17 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AgriLinkFarmerApp() {
+fun AgriLinkFarmerApp(
+    customRepository: AgriRepository? = null,
+    appViewModel: com.example.ui.AgriAppViewModel = viewModel(
+        factory = com.example.ui.AgriAppViewModel.Factory(LocalContext.current)
+    )
+) {
     var selectedLanguage by rememberSaveable { mutableStateOf(AppLanguage.ENGLISH) }
     var currentDestination by rememberSaveable { mutableStateOf(FarmerNavDestination.HOME) }
     var currentScreen by rememberSaveable(stateSaver = AppScreenSaver) { mutableStateOf<AppScreen>(AppScreen.MainNav) }
 
-    val repository: AgriRepository = remember { MockAgriRepository() }
+    val repository: AgriRepository = customRepository ?: appViewModel.repository
     val sellingViewModel: SellingViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -152,11 +159,24 @@ fun AgriLinkFarmerApp() {
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     val baseContext = LocalContext.current
-    val localizedContext = remember(selectedLanguage) {
+    val localizedContext = remember(selectedLanguage, baseContext) {
         baseContext.createLocalizedContext(selectedLanguage.code)
     }
+    val registryOwner = LocalActivityResultRegistryOwner.current
+        ?: (baseContext as? ActivityResultRegistryOwner)
 
-    CompositionLocalProvider(LocalContext provides localizedContext) {
+    val compositionLocals = remember(localizedContext, registryOwner) {
+        if (registryOwner != null) {
+            arrayOf(
+                LocalContext provides localizedContext,
+                LocalActivityResultRegistryOwner provides registryOwner
+            )
+        } else {
+            arrayOf(LocalContext provides localizedContext)
+        }
+    }
+
+    CompositionLocalProvider(*compositionLocals) {
         AgriLinkTheme {
             val appScreenContent: @Composable () -> Unit = {
                 when (val screen = currentScreen) {

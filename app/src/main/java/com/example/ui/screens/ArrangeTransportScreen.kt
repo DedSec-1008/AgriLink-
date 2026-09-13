@@ -21,20 +21,24 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.DirectionsBus
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +56,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
 import com.example.data.AgriRepository
+import com.example.model.TransporterOption
+import com.example.ui.theme.AgriCardBorder
 import com.example.ui.theme.AgriGreenContainer
 import com.example.ui.theme.AgriGreenPrimary
 import com.example.ui.theme.AgriGreenText
@@ -77,12 +83,21 @@ fun ArrangeTransportScreen(
     val cropRes = transaction?.cropNameRes ?: R.string.crop_soybean
     val quantity = transaction?.quantityQuintals ?: 50
     val buyerName = if (transaction != null) stringResource(transaction.buyerNameRes) else "ABC Foods"
+    val agreedPrice = transaction?.agreedPricePerQ ?: 4850
 
     val transporterOptions = remember { repository.getTransporterOptions(cropRes, quantity) }
-    val transporter = transporterOptions.firstOrNull()
+    var selectedOption by remember { mutableStateOf(transporterOptions.firstOrNull()) }
 
     var isBooked by remember { mutableStateOf(transaction?.transporterBooking != null) }
     var isSimulatingUnavailable by remember { mutableStateOf(false) }
+    var showConfirmDialog by remember { mutableStateOf(false) }
+
+    val currentTransporter = selectedOption ?: transporterOptions.firstOrNull()
+    val estCost = currentTransporter?.totalCost ?: 6000
+    val estCostPerQ = currentTransporter?.costPerQuintal ?: 120
+    val otherCostsPerQ = 30
+    val pocketPerQ = agreedPrice - estCostPerQ - otherCostsPerQ
+    val totalPocket = pocketPerQ * quantity
 
     Column(
         modifier = modifier
@@ -102,7 +117,7 @@ fun ArrangeTransportScreen(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.surface)
                     .clickable { onBack() }
                     .testTag("btn_back_arrange_transport"),
                 contentAlignment = Alignment.Center
@@ -131,8 +146,11 @@ fun ArrangeTransportScreen(
 
         if (isBooked) {
             // Transport Arranged Success State
+            val booking = transaction?.transporterBooking
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("transport_arranged_card"),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = AgriGreenContainer)
             ) {
@@ -157,20 +175,20 @@ fun ArrangeTransportScreen(
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = "${stringResource(R.string.transporter_shree_agro)} · ${stringResource(R.string.estimated_pickup_time)}",
+                        text = "${booking?.transporterName ?: currentTransporter?.name ?: "Truck"} · ${stringResource(booking?.deliveryTimingRes ?: R.string.delivery_today)}",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = AgriTextPrimary
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "From: Nagpur, Maharashtra  ➔  To: $buyerName",
+                        text = "Pickup: Your location  ➔  Delivery: $buyerName",
                         style = MaterialTheme.typography.bodySmall,
                         color = AgriTextSecondary
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Estimated cost: ₹6,000 (deducted from final sale)",
+                        text = "Estimated cost: ₹${numberFormat.format(booking?.totalCost ?: estCost)} (deducted from final sale)",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         color = AgriGreenPrimary
@@ -183,21 +201,26 @@ fun ArrangeTransportScreen(
                             .height(48.dp)
                             .testTag("btn_view_sale_after_booking"),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     ) {
                         Text(
                             text = stringResource(R.string.btn_view_sale),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
             }
-        } else if (isSimulatingUnavailable) {
-            // Unavailable Transport Simulation
+        } else if (isSimulatingUnavailable || transporterOptions.isEmpty()) {
+            // Unavailable Transport Empty State
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("card_transport_unavailable"),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),
                 border = CardDefaults.outlinedCardBorder()
@@ -216,14 +239,14 @@ fun ArrangeTransportScreen(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = stringResource(R.string.transport_failure_msg),
+                        text = stringResource(R.string.no_transport_available),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFFE65100)
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = "Drivers are currently busy on this route. You can retry now or choose another local pickup option.",
+                        text = stringResource(R.string.transport_failure_msg),
                         style = MaterialTheme.typography.bodySmall,
                         color = AgriTextSecondary,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -258,30 +281,50 @@ fun ArrangeTransportScreen(
                 }
             }
         } else {
-            // Route & Crop Details Card
+            // Logistics Details Card
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("card_logistics_details"),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                border = CardDefaults.outlinedCardBorder()
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(18.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.LocationOn,
-                            contentDescription = null,
-                            tint = AgriGreenPrimary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
-                            text = "Nagpur, Maharashtra  ➔  $buyerName",
-                            style = MaterialTheme.typography.titleMedium,
+                            text = stringResource(R.string.label_pickup_location),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "Your location",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextPrimary
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = stringResource(R.string.label_delivery_location),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = buyerName,
+                            style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = AgriTextPrimary
                         )
@@ -297,7 +340,7 @@ fun ArrangeTransportScreen(
                             color = AgriTextSecondary
                         )
                         Text(
-                            text = stringResource(R.string.label_distance_val, 42),
+                            text = "28 km",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = AgriTextPrimary
@@ -314,7 +357,7 @@ fun ArrangeTransportScreen(
                             color = AgriTextSecondary
                         )
                         Text(
-                            text = "${stringResource(cropRes)} · $quantity quintals",
+                            text = "${stringResource(cropRes)} — $quantity quintals",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = AgriTextPrimary
@@ -326,12 +369,29 @@ fun ArrangeTransportScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = stringResource(R.string.label_cost_per_q),
+                            text = "Estimated transport cost",
                             style = MaterialTheme.typography.bodyMedium,
                             color = AgriTextSecondary
                         )
                         Text(
-                            text = "₹120 / quintal",
+                            text = "₹${numberFormat.format(estCost)} (Estimated)",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriGreenPrimary
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Estimated transport cost per quintal",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "₹$estCostPerQ / quintal (Estimated)",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = AgriTextPrimary
@@ -343,13 +403,127 @@ fun ArrangeTransportScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = stringResource(R.string.label_transport_cost),
+                            text = "Estimated delivery",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = stringResource(currentTransporter?.deliveryTimingRes ?: R.string.delivery_today),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = AgriTextPrimary
+                        )
+                    }
+                }
+            }
+
+            // Net Realization Breakdown (Cost Transparency)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("card_net_realization_breakdown"),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAF9)),
+                border = CardDefaults.outlinedCardBorder()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "NET REALIZATION BREAKDOWN",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriGreenPrimary,
+                        letterSpacing = 1.sp
+                    )
+
+                    HorizontalDivider(color = Color(0xFFE2E8F0), thickness = 1.dp)
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Buyer price",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "₹${numberFormat.format(agreedPrice)}/q",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = AgriTextPrimary
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Estimated transport",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "− ₹$estCostPerQ/q",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFFC53030)
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Other known costs",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "− ₹$otherCostsPerQ/q",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFFC53030)
+                        )
+                    }
+
+                    HorizontalDivider(color = Color(0xFFE2E8F0), thickness = 1.dp)
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Estimated in your pocket",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = AgriGreenText
                         )
                         Text(
-                            text = "₹${numberFormat.format(6000)}",
+                            text = "₹${numberFormat.format(pocketPerQ)}/q",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = AgriGreenPrimary
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "For $quantity quintals",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "₹${numberFormat.format(totalPocket)}",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.ExtraBold,
                             color = AgriGreenPrimary
@@ -358,131 +532,56 @@ fun ArrangeTransportScreen(
                 }
             }
 
-            // Recommended Transporter Card
+            // Nearby Transport Options
             Text(
-                text = stringResource(R.string.recommended_transport_header),
+                text = stringResource(R.string.nearby_transport_header),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = AgriTextPrimary
             )
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.5.dp, AgriGreenPrimary, RoundedCornerShape(16.dp)),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(18.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = transporter?.name ?: stringResource(R.string.transporter_shree_agro),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = AgriTextPrimary
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Icon(
-                                imageVector = Icons.Default.Verified,
-                                contentDescription = "Verified",
-                                tint = AgriGreenPrimary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = null,
-                                tint = Color(0xFFF59E0B),
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "4.6",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = AgriTextPrimary
-                            )
-                        }
-                    }
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.LocalShipping,
-                            contentDescription = null,
-                            tint = AgriTextSecondary,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = stringResource(R.string.vehicle_small_medium),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = AgriTextSecondary
-                        )
-                    }
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Schedule,
-                            contentDescription = null,
-                            tint = AgriGreenPrimary,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Pickup: ${stringResource(R.string.estimated_pickup_time)}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = AgriGreenPrimary
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                repository.bookTransport(transactionId, "transporter_shree_agro")
-                                isBooked = true
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp)
-                            .testTag("btn_book_transport"),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.LocalShipping,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.btn_book_transport),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-                }
+            transporterOptions.forEachIndexed { index, option ->
+                val isSelected = (selectedOption?.id == option.id)
+                TransportOptionCard(
+                    option = option,
+                    isSelected = isSelected,
+                    onSelect = { selectedOption = option },
+                    numberFormat = numberFormat,
+                    testTagIndex = index
+                )
             }
 
-            // Developer / QA Simulation Trigger for Transport Unavailability
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Primary Book / Arrange Transport CTA
+            Button(
+                onClick = { showConfirmDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+                    .testTag("btn_book_transport"),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocalShipping,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.btn_book_transport),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+
+            // Developer / Simulation trigger for Transport Unavailability
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -494,6 +593,233 @@ fun ArrangeTransportScreen(
                     text = "Simulate transport unavailability (test exception mode)",
                     style = MaterialTheme.typography.bodySmall,
                     color = AgriTextMuted
+                )
+            }
+        }
+    }
+
+    // Explicit Confirmation Dialog
+    if (showConfirmDialog) {
+        val transporterToConfirm = selectedOption ?: transporterOptions.firstOrNull()
+        AlertDialog(
+            onDismissRequest = { showConfirmDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.dialog_confirm_transport_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = AgriTextPrimary
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("dialog_confirm_transport_content"),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = "Vehicle:", color = AgriTextSecondary)
+                        Text(
+                            text = transporterToConfirm?.name ?: "Truck",
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextPrimary
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = "Estimated cost:", color = AgriTextSecondary)
+                        Text(
+                            text = "₹${numberFormat.format(transporterToConfirm?.totalCost ?: estCost)}",
+                            fontWeight = FontWeight.Bold,
+                            color = AgriGreenPrimary
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = "Pickup:", color = AgriTextSecondary)
+                        Text(text = "Your location", fontWeight = FontWeight.SemiBold)
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = "Delivery:", color = AgriTextSecondary)
+                        Text(text = buyerName, fontWeight = FontWeight.SemiBold)
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = "Produce:", color = AgriTextSecondary)
+                        Text(text = "${stringResource(cropRes)} — $quantity quintals", fontWeight = FontWeight.SemiBold)
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = "Estimated delivery:", color = AgriTextSecondary)
+                        Text(
+                            text = stringResource(transporterToConfirm?.deliveryTimingRes ?: R.string.delivery_today),
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = stringResource(R.string.dialog_confirm_transport_msg),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AgriTextSecondary
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showConfirmDialog = false
+                        scope.launch {
+                            val tId = transporterToConfirm?.id ?: "transporter_truck"
+                            repository.bookTransport(transactionId, tId)
+                            isBooked = true
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary),
+                    modifier = Modifier.testTag("btn_dialog_confirm_transport")
+                ) {
+                    Text(
+                        text = stringResource(R.string.btn_confirm_transport),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showConfirmDialog = false },
+                    modifier = Modifier.testTag("btn_dialog_cancel_transport")
+                ) {
+                    Text(
+                        text = stringResource(R.string.btn_go_back),
+                        color = AgriTextSecondary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun TransportOptionCard(
+    option: TransporterOption,
+    isSelected: Boolean,
+    onSelect: () -> Unit,
+    numberFormat: NumberFormat,
+    testTagIndex: Int,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onSelect() }
+            .border(
+                width = if (isSelected) 2.dp else 1.dp,
+                color = if (isSelected) AgriGreenPrimary else AgriCardBorder,
+                shape = RoundedCornerShape(14.dp)
+            )
+            .testTag("transport_option_$testTagIndex"),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) AgriGreenContainer else MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.LocalShipping,
+                        contentDescription = null,
+                        tint = if (isSelected) AgriGreenPrimary else AgriTextSecondary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = option.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriTextPrimary
+                    )
+                }
+
+                Button(
+                    onClick = onSelect,
+                    modifier = Modifier
+                        .height(34.dp)
+                        .testTag("btn_select_transport_$testTagIndex"),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = if (isSelected) {
+                        ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                    } else {
+                        ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFF1F5F9),
+                            contentColor = AgriTextPrimary
+                        )
+                    }
+                ) {
+                    Text(
+                        text = if (isSelected) stringResource(R.string.btn_selected) else stringResource(R.string.btn_select),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Capacity: ${option.capacityQuintals} quintals",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AgriTextSecondary
+                )
+                Text(
+                    text = "Estimated cost: ₹${numberFormat.format(option.totalCost)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = AgriGreenPrimary
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Delivery: ${stringResource(option.deliveryTimingRes)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = AgriTextPrimary
+                )
+                Text(
+                    text = "₹${option.costPerQuintal}/q",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AgriTextSecondary
                 )
             }
         }

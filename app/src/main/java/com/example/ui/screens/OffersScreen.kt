@@ -95,7 +95,7 @@ fun OffersScreen(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
-                        .background(Color.White)
+                        .background(MaterialTheme.colorScheme.surface)
                         .clickable { onBack() }
                         .testTag("btn_back_offers"),
                     contentAlignment = Alignment.Center
@@ -134,7 +134,7 @@ fun OffersScreen(
                         .fillMaxWidth()
                         .padding(vertical = 16.dp)
                         .testTag("empty_offers_card"),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     shape = RoundedCornerShape(16.dp),
                     border = CardDefaults.outlinedCardBorder()
                 ) {
@@ -316,7 +316,7 @@ fun BestOfferCard(
                         text = "⭐ ${stringResource(R.string.badge_best_offer)}",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
 
@@ -373,7 +373,7 @@ fun BestOfferCard(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
-                            .background(Color.White)
+                            .background(AgriGreenContainer)
                             .border(1.dp, AgriHeroGreenBorder, RoundedCornerShape(6.dp))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
@@ -393,7 +393,7 @@ fun BestOfferCard(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = AgriGreenContainer),
                 border = BorderStroke(1.dp, AgriHeroGreenBorder)
             ) {
                 Column(
@@ -486,13 +486,16 @@ fun BestOfferCard(
                         .height(48.dp)
                         .testTag("btn_details_offer_${offer.id}"),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
                     Text(
                         text = stringResource(R.string.btn_view_details),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             } else {
@@ -522,13 +525,16 @@ fun BestOfferCard(
                             .height(48.dp)
                             .testTag("btn_accept_offer_${offer.id}"),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     ) {
                         Text(
                             text = stringResource(R.string.btn_accept_offer),
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -549,7 +555,7 @@ fun NetRealizationComparisonCard(
             .fillMaxWidth()
             .testTag("net_realization_comparison_card"),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = CardDefaults.outlinedCardBorder()
     ) {
         Column(
@@ -692,7 +698,7 @@ fun OfferCard(
             .testTag("offer_card_${offer.id}"),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isAccepted) Color(0xFFF0FDF4) else Color.White
+            containerColor = if (isAccepted) AgriGreenContainer else MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         border = CardDefaults.outlinedCardBorder()
@@ -840,13 +846,16 @@ fun OfferCard(
                         .height(48.dp)
                         .testTag("btn_details_offer_${offer.id}"),
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
                     Text(
                         text = stringResource(R.string.btn_view_details),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             } else if (isCancelled) {
@@ -890,13 +899,16 @@ fun OfferCard(
                             .height(48.dp)
                             .testTag("btn_accept_offer_${offer.id}"),
                         shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     ) {
                         Text(
                             text = stringResource(R.string.btn_accept_offer),
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }

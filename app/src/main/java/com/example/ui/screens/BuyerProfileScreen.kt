@@ -94,7 +94,7 @@ fun BuyerProfileScreen(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.surface)
                     .clickable { onBack() }
                     .testTag("btn_back_buyer_profile"),
                 contentAlignment = Alignment.Center
@@ -158,7 +158,7 @@ fun BuyerProfileScreen(
                             color = AgriGreenText
                         )
                         Text(
-                            text = "Identity and business license verified by AgriLink",
+                            text = stringResource(R.string.buyer_verified_desc),
                             style = MaterialTheme.typography.bodySmall,
                             color = AgriTextSecondary
                         )
@@ -171,7 +171,7 @@ fun BuyerProfileScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(14.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = CardDefaults.outlinedCardBorder()
         ) {
             Column(
@@ -198,7 +198,7 @@ fun BuyerProfileScreen(
                         color = AgriTextPrimary
                     )
                     Text(
-                        text = "${buyer.currentDemandMinQ}–${buyer.currentDemandMaxQ} quintals",
+                        text = "${buyer.currentDemandMinQ}–${buyer.currentDemandMaxQ} ${stringResource(R.string.unit_quintals)}",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.ExtraBold,
                         color = AgriGreenPrimary
@@ -228,7 +228,7 @@ fun BuyerProfileScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(14.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = CardDefaults.outlinedCardBorder()
         ) {
             Column(
@@ -245,14 +245,14 @@ fun BuyerProfileScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "₹$formattedPrice / quintal",
+                    text = "₹$formattedPrice / ${stringResource(R.string.unit_quintals_short)}",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.ExtraBold,
                     color = AgriGreenPrimary
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Quoted directly for immediate purchase",
+                    text = stringResource(R.string.buyer_quoted_directly_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = AgriTextSecondary
                 )
@@ -263,7 +263,7 @@ fun BuyerProfileScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(14.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = CardDefaults.outlinedCardBorder()
         ) {
             Column(
@@ -352,7 +352,7 @@ fun BuyerProfileScreen(
                 .fillMaxWidth()
                 .clickable { showMoreInfo = !showMoreInfo },
             shape = RoundedCornerShape(14.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = CardDefaults.outlinedCardBorder()
         ) {
             Column(
@@ -396,17 +396,17 @@ fun BuyerProfileScreen(
                             color = AgriTextSecondary
                         )
                         Text(
-                            text = "• Payment terms: ${stringResource(buyer.paymentTermsRes)}",
+                            text = "• ${stringResource(R.string.label_payment_terms_colon, stringResource(buyer.paymentTermsRes))}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = AgriTextSecondary
                         )
                         Text(
-                            text = "• Delivery: ${stringResource(buyer.deliveryTermsRes)}",
+                            text = "• ${stringResource(R.string.label_delivery_colon, stringResource(buyer.deliveryTermsRes))}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = AgriTextSecondary
                         )
                         Text(
-                            text = "• Quality standards: ${stringResource(buyer.qualityRequirementsRes)}",
+                            text = "• ${stringResource(R.string.label_quality_standards_colon, stringResource(buyer.qualityRequirementsRes))}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = AgriTextSecondary
                         )

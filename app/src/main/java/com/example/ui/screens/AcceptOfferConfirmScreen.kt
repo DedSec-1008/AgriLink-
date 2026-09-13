@@ -80,7 +80,7 @@ fun AcceptOfferConfirmScreen(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.surface)
                     .clickable { onBack() }
                     .testTag("btn_back_confirm_accept"),
                 contentAlignment = Alignment.Center
@@ -110,7 +110,7 @@ fun AcceptOfferConfirmScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = CardDefaults.outlinedCardBorder()
         ) {
             Column(
@@ -125,7 +125,7 @@ fun AcceptOfferConfirmScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Buyer",
+                        text = stringResource(R.string.label_buyer_label),
                         style = MaterialTheme.typography.bodyMedium,
                         color = AgriTextSecondary
                     )
@@ -143,12 +143,12 @@ fun AcceptOfferConfirmScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Quoted Price",
+                        text = stringResource(R.string.label_quoted_price_label),
                         style = MaterialTheme.typography.bodyMedium,
                         color = AgriTextSecondary
                     )
                     Text(
-                        text = "₹$formattedPrice / quintal",
+                        text = "₹$formattedPrice / ${stringResource(R.string.unit_quintals_short)}",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = AgriTextPrimary
@@ -161,12 +161,12 @@ fun AcceptOfferConfirmScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Quantity",
+                        text = stringResource(R.string.label_quantity_label),
                         style = MaterialTheme.typography.bodyMedium,
                         color = AgriTextSecondary
                     )
                     Text(
-                        text = "${offer.quantityQuintals} quintals",
+                        text = "${offer.quantityQuintals} ${stringResource(R.string.unit_quintals)}",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = AgriTextPrimary
@@ -179,7 +179,7 @@ fun AcceptOfferConfirmScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Payment",
+                        text = stringResource(R.string.label_payment_label),
                         style = MaterialTheme.typography.bodyMedium,
                         color = AgriTextSecondary
                     )
@@ -220,7 +220,7 @@ fun AcceptOfferConfirmScreen(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Net in your pocket after transport and handling",
+                    text = stringResource(R.string.label_net_in_pocket_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = AgriTextSecondary
                 )
@@ -231,7 +231,7 @@ fun AcceptOfferConfirmScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFF0FDF4)),
+            colors = CardDefaults.cardColors(containerColor = AgriGreenContainer.copy(alpha = 0.5f)),
             border = androidx.compose.foundation.BorderStroke(1.dp, com.example.ui.theme.AgriHeroGreenBorder)
         ) {
             Column(
@@ -249,14 +249,14 @@ fun AcceptOfferConfirmScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Status will change to: ${stringResource(R.string.status_offer_accepted)}",
+                        text = stringResource(R.string.label_offer_status_will_change, stringResource(R.string.status_offer_accepted)),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = AgriGreenText
                     )
                 }
                 Text(
-                    text = "Accepting reserves your produce for this buyer. Transport will be arranged in the next step.",
+                    text = stringResource(R.string.label_accept_offer_terms_notice),
                     style = MaterialTheme.typography.bodySmall,
                     color = AgriTextSecondary
                 )
@@ -273,13 +273,16 @@ fun AcceptOfferConfirmScreen(
                 .height(52.dp)
                 .testTag("btn_confirm_accept_offer"),
             shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
         ) {
             Text(
                 text = stringResource(R.string.btn_confirm_accept),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
 

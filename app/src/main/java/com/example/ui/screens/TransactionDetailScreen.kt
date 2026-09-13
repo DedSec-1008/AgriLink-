@@ -63,6 +63,7 @@ import com.example.R
 import com.example.data.AgriRepository
 import com.example.model.AgriTransaction
 import com.example.model.TransactionStatus
+import com.example.ui.theme.AgriCardBorder
 import com.example.ui.theme.AgriGreenContainer
 import com.example.ui.theme.AgriGreenPrimary
 import com.example.ui.theme.AgriGreenText
@@ -137,7 +138,7 @@ fun TransactionDetailScreen(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.surface)
                     .clickable { onBack() }
                     .testTag("btn_back_tx_detail"),
                 contentAlignment = Alignment.Center
@@ -169,7 +170,7 @@ fun TransactionDetailScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = CardDefaults.outlinedCardBorder()
         ) {
             Column(
@@ -357,13 +358,16 @@ fun TransactionDetailScreen(
                         .height(50.dp)
                         .testTag("btn_next_action"),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
                     Text(
                         text = actionButtonText,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -373,7 +377,7 @@ fun TransactionDetailScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = CardDefaults.outlinedCardBorder()
         ) {
             Column(
@@ -467,7 +471,7 @@ fun TransactionDetailScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = CardDefaults.outlinedCardBorder()
         ) {
             Column(
@@ -570,7 +574,7 @@ fun TransactionDetailScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = CardDefaults.outlinedCardBorder()
         ) {
             Row(
@@ -754,7 +758,7 @@ private fun VerticalProgressStep(
                             StepDisplayState.COMPLETED -> AgriGreenPrimary
                             StepDisplayState.CURRENT -> AgriGreenPrimary
                             StepDisplayState.DELAYED -> Color(0xFFEA580C)
-                            StepDisplayState.PENDING -> Color(0xFFE0E0E0)
+                            StepDisplayState.PENDING -> AgriCardBorder
                         }
                     ),
                 contentAlignment = Alignment.Center
@@ -782,7 +786,7 @@ private fun VerticalProgressStep(
                         modifier = Modifier
                             .size(8.dp)
                             .clip(CircleShape)
-                            .background(Color.White)
+                            .background(MaterialTheme.colorScheme.surface)
                     )
                 }
             }
@@ -793,7 +797,7 @@ private fun VerticalProgressStep(
                         .width(2.dp)
                         .height(28.dp)
                         .background(
-                            if (stepState == StepDisplayState.COMPLETED) AgriGreenPrimary else Color(0xFFE0E0E0)
+                            if (stepState == StepDisplayState.COMPLETED) AgriGreenPrimary else AgriCardBorder
                         )
                 )
             }

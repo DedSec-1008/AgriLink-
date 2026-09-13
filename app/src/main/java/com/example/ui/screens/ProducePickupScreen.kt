@@ -20,15 +20,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -53,6 +59,7 @@ import com.example.model.TransactionStatus
 import com.example.ui.theme.AgriGreenContainer
 import com.example.ui.theme.AgriGreenPrimary
 import com.example.ui.theme.AgriGreenText
+import com.example.ui.theme.AgriTextMuted
 import com.example.ui.theme.AgriTextPrimary
 import com.example.ui.theme.AgriTextSecondary
 import kotlinx.coroutines.launch
@@ -80,6 +87,12 @@ fun ProducePickupScreen(
     val cropRes = transaction?.cropNameRes ?: R.string.crop_soybean
     val quantity = transaction?.quantityQuintals ?: 50
     val buyerName = if (transaction != null) stringResource(transaction.buyerNameRes) else "ABC Foods"
+    val booking = transaction?.transporterBooking
+
+    // Checklist states
+    var checkQuality by remember { mutableStateOf(true) }
+    var checkWeight by remember { mutableStateOf(true) }
+    var checkReceipt by remember { mutableStateOf(true) }
 
     Column(
         modifier = modifier
@@ -99,7 +112,7 @@ fun ProducePickupScreen(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.surface)
                     .clickable { onBack() }
                     .testTag("btn_back_produce_pickup"),
                 contentAlignment = Alignment.Center
@@ -129,7 +142,9 @@ fun ProducePickupScreen(
         if (isDispatched) {
             // Already Dispatched Card
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("produce_picked_up_card"),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = AgriGreenContainer)
             ) {
@@ -143,14 +158,20 @@ fun ProducePickupScreen(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
                         tint = AgriGreenPrimary,
-                        modifier = Modifier.size(44.dp)
+                        modifier = Modifier.size(48.dp)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = stringResource(R.string.pickup_success_snack),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold,
                         color = AgriGreenText
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "${stringResource(cropRes)} — $quantity quintals dispatched to $buyerName",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = AgriTextSecondary
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
@@ -171,19 +192,19 @@ fun ProducePickupScreen(
                 }
             }
         } else {
-            // Transporter Ready Card
+            // Transporter & Pickup Details Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .border(1.5.dp, AgriGreenPrimary, RoundedCornerShape(16.dp)),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(18.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -211,65 +232,71 @@ fun ProducePickupScreen(
                         }
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
-                            text = stringResource(R.string.transporter_shree_agro),
-                            style = MaterialTheme.typography.titleLarge,
+                            text = "Pickup date & time",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "Today, 2:00 PM",
+                            style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = AgriTextPrimary
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Icon(
-                            imageVector = Icons.Default.Verified,
-                            contentDescription = "Verified",
-                            tint = AgriGreenPrimary,
-                            modifier = Modifier.size(18.dp)
-                        )
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.LocalShipping,
-                            contentDescription = null,
-                            tint = AgriTextSecondary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
-                            text = stringResource(R.string.vehicle_small_medium),
+                            text = "Transporter",
                             style = MaterialTheme.typography.bodyMedium,
                             color = AgriTextSecondary
                         )
+                        Text(
+                            text = booking?.transporterName ?: "Truck",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextPrimary
+                        )
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Schedule,
-                            contentDescription = null,
-                            tint = AgriGreenPrimary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
-                            text = stringResource(R.string.estimated_pickup_time),
+                            text = "Pickup location",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "Your location",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
-                            color = AgriGreenPrimary
+                            color = AgriTextPrimary
                         )
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.LocationOn,
-                            contentDescription = null,
-                            tint = AgriTextSecondary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
-                            text = "Pickup: Nagpur, Maharashtra  ➔  $buyerName",
+                            text = "Delivery destination",
                             style = MaterialTheme.typography.bodyMedium,
                             color = AgriTextSecondary
+                        )
+                        Text(
+                            text = buyerName,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = AgriTextPrimary
                         )
                     }
 
@@ -283,16 +310,86 @@ fun ProducePickupScreen(
                             color = AgriTextSecondary
                         )
                         Text(
-                            text = "${stringResource(cropRes)} · $quantity quintals",
+                            text = "${stringResource(cropRes)} — $quantity quintals",
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = AgriTextPrimary
+                            fontWeight = FontWeight.Bold,
+                            color = AgriGreenPrimary
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            // Pickup Checklist Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("card_pickup_checklist"),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                border = CardDefaults.outlinedCardBorder()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "PICKUP CHECKLIST",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = AgriTextPrimary,
+                        letterSpacing = 0.5.sp
+                    )
+                    HorizontalDivider(color = Color(0xFFF1F5F9), thickness = 1.dp)
+
+                    ChecklistRow(
+                        title = "Check produce quality before loading",
+                        checked = checkQuality,
+                        onCheckedChange = { checkQuality = it }
+                    )
+                    ChecklistRow(
+                        title = "Ensure correct weight",
+                        checked = checkWeight,
+                        onCheckedChange = { checkWeight = it }
+                    )
+                    ChecklistRow(
+                        title = "Obtain driver receipt / gate pass",
+                        checked = checkReceipt,
+                        onCheckedChange = { checkReceipt = it }
+                    )
+                }
+            }
+
+            // Helper / Warning Notice
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFBEB))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.WarningAmber,
+                        contentDescription = null,
+                        tint = Color(0xFFD97706),
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = "Only confirm after the vehicle is loaded and leaves your premises.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF92400E),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
 
             Button(
                 onClick = {
@@ -324,5 +421,36 @@ fun ProducePickupScreen(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun ChecklistRow(
+    title: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onCheckedChange(!checked) }
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = CheckboxDefaults.colors(
+                checkedColor = AgriGreenPrimary,
+                checkmarkColor = Color.White
+            )
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = if (checked) FontWeight.SemiBold else FontWeight.Normal,
+            color = if (checked) AgriTextPrimary else AgriTextSecondary
+        )
     }
 }

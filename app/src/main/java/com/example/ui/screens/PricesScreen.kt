@@ -30,6 +30,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -75,6 +76,7 @@ import com.example.ui.theme.AgriGoldSecondary
 import com.example.ui.theme.AgriGreenContainer
 import com.example.ui.theme.AgriGreenPrimary
 import com.example.ui.theme.AgriHeroGreenBorder
+import com.example.ui.theme.AgriOnGoldContainer
 import com.example.ui.theme.AgriOnGreenContainer
 import com.example.ui.theme.AgriSuccess
 import com.example.ui.theme.AgriSurface
@@ -283,10 +285,10 @@ fun PricesScreen(
                     }
                 }
             } else {
-                // Portrait Single-Column Hierarchy
+                // Portrait Single-Column Hierarchy (Crop -> Price Hero -> Nearby Markets -> 7-Day Trend -> Sell Action)
                 benchmarkPriceCard()
-                priceTrendCard()
                 nearbyMarketsSection()
+                priceTrendCard()
                 sellActionCard()
             }
 
@@ -488,12 +490,12 @@ private fun BenchmarkPriceHeroCard(
                 Column {
                     Text(
                         text = "₹${primaryPrice.pricePerQuintal}",
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.ExtraBold,
+                        style = MaterialTheme.typography.displaySmall.copy(fontSize = 36.sp),
+                        fontWeight = FontWeight.Black,
                         color = AgriGreenPrimary
                     )
                     Text(
-                        text = "/ quintal",
+                        text = "/ ${stringResource(R.string.unit_quintals)}",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = AgriTextSecondary
@@ -505,6 +507,42 @@ private fun BenchmarkPriceHeroCard(
                     style = MaterialTheme.typography.labelSmall,
                     color = AgriTextMuted
                 )
+            }
+
+            // Quick Decision / Meaning for Farmer
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = if (primaryPrice.isPositiveChange) AgriGreenContainer else AgriGoldContainer,
+                border = BorderStroke(
+                    1.dp,
+                    if (primaryPrice.isPositiveChange) AgriHeroGreenBorder else AgriCardBorder
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("prices_quick_decision_banner")
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = if (primaryPrice.isPositiveChange) Icons.Default.CheckCircle else Icons.Default.Info,
+                        contentDescription = null,
+                        tint = if (primaryPrice.isPositiveChange) AgriSuccess else AgriGoldSecondary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = if (primaryPrice.isPositiveChange) {
+                            stringResource(R.string.quick_decision_rising)
+                        } else {
+                            stringResource(R.string.quick_decision_falling)
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (primaryPrice.isPositiveChange) AgriOnGreenContainer else AgriOnGoldContainer
+                    )
+                }
             }
         }
     }
@@ -650,6 +688,11 @@ private fun TrendChartCanvas(
     points: List<Int>,
     modifier: Modifier = Modifier
 ) {
+    val borderColor = AgriCardBorder
+    val primaryColor = AgriGreenPrimary
+    val successColor = AgriSuccess
+    val ringColor = MaterialTheme.colorScheme.surface
+
     Canvas(modifier = modifier) {
         if (points.size < 2) return@Canvas
 
@@ -672,7 +715,7 @@ private fun TrendChartCanvas(
         // 1. Draw subtle dashed baseline
         val baselineY = h - 6f
         drawLine(
-            color = AgriCardBorder,
+            color = borderColor,
             start = Offset(0f, baselineY),
             end = Offset(w, baselineY),
             strokeWidth = 1.dp.toPx(),
@@ -697,8 +740,8 @@ private fun TrendChartCanvas(
             path = fillPath,
             brush = Brush.verticalGradient(
                 colors = listOf(
-                    AgriGreenPrimary.copy(alpha = 0.22f),
-                    AgriGreenPrimary.copy(alpha = 0.02f)
+                    primaryColor.copy(alpha = 0.22f),
+                    primaryColor.copy(alpha = 0.02f)
                 ),
                 startY = 0f,
                 endY = h
@@ -718,7 +761,7 @@ private fun TrendChartCanvas(
 
         drawPath(
             path = strokePath,
-            color = AgriGreenPrimary,
+            color = primaryColor,
             style = Stroke(width = 3.dp.toPx())
         )
 
@@ -727,15 +770,15 @@ private fun TrendChartCanvas(
             val isLast = index == coords.size - 1
             val radius = if (isLast) 5.dp.toPx() else 3.5.dp.toPx()
 
-            // Outer white ring
+            // Outer ring matching surface background
             drawCircle(
-                color = Color.White,
+                color = ringColor,
                 radius = radius + 2.dp.toPx(),
                 center = offset
             )
             // Inner dot
             drawCircle(
-                color = if (isLast) AgriGreenPrimary else AgriSuccess,
+                color = if (isLast) primaryColor else successColor,
                 radius = radius,
                 center = offset
             )
@@ -876,7 +919,7 @@ private fun MandiComparisonCard(item: MarketComparisonItem) {
                     color = if (item.isBenchmark) AgriGreenPrimary else AgriTextPrimary
                 )
                 Text(
-                    text = "/ quintal",
+                    text = "/ ${stringResource(R.string.unit_quintals)}",
                     style = MaterialTheme.typography.labelSmall,
                     color = AgriTextMuted
                 )

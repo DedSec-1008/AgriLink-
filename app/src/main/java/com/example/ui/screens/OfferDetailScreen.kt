@@ -91,7 +91,7 @@ fun OfferDetailScreen(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.surface)
                     .clickable { onBack() }
                     .testTag("btn_back_offer_detail"),
                 contentAlignment = Alignment.Center
@@ -123,7 +123,7 @@ fun OfferDetailScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF0FDF4)),
+                colors = CardDefaults.cardColors(containerColor = AgriGreenContainer.copy(alpha = 0.5f)),
                 border = androidx.compose.foundation.BorderStroke(1.5.dp, AgriHeroGreenBorder)
             ) {
                 Column(
@@ -190,7 +190,7 @@ fun OfferDetailScreen(
 
         // Offer Status Banner if not pending
         if (!isPending) {
-            val bannerBg = if (offer.status == OfferStatus.ACCEPTED) AgriGreenContainer else Color(0xFFF3F4F6)
+            val bannerBg = if (offer.status == OfferStatus.ACCEPTED) AgriGreenContainer else MaterialTheme.colorScheme.surfaceVariant
             val bannerColor = if (offer.status == OfferStatus.ACCEPTED) AgriGreenText else AgriTextSecondary
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -249,7 +249,7 @@ fun OfferDetailScreen(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "For ${offer.quantityQuintals} quintals (₹${numberFormat.format(offer.estimatedNetPricePerQ)}/q net in your pocket)",
+                    text = "${stringResource(R.string.label_for_quintals_total, offer.quantityQuintals)} (₹${numberFormat.format(offer.estimatedNetPricePerQ)}/${stringResource(R.string.unit_quintals_short)} ${stringResource(R.string.label_after_expenses_short)})",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = AgriTextSecondary
@@ -261,7 +261,7 @@ fun OfferDetailScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = CardDefaults.outlinedCardBorder()
         ) {
             Column(
@@ -357,7 +357,7 @@ fun OfferDetailScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = CardDefaults.outlinedCardBorder()
         ) {
             Column(
@@ -465,13 +465,16 @@ fun OfferDetailScreen(
                     .height(52.dp)
                     .testTag("btn_accept_in_details"),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = AgriGreenPrimary)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
             ) {
                 Text(
                     text = stringResource(R.string.btn_accept_offer),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
 

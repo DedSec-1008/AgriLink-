@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Payments
@@ -82,6 +83,7 @@ fun DeliveryTrackingScreen(
     val cropRes = transaction?.cropNameRes ?: R.string.crop_soybean
     val quantity = transaction?.quantityQuintals ?: 50
     val buyerName = if (transaction != null) stringResource(transaction.buyerNameRes) else "ABC Foods"
+    val booking = transaction?.transporterBooking
 
     Column(
         modifier = modifier
@@ -101,7 +103,7 @@ fun DeliveryTrackingScreen(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.surface)
                     .clickable { onBack() }
                     .testTag("btn_back_delivery_tracking"),
                 contentAlignment = Alignment.Center
@@ -118,7 +120,7 @@ fun DeliveryTrackingScreen(
                     text = if (isDelivered) {
                         stringResource(R.string.title_produce_delivered)
                     } else {
-                        stringResource(R.string.title_produce_in_transit)
+                        stringResource(R.string.title_delivery_confirmation)
                     },
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.ExtraBold,
@@ -135,7 +137,9 @@ fun DeliveryTrackingScreen(
         if (isDelivered) {
             // Produce Delivered Card
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("card_produce_delivered"),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = AgriGreenContainer)
             ) {
@@ -198,19 +202,19 @@ fun DeliveryTrackingScreen(
                 }
             }
         } else {
-            // In Transit Status Card
+            // In Transit / Delivery Confirmation Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .border(1.5.dp, AgriGreenPrimary, RoundedCornerShape(16.dp)),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(18.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -230,7 +234,7 @@ fun DeliveryTrackingScreen(
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Text(
-                                text = "On the way",
+                                text = "Arrived at $buyerName",
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = AgriGreenText
@@ -238,56 +242,122 @@ fun DeliveryTrackingScreen(
                         }
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.LocationOn,
-                            contentDescription = null,
-                            tint = AgriGreenPrimary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
-                            text = "Destination: $buyerName",
-                            style = MaterialTheme.typography.titleMedium,
+                            text = "Delivery status",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "In transit / Arrived at $buyerName",
+                            style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = AgriTextPrimary
                         )
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Schedule,
-                            contentDescription = null,
-                            tint = AgriTextSecondary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
-                            text = stringResource(R.string.expected_delivery_today),
+                            text = "Transporter",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = booking?.transporterName ?: "Truck",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextPrimary
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Delivery location",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "$buyerName (Nagpur)",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriTextPrimary
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Produce",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = "${stringResource(cropRes)} — $quantity quintals",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AgriGreenPrimary
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Expected delivery",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AgriTextSecondary
+                        )
+                        Text(
+                            text = stringResource(R.string.delivery_today),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = AgriTextPrimary
                         )
                     }
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.LocalShipping,
-                            contentDescription = null,
-                            tint = AgriTextSecondary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "${stringResource(cropRes)} · $quantity quintals via Shree Agro Transport",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = AgriTextSecondary
-                        )
-                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            // Note card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F8F5))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        tint = AgriGreenPrimary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = stringResource(R.string.delivery_note_msg),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AgriTextPrimary,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
 
             Button(
                 onClick = {

@@ -1,6 +1,8 @@
 <resources>
-    <string name="app_name">AgriLink</string>
+    <string name="app_name">KisanSetu</string>
     <string name="greeting_farmer">Namaste, Farmer</string>
+    <string name="greeting_farmer_short">Namaste! 👋</string>
+    <string name="greeting_question">What do you want to sell today?</string>
     <string name="location_nagpur">Nagpur, Maharashtra</string>
     
     <!-- Navigation -->
@@ -22,37 +24,65 @@
     <string name="produce_qty_50">50 quintals</string>
     <string name="produce_quality_good">Good quality</string>
 
+    <!-- Today's Price Section -->
     <string name="section_todays_price">TODAY\'S PRICE</string>
+    <string name="label_todays_price">Today\'s Price</string>
     <string name="price_soybean_modal">₹4,850 / quintal</string>
     <string name="market_nagpur">Nagpur Market</string>
     <string name="price_change_yesterday">↑ ₹120 from yesterday</string>
+    <string name="price_trend_rising">↑ Price is rising</string>
+    <string name="price_trend_steady">→ Price is steady</string>
+    <string name="price_trend_falling">↓ Price is falling</string>
+    <string name="per_quintal_unit">per quintal</string>
 
     <!-- Best Selling Opportunity Card -->
     <string name="badge_best_opportunity">BEST SELLING OPPORTUNITY</string>
+    <string name="hero_badge_best_option">⭐ Great option for you</string>
     <string name="buyer_abc_foods">ABC Foods</string>
-    <string name="verified_buyer_tag">Verified Buyer</string>
+    <string name="verified_buyer_tag">Verified Buyer ✓</string>
     <string name="label_quoted_price">Quoted price</string>
+    <string name="label_buyer_quoted_rate">Buyer\'s quoted price</string>
     <string name="quoted_price_val">₹4,850 / quintal</string>
+    <string name="label_transport_charge">Transport</string>
+    <string name="transport_val">₹120 / quintal</string>
+    <string name="label_other_expenses">Other expenses</string>
+    <string name="other_expenses_val">₹30 / quintal</string>
+    <string name="label_approx_receive">You may receive approximately:</string>
     <string name="label_after_expenses">In your pocket after expenses</string>
     <string name="net_price_val">₹4,700 / quintal</string>
-    <string name="label_estimated_total">Total estimated payout</string>
+    <string name="label_estimated_total">Total approx:</string>
     <string name="total_payout_val">₹2,35,000</string>
-    <string name="status_strong_rec">Strong recommendation</string>
-    <string name="reason_verified_buyer">Verified buyer</string>
+    <string name="status_strong_rec">Great option</string>
+    <string name="reason_verified_buyer">Trusted verified buyer</string>
     <string name="reason_good_price">Good price</string>
-    <string name="reason_affordable_transport">Affordable transport</string>
-    <string name="reason_suitable_qty">Suitable quantity match</string>
-    <string name="btn_find_best_place">Find Best Place to Sell</string>
+    <string name="reason_affordable_transport">Fair transport cost</string>
+    <string name="reason_suitable_qty">Right for your quantity</string>
+    <string name="btn_find_best_place">View Where to Sell</string>
     <string name="btn_sell_here">Sell Here</string>
+    <string name="btn_why_this_suggestion">Why this suggestion?</string>
+    <string name="why_suggestion_title">Why ABC Foods?</string>
+    <string name="why_suggestion_explanation">ABC Foods offers guaranteed bank payment upon pickup, provides low-cost verified transport from Nagpur, and specifically requires 50+ quintals of good-quality soybean.</string>
     <string name="label_net_realization_hero">NET IN YOUR POCKET</string>
     <string name="label_deduction_note">₹150/q estimated transport &amp; mandi fee</string>
+    <string name="contextual_help_net_title">Net In Your Pocket</string>
+    <string name="contextual_help_net_desc">This is the estimated amount remaining after deducting transport and mandi expenses.</string>
 
     <!-- Quick Actions -->
     <string name="section_quick_actions">QUICK ACTIONS</string>
     <string name="action_check_prices">Check Prices</string>
     <string name="action_sell_produce">Sell Produce</string>
-    <string name="action_my_lots">My Lots</string>
+    <string name="action_my_lots">My Produce</string>
     <string name="action_get_help">Get Help</string>
+    <string name="quick_prices_label">Check Prices</string>
+    <string name="quick_lots_label">My Crop</string>
+    <string name="quick_help_label">Help</string>
+
+    <!-- State Handling -->
+    <string name="home_loading_message">Finding the best option for you…</string>
+    <string name="home_error_message">Could not load details right now.</string>
+    <string name="home_btn_retry">Try again</string>
+    <string name="home_empty_crop_title">No crop added yet.</string>
+    <string name="home_empty_crop_action">Start selling produce</string>
 
     <!-- Prices Screen -->
     <string name="title_prices">Market Prices</string>
@@ -217,9 +247,8 @@
     <string name="label_estimated_expenses_deduction">Transport + other costs</string>
     <string name="label_for_quintals_total">For %1$d quintals</string>
     <string name="btn_why_this_option">Why this option?</string>
-    <string name="btn_why_this_suggestion">Why this suggestion?</string>
     <string name="btn_hide_details">Hide details</string>
-    <string name="why_suggestion_title">How AgriLink chose this option</string>
+    <string name="why_suggestion_choice_title">How AgriLink chose this option</string>
     <string name="why_factor_price">Market prices: Compares current bids from verified buyers and mandis.</string>
     <string name="why_factor_transport">Travel costs: Calculates transport charges based on your location and distance.</string>
     <string name="why_factor_demand">Buyer demand: Finds active buyers ready to take your produce now.</string>
@@ -459,25 +488,69 @@
     <string name="recommended_transport_header">Recommended transport</string>
     <string name="transporter_shree_agro">Shree Agro Transport</string>
     <string name="vehicle_small_medium">Small/medium goods vehicle</string>
+    <string name="vehicle_truck">Truck</string>
+    <string name="vehicle_mini_truck">Mini Truck</string>
+    <string name="capacity_quintals_val">Capacity: %1$d quintals</string>
+    <string name="delivery_today">Today</string>
+    <string name="delivery_tomorrow">Tomorrow</string>
+    <string name="delivery_label_val">Delivery: %1$s</string>
+    <string name="btn_select">Select</string>
+    <string name="btn_selected">Selected</string>
+    <string name="nearby_transport_header">Nearby Transport</string>
+    <string name="no_transport_available">No transport option available yet</string>
+    <string name="dialog_confirm_transport_title">CONFIRM TRANSPORT</string>
+    <string name="dialog_confirm_transport_msg">Transport cost is an estimate and may change after confirmation.</string>
+    <string name="btn_confirm_transport">Confirm Transport</string>
     <string name="estimated_pickup_time">Tomorrow, 8:00 AM</string>
     <string name="btn_book_transport">BOOK TRANSPORT</string>
     <string name="transport_arranged_header">TRANSPORT ARRANGED ✓</string>
     <string name="transport_failure_msg">Transport isn\'t available right now.</string>
     <string name="btn_choose_another">Choose Another Option</string>
+    <string name="label_your_sale">YOUR SALE</string>
+    <string name="label_your_active_sale">YOUR ACTIVE SALE</string>
+    <string name="step_state_completed">Completed</string>
+    <string name="step_state_current">Current</string>
+    <string name="step_state_upcoming">Upcoming</string>
+    <string name="buyer_price_breakdown_label">Buyer price: ₹%1$s/q</string>
+    <string name="transport_deduction_label">Estimated transport: − ₹%1$s/q</string>
+    <string name="other_costs_deduction_label">Other known costs: − ₹%1$s/q</string>
+    <string name="pocket_realization_label">Estimated amount in your pocket: ₹%1$s/q</string>
+    <string name="pocket_total_label">For %1$d quintals: ₹%2$s</string>
 
     <!-- Phase 4: Pickup & Dispatch Screen -->
-    <string name="title_produce_pickup">PRODUCE PICKUP</string>
+    <string name="title_produce_pickup">Produce pickup</string>
     <string name="msg_transporter_ready">Your transporter is ready.</string>
     <string name="btn_confirm_pickup">CONFIRM PICKUP</string>
+    <string name="btn_mark_as_picked_up">Mark as Picked Up</string>
     <string name="pickup_success_snack">Produce picked up successfully. Status: In transit.</string>
+    <string name="dialog_pickup_confirm_title">Has your produce been picked up?</string>
+    <string name="dialog_pickup_confirm_msg">Please confirm only after your produce has been safely loaded onto the vehicle.</string>
+    <string name="btn_yes_picked_up">Yes, Picked Up</string>
+    <string name="btn_not_yet">Not Yet</string>
+    <string name="status_picked_up">PICKED UP</string>
+    <string name="status_out_for_delivery">OUT FOR DELIVERY</string>
+    <string name="produce_being_transported_msg">Produce is being transported to the buyer.</string>
 
     <!-- Phase 4: In-Transit & Delivery Screen -->
-    <string name="title_produce_in_transit">YOUR PRODUCE IS ON THE WAY</string>
+    <string name="title_produce_in_transit">Your produce is on the way</string>
+    <string name="title_delivery_confirmation">Delivery confirmation</string>
+    <string name="delivery_note_msg">Payment process will initiate after delivery is confirmed.</string>
+    <string name="title_produce_delivered_prompt">Produce delivered?</string>
     <string name="status_in_transit">🚚 In transit</string>
     <string name="expected_delivery_today">Expected delivery: Today</string>
     <string name="title_produce_delivered">PRODUCE DELIVERED ✓</string>
     <string name="delivered_today">Delivered: Today</string>
     <string name="btn_confirm_delivery">CONFIRM DELIVERY</string>
+    <string name="btn_mark_as_delivered">Mark as Delivered</string>
+    <string name="dialog_delivery_confirm_title">Has the buyer received your produce?</string>
+    <string name="dialog_delivery_confirm_msg">Please confirm only after the buyer has acknowledged receipt of your produce.</string>
+    <string name="btn_yes_delivered">Yes, Delivered</string>
+    <string name="delivery_completed_title">DELIVERY COMPLETED</string>
+    <string name="produce_delivered_check">✓ Produce delivered</string>
+    <string name="payment_processing_msg">Payment is being processed.</string>
+    <string name="payment_status_will_appear">Your payment status will appear here.</string>
+    <string name="payment_pending_badge">Payment pending</string>
+    <string name="expected_amount_net_label">Expected amount: ₹%1$s</string>
 
     <!-- Phase 4: Payment Screen & Transparency -->
     <string name="title_payment">Payment</string>
@@ -557,6 +630,9 @@
     <string name="chart_day_today">Today</string>
     <string name="label_todays_benchmark">Today\'s Benchmark Price</string>
     <string name="label_mandi_distance">%1$d km away</string>
+    <string name="quick_decision_rising">Good time to sell • Prices are rising in local markets</string>
+    <string name="quick_decision_steady">Steady market • Prices are stable today</string>
+    <string name="quick_decision_falling">Compare options • Prices softened slightly; nearby markets may pay more</string>
 
     <!-- Stage 7: Lot Creation & Publishing Strings -->
     <string name="step_progress_indicator">Step %1$d of %2$d</string>
@@ -687,7 +763,6 @@
     <string name="offer_detail_cost_transport">Transport: ₹%1$s / quintal</string>
     <string name="offer_detail_cost_other">Other known costs: ₹%1$s / quintal</string>
     <string name="offer_detail_disclaimer">Final amount may change after weighing, quality checking and final agreement.</string>
-    <string name="btn_not_yet">Not Yet</string>
     <string name="dialog_accept_title">Accept this offer?</string>
     <string name="dialog_accept_msg">After accepting, this offer will become your selected sale. You can then arrange delivery.</string>
     
@@ -705,4 +780,73 @@
     <string name="home_offer_accepted_label">Offer accepted</string>
     <string name="home_btn_view_sale">View Sale</string>
     <string name="offer_status_closed">Closed</string>
+
+    <!-- Farmer Profile & Dialog -->
+    <string name="topbar_profile_desc">Farmer Profile</string>
+    <string name="profile_avatar_desc">Farmer Profile</string>
+    <string name="profile_farmer_name">Rajesh Patil</string>
+    <string name="profile_farmer_role">Farmer</string>
+    <string name="profile_farmer_name_with_role">%1$s (%2$s)</string>
+    <string name="profile_fpo_label">FPO: %1$s</string>
+    <string name="profile_fpo_name">Vidarbha Agro Farmers Producer Organization</string>
+    <string name="profile_member_id_label">Member ID: %1$s</string>
+    <string name="profile_helpline_format">Kisan Helpline: %1$s (Toll Free)</string>
+    <string name="btn_ok">OK</string>
+
+    <!-- Phase 4: Best Selling Recommendation & Buyer Experience -->
+    <string name="buyer_verified_badge">✓ Verified Buyer</string>
+    <string name="buyer_verified_desc">Identity and business license verified by KisanSetu</string>
+    <string name="buyer_quoted_directly_desc">Quoted directly for immediate purchase</string>
+    <string name="label_payment_terms_colon">Payment terms: %1$s</string>
+    <string name="label_delivery_colon">Delivery: %1$s</string>
+    <string name="label_quality_standards_colon">Quality standards: %1$s</string>
+    <string name="btn_select_this_buyer">Select this Buyer</string>
+    <string name="label_buyer_label">Buyer</string>
+    <string name="label_crop_label">Crop</string>
+    <string name="label_quantity_label">Quantity</string>
+    <string name="label_quoted_price_label">Quoted Price</string>
+    <string name="label_payment_label">Payment</string>
+    <string name="label_net_in_pocket_desc">Net in your pocket after transport and handling</string>
+    <string name="label_offer_status_will_change">Status will change to: %1$s</string>
+    <string name="label_accept_offer_terms_notice">Accepting reserves your produce for this buyer. Transport will be arranged in the next step.</string>
+    <string name="btn_yes_confirm_accept">Yes, Accept Offer</string>
+    <string name="empty_buyers_guidance">Try checking nearby markets or check back later.</string>
+    <string name="loading_buyers_title">Finding the right buyers for you…</string>
+    <string name="loading_buyers_subtitle">Checking current rates, distance, and demand.</string>
+    <string name="error_buyers_title">Could not fetch buyer information right now.</string>
+    <string name="btn_view_nearby_markets">View Nearby Markets</string>
+    <string name="comparison_advantage_format">In this option, you may receive about ₹%1$s more per quintal after expenses than other alternatives.</string>
+    <string name="tag_top_option">⭐ Top Option</string>
+    <string name="tag_good_option">👍 Good Option</string>
+    <string name="tag_suitable_for_crop">✓ Suitable for your crop</string>
+    <string name="label_approx_total_quintals">%1$d quintals • Approx total:</string>
+    <string name="label_who_is_buying">Who is buying?</string>
+    <string name="label_what_price">What price?</string>
+    <string name="label_what_will_receive">What will you receive?</string>
+    <string name="label_why_this_recommendation">Why this recommendation?</string>
+    <string name="label_what_should_do">What should you do?</string>
+    <string name="why_rec_verified_buyer">✓ Verified buyer</string>
+    <string name="why_rec_quantity_fit">✓ Suitable for your %1$d quintals</string>
+    <string name="why_rec_good_price">✓ Competitive price</string>
+    <string name="why_rec_reasonable_transport">✓ Reasonable transport cost</string>
+    <string name="why_rec_good_payment">✓ Proven on-time payment track record</string>
+    <string name="why_rec_quality_match">✓ Matches your produce quality requirement</string>
+    <string name="why_rec_market_demand">✓ High active demand in this region</string>
+    <string name="confirm_select_buyer_title">Do you want to select %1$s?</string>
+    <string name="btn_confirm_select_buyer">Yes, Select</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="unit_quintals_short">quintals</string>
+
+    <!-- Network & Remote API Strings -->
+    <string name="error_network_no_internet">No internet connection. Showing saved information.</string>
+    <string name="error_network_timeout">Connection took too long. Please try again.</string>
+    <string name="error_network_connection_failed">Unable to reach server. Please check your connection.</string>
+    <string name="error_network_server_error">Information could not be loaded right now. Please try again shortly.</string>
+    <string name="error_network_unauthorized">Your session has expired. Please sign in again.</string>
+    <string name="error_network_forbidden">You do not have permission to perform this action.</string>
+    <string name="error_network_not_found">The requested information could not be found.</string>
+    <string name="error_network_conflict">This request was already processed or has a conflict.</string>
+    <string name="error_network_rate_limit">Too many requests. Please wait a moment before trying again.</string>
+    <string name="error_network_generic">Information could not be loaded right now. Please try again.</string>
+    <string name="error_network_malformed">Received unexpected information from server.</string>
 </resources>
